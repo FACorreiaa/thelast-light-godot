@@ -26,6 +26,9 @@ reference scene.
 - Game-logic tests run under Godot headless (gdUnit4 or `-s` scripts). Unlike Go/C#, there is no
   engine-free test runner.
 - Typed GDScript: `project.godot` sets `untyped_declaration` as an error.
+- Never compare doubles through a decimal parser. Godot's `JSON.parse_string` and
+  `String.to_float()` are not correctly rounded for long decimals; goldens carry bit patterns.
+- No reliance on int64 overflow wrapping: `sim/seeded_random.gd` does u64 math in 16-bit limbs.
 
 ## Headless parity run
 ```
@@ -44,6 +47,8 @@ godot --headless --path . -- --sim-ticks=600
   Archives and logs are kept outside the repo.
 - ⚠️ **Xcode 27 required:** Apple warns that from April 2027 uploads need the iOS 27 SDK, and
   Xcode 26.2 cannot install directly onto the iOS 27.2 phone (CoreDevice tunnel unavailable).
+  App Store Connect already warned on the 2026-11-18 upload (ITMS-90725). For CI, GitHub's
+  `xcode-27` runner label (public preview, Xcode 27.1) has the SDK; `macos-26` stops at Xcode 26.6.
 - Device verdict (launch, feel, touch): pending, Fernando via TestFlight.
 
 ## iOS Simulator

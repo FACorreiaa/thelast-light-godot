@@ -14,7 +14,10 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "oracle",
-            dependencies: [.product(name: "ActionCore", package: "LastLightCore")]
+            dependencies: [
+                .product(name: "ActionCore", package: "LastLightCore"),
+                .product(name: "LastLightCore", package: "LastLightCore"),
+            ]
         ),
     ]
 )

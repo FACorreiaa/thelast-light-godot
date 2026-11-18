@@ -1,4 +1,5 @@
 import ActionCore
+import LastLightCore
 import Foundation
 
 // oracle export <repo>           writes data/levels/*.json, data/tuning.json, data/chapters.json
@@ -72,9 +73,12 @@ let allRuns: [Run] = {
     return runs
 }()
 
+/// A double as its int64 bit pattern: exact, and no decimal parser in between.
+func bits(_ v: Double) -> String { String(Int64(bitPattern: v.bitPattern)) }
+
 func inputText(_ i: InputFrame) -> String {
     let flags = [i.jump, i.jumpHeld, i.attack, i.dodge, i.special, i.switchHero].map { $0 ? "1" : "0" }.joined()
-    return "\(JSON.number(i.moveX)) \(flags)"
+    return "\(bits(i.moveX)) \(flags)"
 }
 
 // MARK: Commands
@@ -123,7 +127,7 @@ case "trace":
             let input = pilot.input(for: world)
             let events = world.step(input)
             var line = "\(Canon.of(world).hash) \(inputText(input))"
-            if !events.isEmpty { line += " " + JSON.write(events, indent: false) }
+            if !events.isEmpty { line += " " + Canon.of(events).json }
             lines.append(line)
         }
         let header: [String: Any] = [
@@ -137,6 +141,35 @@ case "trace":
         print("\(run.id): \(lines.count - 1) frames, complete \(world.isComplete)")
     }
     write(JSON.write(list), to: "\(repo)/tests/golden/runs.json")
+
+case "rng":
+    // Swift's stdlib turns raw SplitMix64 output into ranges with its own algorithms (Lemire's
+    // multiply-shift with rejection for integers). Record a mixed sequence so the port matches them.
+    let repo = args.dropFirst().first ?? "."
+    var lines: [String] = []
+    for seed: UInt64 in [0, 1, 7, 0xDEAD_BEEF_CAFE_F00D] {
+        var rng = SeededRandom(seed: seed)
+        func state() -> String { String(Int64(bitPattern: field(rng, "state") as! UInt64)) }
+        lines.append("seed \(Int64(bitPattern: seed)) \(state())")
+        for n in 0..<400 {
+            switch n % 6 {
+            case 0: lines.append("next \(Int64(bitPattern: rng.next())) \(state())")
+            case 1:
+                let lo = [0, 3, 30, 90, -5][n % 5], hi = lo + [0, 1, 7, 60, 400][(n / 6) % 5]
+                lines.append("closed \(lo) \(hi) \(Int.random(in: lo...hi, using: &rng)) \(state())")
+            case 2:
+                let count = [1, 2, 3, 5, 7, 1000][(n / 6) % 6]
+                lines.append("half 0 \(count) \(Int.random(in: 0..<count, using: &rng)) \(state())")
+            case 3: lines.append("unit \(bits(Double.random(in: 0..<1, using: &rng))) \(state())")
+            case 4:
+                let lo = [0.0, 120.0, -40.5][n % 3], hi = lo + [1.0, 900.0, 1233.7][(n / 6) % 3]
+                lines.append("double \(bits(lo)) \(bits(hi)) \(bits(Double.random(in: lo..<hi, using: &rng))) \(state())")
+            default: lines.append("bool \(Bool.random(using: &rng) ? 1 : 0) \(state())")
+            }
+        }
+    }
+    write(lines.joined(separator: "\n"), to: "\(repo)/tests/golden/rng.txt")
+    print("rng: \(lines.count) lines")
 
 case "dump":
     let rest = Array(args.dropFirst())
