@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":2058,"id":"lock_works-seraphine-s1-fight","lead":"seraphine","level":"lock_works","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":2058,"id":"lock_works-seraphine-s1-fight","lead":"seraphine","level":"lock_works","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 a6d1efcdc5dc0d63
 11d64e7ceb9f4885 4607182418800017408 000000 [{"case":"scene","id":"locks.arrive"}]
 c1d0bab66785b5cb 4607182418800017408 000000

@@ -31,16 +31,29 @@ func write(_ text: String, to path: String) {
 
 /// One scripted run of a level. The same list drives the Swift traces and the GDScript replay.
 struct Run {
-    var level: Level
+    /// Nil for the training room.
+    var level: Level?
     var lead: FighterKind
     var seed: UInt64
     var fights: Bool
     /// Heroes get health to spare, as in the Swift level tests, so the run is about the route.
     var sturdy: Bool
     var frames: Int
+    /// "level", or a training room: "feel" (Caelen and waves) or "partner" (with Orion).
+    var room = "level"
+    /// Nil: the Autopilot drives. "brawl": a fixed input pattern by frame that mashes buttons, to reach
+    /// what a good player avoids (losing, ringing bells out of order, a sworn twin raised).
+    var script: String?
+    /// Tuning.heroDamageScale for the run.
+    var damageScale = 1.0
 
     var id: String {
-        "\(slug(level.name))-\(lead.rawValue)-s\(seed)-\(fights ? "fight" : "walk")\(sturdy ? "" : "-real")"
+        var base = room == "level"
+            ? "\(slug(level!.name))-\(lead.rawValue)-s\(seed)-\(fights ? "fight" : "walk")\(sturdy ? "" : "-real")"
+            : "training_\(room)-s\(seed)"
+        if let script { base += "-\(script)" }
+        if damageScale != 1 { base += "-x\(Int(damageScale))" }
+        return base
     }
 
     var tuning: Tuning {
@@ -50,7 +63,23 @@ struct Run {
             t.seraphine.maxHP = 100_000
             t.nimue.maxHP = 100_000
         }
+        t.heroDamageScale = damageScale
         return t
+    }
+
+    func makeWorld() -> World {
+        switch room {
+        case "feel": World.feelSlice(seed: seed, tuning: tuning)
+        case "partner": World.partnerSlice(seed: seed, tuning: tuning)
+        default: World(level: level!, hero: lead, tuning: tuning, seed: seed)
+        }
+    }
+
+    func input(_ world: World, _ pilot: inout Autopilot) -> InputFrame {
+        guard script == "brawl" else { return pilot.input(for: world) }
+        let f = world.frame
+        return InputFrame(moveX: (f / 180) % 3 == 2 ? -1 : 1, jump: f % 61 == 0, jumpHeld: f % 61 < 10,
+                          attack: f % 7 == 0, dodge: f % 89 == 0, special: f % 240 == 0, switchHero: f % 900 == 450)
     }
 }
 
@@ -70,6 +99,16 @@ let allRuns: [Run] = {
     for level in [Level.foundryYard, .machineHall, .emberMarket, .pilgrimRoad] {
         runs.append(Run(level: level, lead: .caelen, seed: 7, fights: true, sturdy: false, frames: 60 * 120))
     }
+    // Branches the Autopilot never reaches.
+    runs.append(Run(level: nil, lead: .caelen, seed: 3, fights: true, sturdy: false, frames: 60 * 150, room: "feel", script: "brawl"))
+    runs.append(Run(level: nil, lead: .caelen, seed: 4, fights: true, sturdy: false, frames: 60 * 150, room: "partner", script: "brawl"))
+    for seed: UInt64 in [8, 9] {
+        runs.append(Run(level: nil, lead: .caelen, seed: seed, fights: true, sturdy: false, frames: 60 * 150, room: "partner", script: "brawl", damageScale: 2))
+    }
+    runs.append(Run(level: .bellTower, lead: .caelen, seed: 2, fights: true, sturdy: true, frames: 60 * 120, script: "brawl"))
+    runs.append(Run(level: .cloisterGate, lead: .caelen, seed: 2, fights: true, sturdy: true, frames: 60 * 150, script: "brawl"))
+    runs.append(Run(level: .theProtocol, lead: .caelen, seed: 5, fights: true, sturdy: false, frames: 60 * 120, damageScale: 4))
+    runs.append(Run(level: .wardensGate, lead: .nimue, seed: 6, fights: true, sturdy: false, frames: 60 * 120, damageScale: 3))
     return runs
 }()
 
@@ -119,26 +158,30 @@ case "trace":
     let repo = args.dropFirst().first ?? "."
     var list: [String] = []
     for run in allRuns {
-        var world = World(level: run.level, hero: run.lead, tuning: run.tuning, seed: run.seed)
+        var world = run.makeWorld()
         var pilot = Autopilot(fights: run.fights)
         var lines: [String] = []
         lines.append(Canon.of(world).hash)
         for _ in 0..<run.frames where !world.isOver {
-            let input = pilot.input(for: world)
+            let input = run.input(world, &pilot)
             let events = world.step(input)
             var line = "\(Canon.of(world).hash) \(inputText(input))"
             if !events.isEmpty { line += " " + Canon.of(events).json }
             lines.append(line)
         }
         let header: [String: Any] = [
-            "id": run.id, "level": slug(run.level.name), "lead": run.lead.rawValue, "seed": run.seed,
-            "fights": run.fights, "sturdy": run.sturdy, "frames": lines.count - 1,
+            "id": run.id, "level": run.level.map { slug($0.name) } ?? "", "lead": run.lead.rawValue, "seed": run.seed,
+            "fights": run.fights, "sturdy": run.sturdy, "frames": lines.count - 1, "room": run.room,
+            "script": run.script ?? "", "damageScale": run.damageScale,
             "complete": world.isComplete, "over": world.isOver,
         ]
         write(JSON.write(header, indent: false) + "\n" + lines.joined(separator: "\n"),
               to: "\(repo)/tests/golden/\(run.id).trace")
         list.append(run.id)
-        print("\(run.id): \(lines.count - 1) frames, complete \(world.isComplete)")
+        var cases = Set<String>()
+        for l in lines { if let r = l.range(of: "\"case\":\"") { _ = r; for m in l.components(separatedBy: "\"case\":\"").dropFirst() { cases.insert(String(m.prefix { $0 != "\"" })) } } }
+        let rare = ["waveStarted", "waveCleared", "revived", "heroDown", "discord", "raised", "faded", "eclipsed"].filter(cases.contains)
+        print("\(run.id): \(lines.count - 1) frames, complete \(world.isComplete)\(rare.isEmpty ? "" : " " + rare.joined(separator: ","))")
     }
     write(JSON.write(list), to: "\(repo)/tests/golden/runs.json")
 
@@ -180,9 +223,9 @@ case "dump":
         print("usage: oracle dump <run id> <frame>")
         exit(2)
     }
-    var world = World(level: run.level, hero: run.lead, tuning: run.tuning, seed: run.seed)
+    var world = run.makeWorld()
     var pilot = Autopilot(fights: run.fights)
-    for _ in 0..<target where !world.isOver { _ = world.step(pilot.input(for: world)) }
+    for _ in 0..<target where !world.isOver { _ = world.step(run.input(world, &pilot)) }
     print(Canon.of(world).json)
 
 default:

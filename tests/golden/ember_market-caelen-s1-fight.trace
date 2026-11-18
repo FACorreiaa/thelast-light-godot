@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":1378,"id":"ember_market-caelen-s1-fight","lead":"caelen","level":"ember_market","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":1378,"id":"ember_market-caelen-s1-fight","lead":"caelen","level":"ember_market","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 3834ff16613ce4f5
 f3eb116aa4237fb2 4607182418800017408 000000 [{"case":"scene","id":"market.arrive"}]
 c7652f69c187fa25 4607182418800017408 000000

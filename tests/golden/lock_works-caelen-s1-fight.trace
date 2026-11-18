@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":1903,"id":"lock_works-caelen-s1-fight","lead":"caelen","level":"lock_works","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":1903,"id":"lock_works-caelen-s1-fight","lead":"caelen","level":"lock_works","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 b943c74c4606a5f3
 32439b3177bfab97 4607182418800017408 000000 [{"case":"scene","id":"locks.arrive"}]
 f9cb11c5d4e2adf3 4607182418800017408 000000

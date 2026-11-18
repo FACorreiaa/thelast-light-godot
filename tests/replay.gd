@@ -6,11 +6,13 @@ extends SceneTree
 ## --frame0   compare only the state before the first step, for every run
 ## (default)  feed each trace's recorded inputs, compare the state hash after every step and stop a
 ##            run at its first mismatch
+## --pilot   the GDScript Autopilot drives instead: its input must equal the recorded one each step
 ## --run=A,B  only these runs; --dump=N writes the canonical state after N steps to
 ##            user://dump-<id>-<N>.json, in the oracle's `f:<dec>:<hex>` float form, for
 ##            tools/diff_state.py against `oracle dump <id> <N>`
 
 var _frame0 := false
+var _pilot := false
 var _only: PackedStringArray = []
 var _dump := -1
 
@@ -19,6 +21,8 @@ func _init() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a == "--frame0":
 			_frame0 = true
+		elif a == "--pilot":
+			_pilot = true
 		elif a.begins_with("--run="):
 			_only = a.trim_prefix("--run=").split(",", false)
 		elif a.begins_with("--dump="):
@@ -43,6 +47,12 @@ static func make_world(header: Dictionary) -> World:
 		t.caelen.max_hp = 100000.0
 		t.seraphine.max_hp = 100000.0
 		t.nimue.max_hp = 100000.0
+	t.hero_damage_scale = float(header.get("damageScale", 1.0))
+	match String(header.get("room", "level")):
+		"feel":
+			return World.feel_slice(int(header.seed), t)
+		"partner":
+			return World.partner_slice(int(header.seed), t)
 	return World.from_level(Level.load_id(header.level), header.lead, t, int(header.seed))
 
 
@@ -58,10 +68,18 @@ func _replay(id: String) -> bool:
 		return false
 	if _frame0:
 		return true
+	var pilot := Autopilot.new()
+	pilot.fights = bool(header.fights)
 	for n in range(2, lines.size()):
 		var f := lines[n].split(" ", false, 3)
 		var inp := InputFrame.make(_bits_to_float(int(f[1])), f[2][0] == "1", f[2][1] == "1", f[2][2] == "1",
 			f[2][3] == "1", f[2][4] == "1", f[2][5] == "1")
+		if _pilot and String(header.get("script", "")) == "":
+			var mine := pilot.input_for(world)
+			if not mine.equals(inp) or _float_bits(mine.move_x) != int(f[1]):
+				print("PILOT %s step %d: got move %s jump %s held %s atk %s dodge %s sp %s, want %s %s" % [id, n - 1,
+					mine.move_x, mine.jump, mine.jump_held, mine.attack, mine.dodge, mine.special, inp.move_x, f[2]])
+				return false
 		var events: Array = world.step(inp)
 		var step := n - 1
 		if step == _dump:
@@ -78,6 +96,13 @@ func _replay(id: String) -> bool:
 			return false
 	print("ok %s (%d steps)" % [id, lines.size() - 2])
 	return true
+
+
+static func _float_bits(x: float) -> int:
+	var b := PackedByteArray()
+	b.resize(8)
+	b.encode_double(0, x)
+	return b.decode_s64(0)
 
 
 static func _bits_to_float(bits: int) -> float:

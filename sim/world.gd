@@ -69,6 +69,27 @@ static func training(p_tuning: Tuning, seed: int, lo: float = 0.0, hi: float = 1
 	return w
 
 
+## Stage 1: Caelen alone in a grey-box room with a training dummy and looping waves.
+static func feel_slice(seed: int, p_tuning: Tuning) -> World:
+	var w := World.training(p_tuning, seed)
+	w.spawn("dummy", 150.0, 0.0, 1.0)
+	w.control(w.spawn("caelen", 380.0, 0.0, 1.0))
+	w.set_waves([
+		[["scrapDrone", 0.92], ["scrapDrone", 0.99]],
+		[["forgedSoldier", 0.95]],
+		[["scrapDrone", 0.90], ["scrapDrone", 0.97], ["forgedSoldier", 0.99]],
+		[["forgedSoldier", 0.94], ["scrapDrone", 0.02], ["scrapDrone", 0.99], ["scrapDrone", 0.86]],
+	], 240)
+	return w
+
+
+## Stage 2: the same room with Orion at Caelen's side. The player can switch between them.
+static func partner_slice(seed: int, p_tuning: Tuning) -> World:
+	var w := feel_slice(seed, p_tuning)
+	w.spawn("orion", 290.0, 0.0, 1.0)
+	return w
+
+
 ## A world built from level data. `from_checkpoint` and `p_collected` carry progress across a retry.
 static func from_level(p_level: Level, hero: String, p_tuning: Tuning, seed: int,
 		from_checkpoint: int = -1, p_collected: Dictionary = {}) -> World:

@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":1673,"id":"pilgrim_road-caelen-s1-fight","lead":"caelen","level":"pilgrim_road","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":1673,"id":"pilgrim_road-caelen-s1-fight","lead":"caelen","level":"pilgrim_road","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 9698d03f0e7be16f
 56f75d36c9d7bbc4 4607182418800017408 000000 [{"case":"scene","id":"road.arrive"}]
 f4f9350ea136ee0e 4607182418800017408 000000

@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":1783,"id":"choir_stair-caelen-s1-fight","lead":"caelen","level":"choir_stair","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":1783,"id":"choir_stair-caelen-s1-fight","lead":"caelen","level":"choir_stair","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 a353ce7868cc71f4
 8785472f8a1e11fa 4607182418800017408 000000 [{"case":"scene","id":"stair.arrive"}]
 a615e8bce90a6d91 4607182418800017408 000000

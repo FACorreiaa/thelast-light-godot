@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":2817,"id":"machine_hall-caelen-s7-fight-real","lead":"caelen","level":"machine_hall","over":true,"seed":7,"sturdy":false}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":2817,"id":"machine_hall-caelen-s7-fight-real","lead":"caelen","level":"machine_hall","over":true,"room":"level","script":"","seed":7,"sturdy":false}
 98f2d3ae6138fdfa
 eefd96fc6d747428 4607182418800017408 000000 [{"case":"woke","id":3},{"case":"woke","id":4},{"case":"scene","id":"hall.enter"}]
 970320dd2292331d 4607182418800017408 000000

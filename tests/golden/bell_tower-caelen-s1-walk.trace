@@ -1,4 +1,4 @@
-{"complete":true,"fights":false,"frames":1900,"id":"bell_tower-caelen-s1-walk","lead":"caelen","level":"bell_tower","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":false,"frames":1900,"id":"bell_tower-caelen-s1-walk","lead":"caelen","level":"bell_tower","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 53bf8919eff69220
 8671fff1d59a478f 4607182418800017408 000000 [{"case":"scene","id":"bells.arrive"}]
 6397a07c0f650545 4607182418800017408 000000

@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":1632,"id":"ember_market-caelen-s7-fight-real","lead":"caelen","level":"ember_market","over":true,"seed":7,"sturdy":false}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":1632,"id":"ember_market-caelen-s7-fight-real","lead":"caelen","level":"ember_market","over":true,"room":"level","script":"","seed":7,"sturdy":false}
 7530ca83ea81c806
 8ec6191a33a1766f 4607182418800017408 000000 [{"case":"scene","id":"market.arrive"}]
 4d57f238e8de0999 4607182418800017408 000000

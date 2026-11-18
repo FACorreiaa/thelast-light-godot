@@ -1,4 +1,4 @@
-{"complete":true,"fights":false,"frames":1303,"id":"sun_cloister-caelen-s1-walk","lead":"caelen","level":"sun_cloister","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":false,"frames":1303,"id":"sun_cloister-caelen-s1-walk","lead":"caelen","level":"sun_cloister","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 9952a7fbcb12c9b7
 3aba5743df9e3329 4607182418800017408 000000 [{"case":"scene","id":"cloister.arrive"}]
 603606493f53e312 4607182418800017408 000000

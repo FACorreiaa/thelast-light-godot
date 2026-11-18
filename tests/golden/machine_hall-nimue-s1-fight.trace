@@ -1,4 +1,4 @@
-{"complete":true,"fights":true,"frames":2805,"id":"machine_hall-nimue-s1-fight","lead":"nimue","level":"machine_hall","over":true,"seed":1,"sturdy":true}
+{"complete":true,"damageScale":1.0,"fights":true,"frames":2805,"id":"machine_hall-nimue-s1-fight","lead":"nimue","level":"machine_hall","over":true,"room":"level","script":"","seed":1,"sturdy":true}
 7f81eecd7a018e7d
 e0b80f56f3cba4c8 4607182418800017408 000000 [{"case":"woke","id":3},{"case":"woke","id":4},{"case":"scene","id":"hall.enter"}]
 4d8dc8be49dd57f2 4607182418800017408 000000
