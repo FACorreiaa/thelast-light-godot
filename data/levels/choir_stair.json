@@ -1,0 +1,306 @@
+{
+  "name": "The Choir Stair",
+  "width": 5600.0,
+  "start": {
+    "x": 120.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 1200.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1200.0,
+        "minY": -460.0,
+        "maxX": 1350.0,
+        "maxY": 70.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1350.0,
+        "minY": -460.0,
+        "maxX": 1500.0,
+        "maxY": 140.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1500.0,
+        "minY": -460.0,
+        "maxX": 2700.0,
+        "maxY": 210.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2300.0,
+        "minY": 282.0,
+        "maxX": 2420.0,
+        "maxY": 300.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2450.0,
+        "minY": 367.0,
+        "maxX": 2570.0,
+        "maxY": 385.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2800.0,
+        "minY": -460.0,
+        "maxX": 4000.0,
+        "maxY": 210.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 4000.0,
+        "minY": -460.0,
+        "maxX": 4150.0,
+        "maxY": 280.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 4150.0,
+        "minY": -460.0,
+        "maxX": 5800.0,
+        "maxY": 350.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    }
+  ],
+  "hazards": [],
+  "levers": [],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [
+    {
+      "x": 1600.0,
+      "y": 210.0
+    },
+    {
+      "x": 2900.0,
+      "y": 210.0
+    },
+    {
+      "x": 4300.0,
+      "y": 350.0
+    }
+  ],
+  "pickups": [
+    {
+      "id": 1,
+      "pos": {
+        "x": 500.0,
+        "y": 40.0
+      },
+      "secret": false
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 1420.0,
+        "y": 185.0
+      },
+      "secret": false
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 2510.0,
+        "y": 430.0
+      },
+      "secret": true
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 3350.0,
+        "y": 250.0
+      },
+      "secret": false
+    },
+    {
+      "id": 5,
+      "pos": {
+        "x": 4450.0,
+        "y": 390.0
+      },
+      "secret": false
+    }
+  ],
+  "enemies": [
+    {
+      "kind": "zealot",
+      "pos": {
+        "x": 800.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "radiantAcolyte",
+      "pos": {
+        "x": 1050.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "solarGuard",
+      "pos": {
+        "x": 1900.0,
+        "y": 210.0
+      }
+    },
+    {
+      "kind": "zealot",
+      "pos": {
+        "x": 2200.0,
+        "y": 210.0
+      }
+    },
+    {
+      "kind": "haloDisciple",
+      "pos": {
+        "x": 2450.0,
+        "y": 360.0
+      }
+    },
+    {
+      "kind": "solarGuard",
+      "pos": {
+        "x": 3200.0,
+        "y": 210.0
+      }
+    },
+    {
+      "kind": "radiantAcolyte",
+      "pos": {
+        "x": 3450.0,
+        "y": 210.0
+      }
+    },
+    {
+      "kind": "zealot",
+      "pos": {
+        "x": 3650.0,
+        "y": 210.0
+      }
+    },
+    {
+      "kind": "zealot",
+      "pos": {
+        "x": 3720.0,
+        "y": 210.0
+      }
+    },
+    {
+      "kind": "haloDisciple",
+      "pos": {
+        "x": 4600.0,
+        "y": 500.0
+      }
+    },
+    {
+      "kind": "solarGuard",
+      "pos": {
+        "x": 4900.0,
+        "y": 350.0
+      }
+    },
+    {
+      "kind": "radiantAcolyte",
+      "pos": {
+        "x": 5150.0,
+        "y": 350.0
+      }
+    }
+  ],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 60.0,
+      "y": 0.0
+    }
+  },
+  "boss": null,
+  "twin": null,
+  "scenes": [
+    {
+      "scene": "stair.arrive",
+      "cue": "start"
+    },
+    {
+      "scene": "stair.listen",
+      "cue": {
+        "case": "reach",
+        "_0": 4200.0
+      }
+    }
+  ],
+  "exitX": 5450.0,
+  "killY": -260.0
+}

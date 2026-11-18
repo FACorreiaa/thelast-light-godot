@@ -11,3 +11,7 @@ releases/
 
 # OS
 .DS_Store
+
+# Swift oracle build
+.build/
+.swiftpm/

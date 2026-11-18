@@ -1,0 +1,196 @@
+{
+  "name": "Awakening",
+  "width": 3500.0,
+  "start": {
+    "x": 120.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 1100.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 520.0,
+        "minY": -460.0,
+        "maxX": 700.0,
+        "maxY": 60.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1200.0,
+        "minY": -460.0,
+        "maxX": 1800.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1300.0,
+        "minY": 67.0,
+        "maxX": 1420.0,
+        "maxY": 85.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1470.0,
+        "minY": 147.0,
+        "maxX": 1590.0,
+        "maxY": 165.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1700.0,
+        "minY": -460.0,
+        "maxX": 1800.0,
+        "maxY": 90.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1800.0,
+        "minY": -460.0,
+        "maxX": 2400.0,
+        "maxY": 180.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2520.0,
+        "minY": -460.0,
+        "maxX": 3700.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    }
+  ],
+  "hazards": [],
+  "levers": [],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [
+    {
+      "x": 1900.0,
+      "y": 180.0
+    },
+    {
+      "x": 2620.0,
+      "y": 0.0
+    }
+  ],
+  "pickups": [
+    {
+      "id": 1,
+      "pos": {
+        "x": 470.0,
+        "y": 95.0
+      },
+      "secret": false
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 1150.0,
+        "y": 90.0
+      },
+      "secret": false
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 1530.0,
+        "y": 210.0
+      },
+      "secret": false
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 2460.0,
+        "y": 150.0
+      },
+      "secret": false
+    }
+  ],
+  "enemies": [
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 3000.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 2080.0,
+      "y": 180.0
+    }
+  },
+  "boss": null,
+  "twin": null,
+  "scenes": [
+    {
+      "scene": "awakening.orion",
+      "cue": "partnerJoins"
+    }
+  ],
+  "exitX": 3380.0,
+  "killY": -260.0
+}

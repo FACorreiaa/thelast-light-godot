@@ -1,0 +1,374 @@
+{
+  "name": "The Machine Hall",
+  "width": 5900.0,
+  "start": {
+    "x": 120.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 800.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 820.0,
+        "minY": -18.0,
+        "maxX": 940.0,
+        "maxY": 0.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 240.0,
+        "y": 0.0
+      },
+      "period": 260
+    },
+    {
+      "box": {
+        "minX": 1200.0,
+        "minY": -460.0,
+        "maxX": 2600.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2080.0,
+        "minY": -460.0,
+        "maxX": 2600.0,
+        "maxY": 80.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2200.0,
+        "minY": 147.0,
+        "maxX": 2320.0,
+        "maxY": 165.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2380.0,
+        "minY": 232.0,
+        "maxX": 2500.0,
+        "maxY": 250.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2720.0,
+        "minY": -460.0,
+        "maxX": 3500.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 3390.0,
+        "minY": -18.0,
+        "maxX": 3490.0,
+        "maxY": 0.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 170.0
+      },
+      "period": 240
+    },
+    {
+      "box": {
+        "minX": 3500.0,
+        "minY": -460.0,
+        "maxX": 3700.0,
+        "maxY": 150.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 3720.0,
+        "minY": 132.0,
+        "maxX": 3840.0,
+        "maxY": 150.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 340.0,
+        "y": 0.0
+      },
+      "period": 320
+    },
+    {
+      "box": {
+        "minX": 4200.0,
+        "minY": -460.0,
+        "maxX": 4400.0,
+        "maxY": 150.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 4400.0,
+        "minY": -460.0,
+        "maxX": 6100.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    }
+  ],
+  "hazards": [
+    {
+      "box": {
+        "minX": 1830.0,
+        "minY": 0.0,
+        "maxX": 1862.0,
+        "maxY": 150.0
+      },
+      "damage": 12.0,
+      "period": 160,
+      "onFrames": 80,
+      "phase": 0,
+      "warning": 30
+    },
+    {
+      "box": {
+        "minX": 1940.0,
+        "minY": 0.0,
+        "maxX": 1972.0,
+        "maxY": 150.0
+      },
+      "damage": 12.0,
+      "period": 160,
+      "onFrames": 80,
+      "phase": 80,
+      "warning": 30
+    },
+    {
+      "box": {
+        "minX": 4640.0,
+        "minY": 0.0,
+        "maxX": 4672.0,
+        "maxY": 150.0
+      },
+      "damage": 12.0,
+      "period": 150,
+      "onFrames": 80,
+      "phase": 0,
+      "warning": 30
+    }
+  ],
+  "levers": [],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [
+    {
+      "x": 1270.0,
+      "y": 0.0
+    },
+    {
+      "x": 2790.0,
+      "y": 0.0
+    },
+    {
+      "x": 4300.0,
+      "y": 150.0
+    }
+  ],
+  "pickups": [
+    {
+      "id": 1,
+      "pos": {
+        "x": 1900.0,
+        "y": 40.0
+      },
+      "secret": false
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 2440.0,
+        "y": 295.0
+      },
+      "secret": true
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 3250.0,
+        "y": 40.0
+      },
+      "secret": false
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 3600.0,
+        "y": 195.0
+      },
+      "secret": false
+    },
+    {
+      "id": 5,
+      "pos": {
+        "x": 5500.0,
+        "y": 40.0
+      },
+      "secret": false
+    }
+  ],
+  "enemies": [
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 520.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 640.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "forgedSoldier",
+      "pos": {
+        "x": 1600.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "sentryCore",
+      "pos": {
+        "x": 1780.0,
+        "y": 40.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 2980.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 3080.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 3180.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "forgedSoldier",
+      "pos": {
+        "x": 4950.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "dogmaFrame",
+      "pos": {
+        "x": 5040.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 5120.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 5260.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 60.0,
+      "y": 0.0
+    }
+  },
+  "boss": null,
+  "twin": null,
+  "scenes": [
+    {
+      "scene": "hall.enter",
+      "cue": "start"
+    }
+  ],
+  "exitX": 5780.0,
+  "killY": -260.0
+}

@@ -1,0 +1,64 @@
+{
+  "name": "The Cloister Gate",
+  "width": 1800.0,
+  "start": {
+    "x": 140.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 2000.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    }
+  ],
+  "hazards": [],
+  "levers": [],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [],
+  "pickups": [],
+  "enemies": [],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 80.0,
+      "y": 0.0
+    }
+  },
+  "boss": {
+    "kind": "swornShield",
+    "pos": {
+      "x": 1150.0,
+      "y": 0.0
+    }
+  },
+  "twin": {
+    "kind": "swornSpear",
+    "pos": {
+      "x": 1350.0,
+      "y": 0.0
+    }
+  },
+  "scenes": [
+    {
+      "scene": "sworn.wake",
+      "cue": "bossWakes"
+    },
+    {
+      "scene": "sworn.raised",
+      "cue": "raised"
+    }
+  ],
+  "exitX": "inf",
+  "killY": -260.0
+}

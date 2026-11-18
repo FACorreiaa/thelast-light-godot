@@ -1,0 +1,325 @@
+{
+  "name": "Foundry Yard",
+  "width": 4400.0,
+  "start": {
+    "x": 120.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 900.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 640.0,
+        "minY": -460.0,
+        "maxX": 760.0,
+        "maxY": 50.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 760.0,
+        "minY": -460.0,
+        "maxX": 900.0,
+        "maxY": 100.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 900.0,
+        "minY": -460.0,
+        "maxX": 1500.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1010.0,
+        "minY": 72.0,
+        "maxX": 1130.0,
+        "maxY": 90.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1180.0,
+        "minY": 157.0,
+        "maxX": 1300.0,
+        "maxY": 175.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1350.0,
+        "minY": 242.0,
+        "maxX": 1470.0,
+        "maxY": 260.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 1610.0,
+        "minY": -460.0,
+        "maxX": 2300.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2180.0,
+        "minY": -460.0,
+        "maxX": 2240.0,
+        "maxY": 84.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2320.0,
+        "minY": -18.0,
+        "maxX": 2440.0,
+        "maxY": 0.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 240.0,
+        "y": 0.0
+      },
+      "period": 260
+    },
+    {
+      "box": {
+        "minX": 2700.0,
+        "minY": -460.0,
+        "maxX": 3400.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 3180.0,
+        "minY": -18.0,
+        "maxX": 3290.0,
+        "maxY": 0.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 170.0
+      },
+      "period": 240
+    },
+    {
+      "box": {
+        "minX": 3300.0,
+        "minY": -460.0,
+        "maxX": 3400.0,
+        "maxY": 150.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 3400.0,
+        "minY": -460.0,
+        "maxX": 4600.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    }
+  ],
+  "hazards": [
+    {
+      "box": {
+        "minX": 2960.0,
+        "minY": 0.0,
+        "maxX": 2996.0,
+        "maxY": 150.0
+      },
+      "damage": 12.0,
+      "period": 150,
+      "onFrames": 80,
+      "phase": 0,
+      "warning": 30
+    }
+  ],
+  "levers": [],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [
+    {
+      "x": 2770.0,
+      "y": 0.0
+    },
+    {
+      "x": 3580.0,
+      "y": 0.0
+    }
+  ],
+  "pickups": [
+    {
+      "id": 1,
+      "pos": {
+        "x": 1070.0,
+        "y": 130.0
+      },
+      "secret": false
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 1410.0,
+        "y": 305.0
+      },
+      "secret": true
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 1555.0,
+        "y": 95.0
+      },
+      "secret": false
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 3080.0,
+        "y": 40.0
+      },
+      "secret": false
+    },
+    {
+      "id": 5,
+      "pos": {
+        "x": 3350.0,
+        "y": 195.0
+      },
+      "secret": false
+    }
+  ],
+  "enemies": [
+    {
+      "kind": "dummy",
+      "pos": {
+        "x": 430.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 1960.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 3760.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 3880.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "forgedSoldier",
+      "pos": {
+        "x": 4080.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 60.0,
+      "y": 0.0
+    }
+  },
+  "boss": null,
+  "twin": null,
+  "scenes": [],
+  "exitX": 4300.0,
+  "killY": -260.0
+}

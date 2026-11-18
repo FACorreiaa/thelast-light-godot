@@ -1,0 +1,338 @@
+{
+  "name": "The Bell Tower",
+  "width": 4600.0,
+  "start": {
+    "x": 120.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 4800.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2280.0,
+        "minY": 82.0,
+        "maxX": 2400.0,
+        "maxY": 100.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    },
+    {
+      "box": {
+        "minX": 2430.0,
+        "minY": 172.0,
+        "maxX": 2550.0,
+        "maxY": 190.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    }
+  ],
+  "hazards": [
+    {
+      "box": {
+        "minX": 3150.0,
+        "minY": 0.0,
+        "maxX": 3182.0,
+        "maxY": 150.0
+      },
+      "damage": 12.0,
+      "period": 140,
+      "onFrames": 60,
+      "phase": 0,
+      "warning": 30
+    }
+  ],
+  "levers": [
+    {
+      "id": 2,
+      "pos": {
+        "x": 480.0,
+        "y": 0.0
+      },
+      "holdFrames": 0,
+      "glow": 0.0
+    },
+    {
+      "id": 1,
+      "pos": {
+        "x": 680.0,
+        "y": 0.0
+      },
+      "holdFrames": 0,
+      "glow": 0.0
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 880.0,
+        "y": 0.0
+      },
+      "holdFrames": 0,
+      "glow": 0.0
+    },
+    {
+      "id": 6,
+      "pos": {
+        "x": 1850.0,
+        "y": 0.0
+      },
+      "holdFrames": 0,
+      "glow": 0.0
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 2050.0,
+        "y": 0.0
+      },
+      "holdFrames": 0,
+      "glow": 0.0
+    },
+    {
+      "id": 7,
+      "pos": {
+        "x": 2250.0,
+        "y": 0.0
+      },
+      "holdFrames": 0,
+      "glow": 0.0
+    },
+    {
+      "id": 5,
+      "pos": {
+        "x": 2450.0,
+        "y": 0.0
+      },
+      "holdFrames": 0,
+      "glow": 0.0
+    },
+    {
+      "id": 9,
+      "pos": {
+        "x": 3020.0,
+        "y": 0.0
+      },
+      "holdFrames": 420,
+      "glow": 0.0
+    },
+    {
+      "id": 8,
+      "pos": {
+        "x": 3300.0,
+        "y": 0.0
+      },
+      "holdFrames": 420,
+      "glow": 0.0
+    },
+    {
+      "id": 10,
+      "pos": {
+        "x": 3720.0,
+        "y": 0.0
+      },
+      "holdFrames": 420,
+      "glow": 0.0
+    }
+  ],
+  "plates": [],
+  "gates": [
+    {
+      "id": 10,
+      "box": {
+        "minX": 1088.0,
+        "minY": 0.0,
+        "maxX": 1112.0,
+        "maxY": 170.0
+      },
+      "opensWith": [
+        1,
+        2,
+        3
+      ],
+      "inverted": false,
+      "inOrder": true
+    },
+    {
+      "id": 11,
+      "box": {
+        "minX": 2638.0,
+        "minY": 0.0,
+        "maxX": 2662.0,
+        "maxY": 170.0
+      },
+      "opensWith": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "inverted": false,
+      "inOrder": true
+    },
+    {
+      "id": 12,
+      "box": {
+        "minX": 3968.0,
+        "minY": 0.0,
+        "maxX": 3992.0,
+        "maxY": 170.0
+      },
+      "opensWith": [
+        8,
+        9,
+        10
+      ],
+      "inverted": false,
+      "inOrder": true
+    }
+  ],
+  "checkpoints": [
+    {
+      "x": 1230.0,
+      "y": 0.0
+    },
+    {
+      "x": 2800.0,
+      "y": 0.0
+    }
+  ],
+  "pickups": [
+    {
+      "id": 1,
+      "pos": {
+        "x": 300.0,
+        "y": 40.0
+      },
+      "secret": false
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 1620.0,
+        "y": 40.0
+      },
+      "secret": false
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 2490.0,
+        "y": 235.0
+      },
+      "secret": true
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 2950.0,
+        "y": 40.0
+      },
+      "secret": false
+    },
+    {
+      "id": 5,
+      "pos": {
+        "x": 4200.0,
+        "y": 40.0
+      },
+      "secret": false
+    }
+  ],
+  "enemies": [
+    {
+      "kind": "zealot",
+      "pos": {
+        "x": 1450.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "zealot",
+      "pos": {
+        "x": 1520.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "radiantAcolyte",
+      "pos": {
+        "x": 1700.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "haloDisciple",
+      "pos": {
+        "x": 2150.0,
+        "y": 150.0
+      }
+    },
+    {
+      "kind": "solarGuard",
+      "pos": {
+        "x": 3500.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "radiantAcolyte",
+      "pos": {
+        "x": 3850.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 60.0,
+      "y": 0.0
+    }
+  },
+  "boss": null,
+  "twin": null,
+  "scenes": [
+    {
+      "scene": "bells.arrive",
+      "cue": "start"
+    },
+    {
+      "scene": "bells.order",
+      "cue": {
+        "case": "reach",
+        "_0": 380.0
+      }
+    },
+    {
+      "scene": "bells.race",
+      "cue": {
+        "case": "reach",
+        "_0": 2880.0
+      }
+    }
+  ],
+  "exitX": 4450.0,
+  "killY": -260.0
+}

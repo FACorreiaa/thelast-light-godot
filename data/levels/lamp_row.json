@@ -1,0 +1,91 @@
+{
+  "name": "The Lamp Row",
+  "width": 1800.0,
+  "start": {
+    "x": 140.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 2000.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0
+    }
+  ],
+  "hazards": [],
+  "levers": [
+    {
+      "id": 1,
+      "pos": {
+        "x": 420.0,
+        "y": 0.0
+      },
+      "holdFrames": 480,
+      "glow": 150.0
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 820.0,
+        "y": 0.0
+      },
+      "holdFrames": 480,
+      "glow": 150.0
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 1220.0,
+        "y": 0.0
+      },
+      "holdFrames": 480,
+      "glow": 150.0
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 1600.0,
+        "y": 0.0
+      },
+      "holdFrames": 480,
+      "glow": 150.0
+    }
+  ],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [],
+  "pickups": [],
+  "enemies": [],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 80.0,
+      "y": 0.0
+    }
+  },
+  "boss": {
+    "kind": "lamplighter",
+    "pos": {
+      "x": 1250.0,
+      "y": 0.0
+    }
+  },
+  "twin": null,
+  "scenes": [
+    {
+      "scene": "lamp.wake",
+      "cue": "bossWakes"
+    }
+  ],
+  "exitX": "inf",
+  "killY": -260.0
+}

@@ -1,0 +1,168 @@
+{
+  "chapters": [
+    {
+      "ending": "The Protocol is silent. It was only a voice. The Eclipse Engine has not stopped.",
+      "id": "chapter1",
+      "number": 1,
+      "route": {
+        "caelen": [
+          "awakening",
+          "foundry_yard",
+          "machine_hall",
+          "lock_works",
+          "wardens_gate",
+          "protocol"
+        ],
+        "nimue": [
+          "undercroft",
+          "foundry_yard",
+          "machine_hall",
+          "lock_works",
+          "wardens_gate",
+          "protocol"
+        ],
+        "seraphine": [
+          "sun_gauges",
+          "foundry_yard",
+          "machine_hall",
+          "lock_works",
+          "wardens_gate",
+          "protocol"
+        ]
+      },
+      "title": "The Foundry"
+    },
+    {
+      "ending": "The Cinder King is beaten. His ledgers are not finished.",
+      "id": "chapter2",
+      "number": 2,
+      "route": {
+        "caelen": [
+          "ember_market",
+          "toll_canal",
+          "lantern_roofs",
+          "lamp_row",
+          "cinder_docks",
+          "cinder_vault"
+        ],
+        "nimue": [
+          "ember_market",
+          "toll_canal",
+          "lantern_roofs",
+          "lamp_row",
+          "cinder_docks",
+          "cinder_vault"
+        ],
+        "seraphine": [
+          "ember_market",
+          "toll_canal",
+          "lantern_roofs",
+          "lamp_row",
+          "cinder_docks",
+          "cinder_vault"
+        ]
+      },
+      "title": "The Lantern Cities"
+    },
+    {
+      "ending": "The Last Oracle is beaten. She still believes the ending is coming.",
+      "id": "chapter3",
+      "number": 3,
+      "route": {
+        "caelen": [
+          "pilgrim_road",
+          "bell_tower",
+          "sun_cloister",
+          "cloister_gate",
+          "choir_stair",
+          "oracles_terrace"
+        ],
+        "nimue": [
+          "pilgrim_road",
+          "bell_tower",
+          "sun_cloister",
+          "cloister_gate",
+          "choir_stair",
+          "oracles_terrace"
+        ],
+        "seraphine": [
+          "pilgrim_road",
+          "bell_tower",
+          "sun_cloister",
+          "cloister_gate",
+          "choir_stair",
+          "oracles_terrace"
+        ]
+      },
+      "title": "The Dawnfaith"
+    }
+  ],
+  "factions": [
+    {
+      "id": "foundry",
+      "lead": "caelen",
+      "opening": "awakening"
+    },
+    {
+      "id": "dawnfaith",
+      "lead": "seraphine",
+      "opening": "sun_gauges"
+    },
+    {
+      "id": "lanternCities",
+      "lead": "nimue",
+      "opening": "undercroft"
+    }
+  ],
+  "fighterKinds": [
+    "caelen",
+    "orion",
+    "seraphine",
+    "nimue",
+    "decoy",
+    "dummy",
+    "scrapDrone",
+    "forgedSoldier",
+    "sentryCore",
+    "dogmaFrame",
+    "theProtocol",
+    "lineWarden",
+    "ratborn",
+    "lanternGunner",
+    "smugglerBrute",
+    "nightWeaver",
+    "weaverImage",
+    "cinderKing",
+    "lamplighter",
+    "swornShield",
+    "swornSpear",
+    "zealot",
+    "radiantAcolyte",
+    "solarGuard",
+    "haloDisciple",
+    "lastOracle"
+  ],
+  "levels": [
+    "awakening",
+    "sun_gauges",
+    "undercroft",
+    "foundry_yard",
+    "machine_hall",
+    "lock_works",
+    "wardens_gate",
+    "protocol",
+    "ember_market",
+    "toll_canal",
+    "lantern_roofs",
+    "lamp_row",
+    "cinder_docks",
+    "cinder_vault",
+    "pilgrim_road",
+    "bell_tower",
+    "sun_cloister",
+    "cloister_gate",
+    "choir_stair",
+    "oracles_terrace"
+  ],
+  "swiftTag": "swift-final"
+}
