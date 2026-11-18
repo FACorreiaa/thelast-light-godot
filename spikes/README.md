@@ -40,8 +40,8 @@ godot --headless --path . -- --sim-ticks=600
 ## iOS / TestFlight (2026-11-18)
 - App Store Connect record **LastLight GdSpike** (`com.fernandocorreia.lastlight.gdspike`, SKU
   `lastlight-gdspike`); build 1 uploaded with `ITSAppUsesNonExemptEncryption=false`.
-- Records **LastLight GoSpike / CsSpike** also exist, with build 1 uploaded. Removing them is an
-  App Store Connect action, not yet done.
+- Records **LastLight GoSpike / CsSpike** were removed from App Store Connect on 2026-11-18 (Fernando's
+  call). Their names are released; their explicit App IDs are still registered in the Developer portal.
 - Flow: `--export-release "iOS"` (preset `export_project_only=true`) → `xcodebuild archive`
   (team 84X9WYBF36, automatic signing) → `-exportArchive` with `destination=upload`.
   Archives and logs are kept outside the repo.
