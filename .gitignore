@@ -1,0 +1,13 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Export output (iOS Xcode projects, exe, app bundles)
+build/
+releases/
+*.ipa
+*.pck
+*.xcarchive
+
+# OS
+.DS_Store
