@@ -152,7 +152,7 @@ case "rng":
         func state() -> String { String(Int64(bitPattern: field(rng, "state") as! UInt64)) }
         lines.append("seed \(Int64(bitPattern: seed)) \(state())")
         for n in 0..<400 {
-            switch n % 6 {
+            switch n % 7 {
             case 0: lines.append("next \(Int64(bitPattern: rng.next())) \(state())")
             case 1:
                 let lo = [0, 3, 30, 90, -5][n % 5], hi = lo + [0, 1, 7, 60, 400][(n / 6) % 5]
@@ -164,6 +164,9 @@ case "rng":
             case 4:
                 let lo = [0.0, 120.0, -40.5][n % 3], hi = lo + [1.0, 900.0, 1233.7][(n / 6) % 3]
                 lines.append("double \(bits(lo)) \(bits(hi)) \(bits(Double.random(in: lo..<hi, using: &rng))) \(state())")
+            case 5:
+                let lo = [40.0, 0.0, -300.25][n % 3], hi = lo + [1320.0, 0.5, 77.125][(n / 7) % 3]
+                lines.append("dclosed \(bits(lo)) \(bits(hi)) \(bits(Double.random(in: lo...hi, using: &rng))) \(state())")
             default: lines.append("bool \(Bool.random(using: &rng) ? 1 : 0) \(state())")
             }
         }

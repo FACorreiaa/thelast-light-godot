@@ -53,6 +53,16 @@ func double_half_open(lo: float, hi: float) -> float:
 	return r
 
 
+## Swift `Double.random(in: lo...hi, using:)`.
+func double_closed(lo: float, hi: float) -> float:
+	var delta := hi - lo
+	var bits := _next_below(0x20000000000001)  # 2^53 + 1
+	if bits == 0x20000000000000:
+		return hi
+	var unit := float(bits) / 9007199254740992.0
+	return delta * unit + lo
+
+
 ## Swift `Bool.random(using:)`.
 func coin() -> bool:
 	return (_shr(next(), 17) & 1) == 0

@@ -23,6 +23,8 @@ func _init() -> void:
 				got = _bits(rng.double_half_open(0.0, 1.0)); want = f[1]
 			"double":
 				got = _bits(rng.double_half_open(_f(f[1]), _f(f[2]))); want = f[3]
+			"dclosed":
+				got = _bits(rng.double_closed(_f(f[1]), _f(f[2]))); want = f[3]
 			"bool":
 				got = "1" if rng.coin() else "0"; want = f[1]
 		n += 1
