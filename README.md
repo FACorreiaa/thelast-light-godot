@@ -9,3 +9,5 @@ the Swift simulation frame by frame (64-bit floats, SHA-256 state hash). Godot d
 reads input; it does not run the gameplay physics.
 
 - `spikes/`: the language spike that chose GDScript, plus the parity-hash reference (`spikes/gdspike/sim.gd`).
+- `UniverseBible/`: the world, characters, factions and canon. Engine-agnostic lore reference, copied from the Swift repo at `swift-final`.
+- `docs/swift-reference/`: design specs, cast sheet and plans from the Swift version, for reference.
