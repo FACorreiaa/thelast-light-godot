@@ -55,8 +55,8 @@ static func from_data(d: Dictionary) -> Level:
 	l.twin = Placement.from_data(d.twin) if d.twin != null else null
 	for s: Dictionary in d.scenes:
 		l.scenes.append(SceneTrigger.from_data(s))
-	l.exit_x = float(d.exitX)
-	l.kill_y = float(d.killY)
+	l.exit_x = Specs.num(d.exitX)
+	l.kill_y = Specs.num(d.killY)
 	return l
 
 

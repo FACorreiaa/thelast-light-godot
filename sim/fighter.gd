@@ -165,7 +165,7 @@ func hitbox() -> Box:
 		return Box.new(pos.x - spec.width / 2.0 - a.reach, pos.y + a.y_offset,
 			pos.x + spec.width / 2.0 + a.reach, pos.y + a.y_offset + a.height)
 	var front := pos.x + facing * (spec.width / 2.0 + a.reach)
-	return Box.new(minf(pos.x, front), pos.y + a.y_offset, maxf(pos.x, front), pos.y + a.y_offset + a.height)
+	return Box.new(Sw.min_d(pos.x, front), pos.y + a.y_offset, Sw.max_d(pos.x, front), pos.y + a.y_offset + a.height)
 
 
 func is_dodge_invulnerable() -> bool:

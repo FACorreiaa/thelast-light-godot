@@ -10,6 +10,22 @@ const INT_PAYLOAD := ["count", "active", "warning", "columns", "daze", "slowFram
 	"stagger", "window", "frames"]
 
 
+## A Double from the export. The Swift exporter writes non-finite values as "inf", "-inf" or
+## "nan" strings; a boss room's exitX is infinity. float("inf") on a String is not infinity.
+static func num(v: Variant) -> float:
+	if v is String:
+		match String(v):
+			"inf":
+				return INF
+			"-inf":
+				return -INF
+			"nan":
+				return NAN
+		push_error("Specs.num: not a number: %s" % v)
+		return NAN
+	return float(v)
+
+
 static func payload(v: Variant) -> Dictionary:
 	if v is String:
 		return {"case": v}
