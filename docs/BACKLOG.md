@@ -41,10 +41,18 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
 5. **Bible verdicts:**
    - DRAFT-010 holds 9 PROPOSED world claims (Lantern Cities).
    - Character backstories are decided one character at a time (DEC-010).
-6. **Art.** The owner has said it comes last.
-   - Production characters, enemies and bosses replace the code-drawn neon placeholders.
-   - Each chapter's places become distinct playable spaces: a platforming mechanic of their own, something about
-     their faction, and a different symptom of the world's decline.
+6. **Art.** The owner has said it comes last (confirmed 2026-11-19). Saved for when it starts:
+   - **Scenarios.** Each place is a distinct, playable space, not a backdrop. It introduces a memorable
+     platforming mechanic, reveals something about its faction, and shows a different symptom of the world's
+     decline. Mood references, one per region, are in `UniverseBible/ArtReferences/Scenarios/`.
+   - **Characters, enemies and bosses.** The creator's concept sheets (hero roster cards, faction line-up, enemy
+     overview, Foundry enemies with The Protocol's phases and attacks) set names, looks, roles and attacks. They
+     are not on disk yet; save them into `UniverseBible/ArtReferences/` (see its README).
+   - **How.** Godot draws, lights and animates the art but does not make it. The owner's plan: model and animate in
+     Blender, then render sprite sheets or use the 3D models directly with a side-on camera. The simulation does not
+     depend on the drawing, so either works. Painted scenario art becomes parallax layers; the playable ground is
+     tiles and props that match the collision. Higgsfield is connected and can generate images and 3D (spend needs
+     the owner's approval). A Meshy MCP would be a new agent tool, which the quarter's rules rule out.
 7. **Release.**
    - The port ships under the "LastLight GdSpike" App Store Connect record, while the real record is "The Last
      Light - Chapter Zero" (`com.fernandocorreia.lastlight`). Move the bundle id over before strangers test it.
