@@ -20,6 +20,11 @@ var twin: Placement
 var scenes: Array[SceneTrigger] = []
 var exit_x: float
 var kill_y: float
+## Eclipse phases (the final chapter; port-only, absent from Swift's levels). Frames for a full light-and-shadow
+## cycle; zero means the level has none. The light half comes first.
+var eclipse_period: int = 0
+## Frames before a swap in which the ground about to go is shown failing.
+var eclipse_warning: int = 0
 
 
 static func load_id(level_id: String) -> Level:
@@ -57,6 +62,8 @@ static func from_data(d: Dictionary) -> Level:
 		l.scenes.append(SceneTrigger.from_data(s))
 	l.exit_x = Specs.num(d.exitX)
 	l.kill_y = Specs.num(d.killY)
+	l.eclipse_period = int(d.get("eclipsePeriod", 0))
+	l.eclipse_warning = int(d.get("eclipseWarning", 0))
 	return l
 
 
@@ -67,6 +74,8 @@ class Platform:
 	var travel: Vec2
 	## Frames for a full there-and-back trip. Zero means it does not move.
 	var period: int
+	## Eclipse phase: 1 is solid only in the light, -1 only in shadow, 0 always (every Swift level).
+	var eclipse: int = 0
 
 	static func make(b: Box) -> Platform:
 		var p := Platform.new()
@@ -94,6 +103,7 @@ class Platform:
 		p.one_way = bool(d.oneWay)
 		p.travel = Vec2.from_data(d.travel)
 		p.period = int(d.period)
+		p.eclipse = int(d.get("eclipse", 0))
 		return p
 
 
@@ -219,3 +229,21 @@ class SceneTrigger:
 		s.scene = d.scene
 		s.cue = Specs.payload(d.cue)
 		return s
+
+
+## True while the eclipse's light half lasts on `frame`. Always light on a level without eclipse phases.
+func eclipse_light(frame: int) -> bool:
+	return eclipse_period <= 0 or frame % eclipse_period < eclipse_period / 2
+
+
+## Frames until the light and shadow next swap; -1 on a level without eclipse phases.
+func frames_to_eclipse_swap(frame: int) -> int:
+	if eclipse_period <= 0:
+		return -1
+	var half := eclipse_period / 2
+	return half - frame % eclipse_period % half
+
+
+## Whether platform `p` is solid on `frame`.
+func eclipse_solid(p: Platform, frame: int) -> bool:
+	return p.eclipse == 0 or (p.eclipse > 0) == eclipse_light(frame)

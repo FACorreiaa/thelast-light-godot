@@ -110,7 +110,7 @@ static func from_level(p_level: Level, hero: String, p_tuning: Tuning, seed: int
 		# Nothing is on at the start, so an inverted gate starts open.
 		w.gate_open[g.id] = 1.0 if g.inverted else 0.0
 	for p in w.platforms:
-		w.platform_boxes.append(p.box_at(0))
+		w.platform_boxes.append(p.box_at(0) if p_level.eclipse_solid(p, 0) else _eclipsed(p))
 	for g in p_level.gates:
 		if g.inverted and w.gate_platform.has(g.id):
 			w.platform_boxes[int(w.gate_platform[g.id])] = g.box.offset(0.0, g.box.max_y - g.box.min_y + 20.0)
@@ -227,10 +227,12 @@ func step(input: InputFrame) -> Array:
 		if other >= 0:
 			_pass_control(other, events)
 	for i in platforms.size():
-		if platforms[i].moves():
+		if platforms[i].moves() and platforms[i].eclipse == 0:
 			var nb := platforms[i].box_at(frame + 1)
 			platform_deltas[i] = Vec2.new(nb.min_x - platform_boxes[i].min_x, nb.min_y - platform_boxes[i].min_y)
 			platform_boxes[i] = nb
+	if level != null and level.eclipse_period > 0:
+		_eclipse_platforms(events)
 	var snapshot: Array[Fighter] = []
 	for g in fighters:
 		snapshot.append(g.copy())
@@ -1500,6 +1502,45 @@ func plate_under(f: Fighter) -> Level.Plate:
 		if f.pos.x >= p.x0 and f.pos.x <= p.x1 and absf(f.pos.y - p.top) < 2.0:
 			return p
 	return null
+
+
+## Where an eclipsed platform's box waits while it is not there: far below everything, so nothing touches it.
+static func _eclipsed(p: Level.Platform) -> Box:
+	return p.box.offset(0.0, -100000.0)
+
+
+## Eclipse phases: ground that is solid only in the light or only in shadow comes and goes as they swap. Like a
+## gate, ground will not form around someone standing in its space; it waits until they are clear.
+func _eclipse_platforms(events: Array) -> void:
+	var light_now := level.eclipse_light(frame)
+	var light_next := level.eclipse_light(frame + 1)
+	if light_now != light_next:
+		events.append({"case": "eclipse", "light": light_next})
+	for i in platforms.size():
+		var p: Level.Platform = platforms[i]
+		if p.eclipse == 0:
+			continue
+		var there := platform_boxes[i].min_y > -50000.0
+		var want := level.eclipse_solid(p, frame + 1)
+		if want == there and not p.moves():
+			continue
+		if not want:
+			platform_boxes[i] = _eclipsed(p)
+			platform_deltas[i] = Vec2.zero()
+			continue
+		var nb := p.box_at(frame + 1)
+		if there:
+			platform_deltas[i] = Vec2.new(nb.min_x - platform_boxes[i].min_x, nb.min_y - platform_boxes[i].min_y)
+		else:
+			var blocked := false
+			for f in fighters:
+				if f.is_alive() and f.hurtbox().intersects(nb):
+					blocked = true
+					break
+			if blocked:
+				continue
+			platform_deltas[i] = Vec2.zero()
+		platform_boxes[i] = nb
 
 
 ## True when a gate's levers and plates would have it open.

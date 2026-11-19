@@ -27,5 +27,6 @@ run '^glyphs: [0-9]+ weights checked, 0 failed' -s res://tests/check_glyphs.gd
 run '^story: [0-9]+ runs, 0 mismatched' -s res://tests/test_story.gd
 run '^flow: [0-9]+ checks, 0 failed' -s res://tests/test_flow.gd
 run '^input: [0-9]+ checks, 0 failed' -s res://tests/test_input.gd
+run '^eclipse: [0-9]+ checks, 0 failed' -s res://tests/test_eclipse.gd
 run '^replay: ([0-9]+)/\1 runs match' -s res://tests/replay.gd -- "$@"
 exit $fail

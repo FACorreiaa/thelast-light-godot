@@ -134,6 +134,11 @@ func input_for(world: World) -> InputFrame:
 		inp.move_x = 0.0
 		return inp
 
+	# Eclipse ground just ahead that will go before the hero is across: wait for the next time it is there.
+	if level.eclipse_period > 0 and _eclipse_wait(me, world, level):
+		inp.move_x = 0.0
+		return inp
+
 	# A wall ahead: jump it if it is low enough, otherwise wait on the lift beside it.
 	# Swift zips platforms with their boxes: the shorter of the two bounds the walk.
 	var solids := mini(world.platforms.size(), world.platform_boxes.size())
@@ -469,3 +474,23 @@ func _jump(inp: InputFrame) -> void:
 	inp.jump = true
 	inp.jump_held = true
 	_jump_held = 30
+
+
+## Port-only (no Swift counterpart): true when the next stretch of eclipse ground starts within reach and would
+## be gone, or not yet there, by the time the hero has walked across it.
+func _eclipse_wait(me: Fighter, world: World, level: Level) -> bool:
+	var half := me.spec.width / 2.0
+	var left := level.frames_to_eclipse_swap(world.frame)
+	for i: int in mini(world.platforms.size(), world.platform_boxes.size()):
+		var p: Level.Platform = world.platforms[i]
+		if p.eclipse == 0:
+			continue
+		var b: Box = p.box_at(world.frame)
+		var ahead := b.min_x - (me.pos.x + half)
+		if ahead < -2.0 or ahead > 60.0 or absf(b.max_y - me.pos.y) > 40.0:
+			continue
+		if not level.eclipse_solid(p, world.frame):
+			return true
+		var cross := (b.max_x - b.min_x + me.spec.width + Sw.max_d(ahead, 0.0)) / Sw.max_d(me.spec.run_speed, 1.0)
+		return float(left) < cross * Tuning.FRAMES_PER_SECOND + 12.0
+	return false
