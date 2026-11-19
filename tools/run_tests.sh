@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the headless parity suite. A GDScript parse error can still exit 0, so each step must also
+# Runs the headless suite: sim and story parity against the Swift goldens, and the app flow. A GDScript parse error can still exit 0, so each step must also
 # print its own success line and no SCRIPT ERROR.
 #   GODOT=/path/to/godot tools/run_tests.sh [replay args...]
 set -uo pipefail
@@ -24,5 +24,6 @@ tools/check_sim.sh || fail=1
 run '^doubles: [0-9]+ checked, 0 mismatched' -s res://tests/check_doubles.gd
 run '^rng: [0-9]+ calls, 0 mismatched' -s res://tests/test_rng.gd
 run '^story: [0-9]+ runs, 0 mismatched' -s res://tests/test_story.gd
+run '^flow: [0-9]+ checks, 0 failed' -s res://tests/test_flow.gd
 run '^replay: ([0-9]+)/\1 runs match' -s res://tests/replay.gd -- "$@"
 exit $fail

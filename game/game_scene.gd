@@ -12,6 +12,12 @@ extends Node2D
 
 enum Mode { LEVEL, ROOM }
 
+## Asks for the pause menu.
+signal pause_requested
+## A level was cleared: the results screen's numbers (see `_level_result`).
+signal level_completed(result: Dictionary)
+
+
 const GROUND_Y := 104.0
 const CLEAR := Color(0, 0, 0, 0)
 
@@ -23,6 +29,21 @@ var lead := "caelen"
 var level_index := 0
 var show_debug := false
 var screen_shake := true
+var story: StoryPresenter
+var settings := Settings.new()
+## The bot normally loops levels; with this it stops on the results screen like a player would.
+var demo_shows_results := false
+## Held still behind a menu. Time spent frozen is not simulated afterwards.
+var frozen := false:
+	set(v):
+		frozen = v
+		accumulator = 0.0
+		# Keys held while a menu was open do not count as new presses.
+		if not v:
+			input.poll()
+		# Menus sit over a clean picture: no HUD, no on-screen buttons.
+		hud.visible = not v
+		controls.visible = not v
 
 var far_layer := Node2D.new()
 var mid_layer := Node2D.new()
@@ -83,9 +104,20 @@ func _ready() -> void:
 	_frame_limit = int(_arg(args, "--frames", "-1"))
 	# The on-screen controls show on phones and tablets, or with --touch (the mouse acts as one finger).
 	show_touch = (OS.has_feature("mobile") or args.has("--touch")) and not demo
+	if story == null:
+		story = StoryPresenter.new()
+	# --lead and --level are for checking a route or a level without playing up to it.
+	var saved := ConfigFile.new()
+	saved.load(SaveDir.path("progress.cfg"))
+	var saved_lead := String(saved.get_value("progress", "lead", "caelen"))
+	lead = _arg(args, "--lead", "caelen" if demo else saved_lead)
 	_levels = route(lead)
-	level_index = clampi(int(_arg(args, "--level", "0")), 0, _levels.size() - 1)
+	var saved_level := _levels.find(String(saved.get_value("progress", "level", "")))
+	var asked := _arg(args, "--level", "")
+	level_index = clampi(int(asked) if asked != "" else (0 if demo else maxi(saved_level, 0)), 0, _levels.size() - 1)
 	world = _make_world(1, -1, {})
+	if mode == Mode.LEVEL:
+		story.forget(_scene_ids())
 
 	RenderingServer.set_default_clear_color(Palette.SKY)
 	Sk.z(far_layer, -30)
@@ -139,6 +171,7 @@ static func route(p_lead: String) -> Array[String]:
 
 func _make_world(seed: int, from_checkpoint: int, collected: Dictionary) -> World:
 	var t := Tuning.load_default()
+	t.hero_damage_scale = settings.damage_taken()
 	if mode == Mode.ROOM:
 		return World.partner_slice(seed, t)
 	return World.from_level(Level.load_id(_levels[level_index]), lead, t, seed, from_checkpoint, collected)
@@ -439,7 +472,24 @@ func _build_room_floor() -> void:
 
 func _process(delta: float) -> void:
 	accumulator += minf(delta, 0.1)
+	if frozen:
+		_draw_frame()
+		_after_frame(delta)
+		return
 	var reading := input.poll()
+	if (reading.pause or _pause_requested) and not story.is_active():
+		_pause_requested = false
+		pause_requested.emit()
+		return
+	# While someone is speaking the game holds still. Attack or jump moves the scene on.
+	if story.is_active():
+		if reading.attack or reading.jump:
+			story.advance()
+		controls.take_presses()
+		accumulator = 0.0
+		_draw_frame()
+		_after_frame(delta)
+		return
 	if reading.mode:
 		_toggle_mode()
 	if reading.debug:
@@ -453,7 +503,6 @@ func _process(delta: float) -> void:
 	if world.is_over and not presses.is_empty() and not reading.restart:
 		_restart(false)
 		presses = {}
-	_pause_requested = false  # The pause menu arrives with the menus port.
 	var inp := InputFrame.make(reading.move_x if reading.move_x != 0.0 else controls.move_x,
 		reading.jump or presses.has(TouchControls.Pad.JUMP), reading.jump_held or controls.jump_held,
 		reading.attack or presses.has(TouchControls.Pad.ATTACK), reading.dodge or presses.has(TouchControls.Pad.DODGE),
@@ -461,7 +510,7 @@ func _process(delta: float) -> void:
 		reading.switch_hero or presses.has(TouchControls.Pad.SWITCH_HERO))
 	var step := 1.0 / Tuning.FRAMES_PER_SECOND
 	var steps := 0
-	while accumulator >= step and steps < 4:
+	while accumulator >= step and steps < 4 and not story.is_active():
 		var frame_input := inp if not demo else (pilot.input_for(world) if mode == Mode.LEVEL else DemoBot.input_for(world))
 		if mode == Mode.LEVEL and not world.is_over:
 			level_frames += 1
@@ -787,6 +836,10 @@ func _restart(fresh: bool) -> void:
 			downs = 0
 		world = _make_world(seed, world.checkpoint_index if resume else -1, world.collected.duplicate() if resume else {})
 		pilot = Autopilot.new()
+		# A level started over plays its scenes again; a retry from a checkpoint does not.
+		if not resume:
+			story.forget(_scene_ids())
+		_save_progress()
 	for node: FighterNode in nodes.values():
 		if is_instance_valid(node):
 			node.queue_free()
@@ -799,6 +852,111 @@ func _restart(fresh: bool) -> void:
 		camera_y = maxf(-40.0, hero.pos.y - 70.0)
 	if mode == Mode.LEVEL and world.checkpoint_index < 0:
 		hud.announce(world.level.name.to_upper())
+
+
+# MARK: Menus
+
+
+func _scene_ids() -> Array:
+	return world.level.scenes.map(func(t: Level.SceneTrigger) -> String: return t.scene) if world.level != null else []
+
+
+## The saved place: the lead and the level by id, so adding a chapter never moves it.
+func _save_progress() -> void:
+	if demo:
+		return
+	var cfg := ConfigFile.new()
+	cfg.set_value("progress", "lead", lead)
+	cfg.set_value("progress", "level", _levels[level_index])
+	cfg.save(SaveDir.path("progress.cfg"))
+
+
+func current_level() -> int:
+	return level_index
+
+
+func level_names() -> Array[String]:
+	var out: Array[String] = []
+	for id in _levels:
+		out.append(Level.load_id(id).name)
+	return out
+
+
+## Each chapter with the run index of its first level and its level names:
+## [{id, number, title, ending, start, names}], for the chapter list.
+func chapter_list() -> Array:
+	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
+	var out: Array = []
+	var start := 0
+	for c: Dictionary in index.chapters:
+		var names: Array[String] = []
+		for id: String in c.route[lead]:
+			names.append(Level.load_id(id).name)
+		out.append({"id": c.id, "number": int(c.number), "title": c.title, "ending": c.ending, "start": start, "names": names})
+		start += names.size()
+	return out
+
+
+## The chapter the level at `index` belongs to, with where it starts in the run.
+func chapter_at(index: int) -> Dictionary:
+	var list := chapter_list()
+	for c: Dictionary in list:
+		if index < int(c.start) + (c.names as Array).size():
+			return c
+	return list[-1]
+
+
+## What the results screen shows after a level (LevelResult.swift).
+func _level_result() -> Dictionary:
+	var c := chapter_at(level_index)
+	var ends_chapter := level_index + 1 == int(c.start) + (c.names as Array).size()
+	return {"name": world.level.name, "index": level_index, "chapter_number": c.number, "chapter_title": c.title,
+		"ending": c.ending if ends_chapter else "", "chapter_start": c.start, "is_final": level_index + 1 == _levels.size(),
+		"seconds": float(level_frames) / Tuning.FRAMES_PER_SECOND, "defeated": kills, "downs": downs,
+		"found": world.collected.size(), "hidden": world.level.pickups.size()}
+
+
+func apply_settings(p_settings: Settings) -> void:
+	settings = p_settings.copy()
+	sound.volume = settings.volume
+	haptics.enabled = settings.haptics
+	screen_shake = settings.screen_shake
+	show_debug = settings.debug_overlay
+
+
+## A new run as this faction's lead, from their opening.
+func begin_as(p_lead: String) -> void:
+	lead = p_lead
+	_levels = route(lead)
+	play_level(0)
+
+
+func play_level(index: int) -> void:
+	mode = Mode.LEVEL
+	level_index = clampi(index, 0, _levels.size() - 1)
+	_restart(true)
+	_show_hint()
+
+
+func play_training_room() -> void:
+	mode = Mode.ROOM
+	_restart(true)
+	_show_hint()
+	hud.announce("TRAINING ROOM")
+
+
+## Back to the last checkpoint, as after a fall in battle.
+func retry() -> void:
+	_restart(world.is_complete)
+
+
+## From the results screen: the next level.
+func advance() -> void:
+	_restart(false)
+
+
+func restart_level() -> void:
+	_restart(true)
 
 
 ## Steps through every level and then the training room.
@@ -994,7 +1152,10 @@ func _react(events: Array) -> void:
 				haptics.rigid()
 				var total := world.level.pickups.size() if world.level != null else 0
 				var next := "tap to continue" if level_index + 1 < _levels.size() else "tap to start over"
-				hud.show_message("CLEAR" if demo else "CLEAR   ◆ %d/%d\n%s" % [world.collected.size(), total, next])
+				if (demo and not demo_shows_results) or level_completed.get_connections().is_empty():
+					hud.show_message("CLEAR" if demo else "CLEAR   ◆ %d/%d\n%s" % [world.collected.size(), total, next])
+				else:
+					level_completed.emit(_level_result())
 			"swing":
 				var id: int = e["id"]
 				if id == world.boss_id:
@@ -1041,8 +1202,9 @@ func _react(events: Array) -> void:
 				if f != null:
 					_popup("SLOWED", _top(f), Palette.EMBER, 14)
 			"scene":
-				# The demo bot does not read. Dialogue arrives with the story port.
-				pass
+				# The demo bot does not read.
+				if not demo:
+					story.begin(e["id"])
 			"flared", "eclipsed":
 				var colour := Palette.GOLD if c == "flared" else Palette.VIOLET
 				_ring(e["at"], e["radius"], colour)
