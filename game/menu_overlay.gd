@@ -309,14 +309,18 @@ func _segmented(names: Array, chosen: int, pick: Callable) -> Control:
 	track.add_theme_stylebox_override("panel", ts)
 	var row := _hbox(2)
 	var segments: Array[PanelContainer] = []
+	var labels: Array[Label] = []
+	# As iOS draws it: the chosen segment a white pill with dark text.
 	var paint := func(sel: int) -> void:
 		for j in segments.size():
-			segments[j].add_theme_stylebox_override("panel", UI.box(Color(1, 1, 1, 0.24), 6) if j == sel else StyleBoxEmpty.new())
+			segments[j].add_theme_stylebox_override("panel", UI.box(Color.WHITE, 7) if j == sel else StyleBoxEmpty.new())
+			labels[j].add_theme_color_override("font_color", Color.BLACK if j == sel else Color(1, 1, 1, 0.85))
 	for i in names.size():
 		var l := UI.label(String(names[i]), 13, Color.WHITE, "semibold")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		l.custom_minimum_size.y = 28
+		labels.append(l)
 		var b := UI.button(l, func() -> void:
 			paint.call(i)
 			pick.call(i), StyleBoxEmpty.new())
@@ -358,6 +362,8 @@ func _chapter_panel(close: Callable) -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	# SwiftUI's indicator is hidden at rest; the list still scrolls by drag or wheel.
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	scroll.custom_minimum_size.y = minf(260.0, size.y - 136.0)
 	scroll.add_child(list)
 	_panel_frame("CHAPTERS", close, [scroll] as Array[Control])
