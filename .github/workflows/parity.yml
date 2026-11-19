@@ -1,0 +1,40 @@
+name: parity
+
+# Replays every Swift golden trace against the GDScript sim and requires a bit-exact state hash on
+# every frame (and, for Autopilot runs, the same Autopilot input). See tests/replay.gd.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: parity-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Godot
+        run: |
+          base=https://github.com/godotengine/godot-builds/releases/download/$GODOT_VERSION
+          zip=Godot_v${GODOT_VERSION}_linux.x86_64.zip
+          curl -fsSL -o "$RUNNER_TEMP/$zip" "$base/$zip"
+          curl -fsSL -o "$RUNNER_TEMP/SHA512-SUMS.txt" "$base/SHA512-SUMS.txt"
+          (cd "$RUNNER_TEMP" && grep " $zip\$" SHA512-SUMS.txt | sha512sum -c -)
+          unzip -q "$RUNNER_TEMP/$zip" -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: Replay shard ${{ matrix.shard }}/8
+        run: tools/run_tests.sh --pilot --shard=${{ matrix.shard }}/8

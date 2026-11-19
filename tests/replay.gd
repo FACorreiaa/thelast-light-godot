@@ -7,6 +7,7 @@ extends SceneTree
 ## (default)  feed each trace's recorded inputs, compare the state hash after every step and stop a
 ##            run at its first mismatch
 ## --pilot   the GDScript Autopilot drives instead: its input must equal the recorded one each step
+## --shard=I/N  only runs whose index in runs.json is I mod N (CI splits the suite this way)
 ## --run=A,B  only these runs; --dump=N writes the canonical state after N steps to
 ##            user://dump-<id>-<N>.json, in the oracle's `f:<dec>:<hex>` float form, for
 ##            tools/diff_state.py against `oracle dump <id> <N>`
@@ -15,6 +16,8 @@ var _frame0 := false
 var _pilot := false
 var _only: PackedStringArray = []
 var _dump := -1
+var _shard := 0
+var _shards := 1
 
 
 func _init() -> void:
@@ -25,13 +28,20 @@ func _init() -> void:
 			_pilot = true
 		elif a.begins_with("--run="):
 			_only = a.trim_prefix("--run=").split(",", false)
+		elif a.begins_with("--shard="):
+			var p := a.trim_prefix("--shard=").split("/")
+			_shard = int(p[0])
+			_shards = int(p[1])
 		elif a.begins_with("--dump="):
 			_dump = int(a.trim_prefix("--dump="))
 	var runs: Array = JSON.parse_string(FileAccess.get_file_as_string("res://tests/golden/runs.json"))
 	var passed := 0
 	var total := 0
-	for id: String in runs:
+	for n in runs.size():
+		var id: String = runs[n]
 		if not _only.is_empty() and not _only.has(id):
+			continue
+		if n % _shards != _shard:
 			continue
 		total += 1
 		if _replay(id):
