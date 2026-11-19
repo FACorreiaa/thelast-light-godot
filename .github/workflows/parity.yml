@@ -39,6 +39,30 @@ jobs:
       - name: Replay shard ${{ matrix.shard }}/8
         run: tools/run_tests.sh --pilot --shard=${{ matrix.shard }}/8
 
+  # Swift's level guarantees, owned by the port: the oracle for levels that have no Swift golden.
+  levels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Godot
+        run: |
+          base=https://github.com/godotengine/godot-builds/releases/download/$GODOT_VERSION
+          zip=Godot_v${GODOT_VERSION}_linux.x86_64.zip
+          curl -fsSL -o "$RUNNER_TEMP/$zip" "$base/$zip"
+          curl -fsSL -o "$RUNNER_TEMP/SHA512-SUMS.txt" "$base/SHA512-SUMS.txt"
+          (cd "$RUNNER_TEMP" && grep " $zip\$" SHA512-SUMS.txt | sha512sum -c -)
+          unzip -q "$RUNNER_TEMP/$zip" -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: Every level and route finishable by the autopilot
+        run: |
+          "$GODOT" --headless --path . --import >/dev/null 2>&1 || true
+          out=$("$GODOT" --headless --path . -s res://tests/test_levels.gd 2>&1); code=$?
+          echo "$out" | grep -E "FAIL|levels:|SCRIPT ERROR" || true
+          [[ $code -eq 0 ]] && grep -qE "^levels: [0-9]+ checks, 0 failed" <<<"$out" && ! grep -q "SCRIPT ERROR" <<<"$out"
+
   # The same suite on Windows: the shipped Steam build runs there, so the sim must be bit-exact on MSVC too.
   windows:
     runs-on: windows-latest
