@@ -38,7 +38,7 @@ var alpha: float:
 		modulate.a = v
 
 
-## weight: "medium", "demibold", "bold", "heavy" (AvenirNext faces) or "mono" (Menlo).
+## weight: "medium", "demibold", "bold", "heavy" (Avenir Next's weights 500/600/700/900) or "mono" (Menlo).
 static func make(p_text: String, size: float, p_color: Color, weight := "heavy") -> SkLabel:
 	var l := SkLabel.new()
 	l.text = p_text
@@ -48,16 +48,41 @@ static func make(p_text: String, size: float, p_color: Color, weight := "heavy")
 	return l
 
 
+## The HUD family, bundled so every platform draws the same weights (Godot only reaches Avenir Next's Bold
+## face, and Windows has no Avenir). Both are SIL OFL; `--hud-font NunitoSans` picks the other one.
+const HUD_FAMILIES := {"Figtree": "res://fonts/Figtree.ttf", "NunitoSans": "res://fonts/NunitoSans.ttf"}
+static var hud_family := _family_from_args()
+const WEIGHTS := {"medium": 500, "demibold": 600, "bold": 700, "heavy": 900}
+
+
+static func _family_from_args() -> String:
+	var args := OS.get_cmdline_user_args()
+	var i := args.find("--hud-font")
+	return args[i + 1] if i >= 0 and i + 1 < args.size() and HUD_FAMILIES.has(args[i + 1]) else "Figtree"
+
+
 static func font_for(weight: String) -> Font:
 	if not _fonts.has(weight):
-		var f := SystemFont.new()
 		if weight == "mono":
-			f.font_names = PackedStringArray(["Menlo", "SF Mono", "Consolas", "monospace"])
+			var m := SystemFont.new()
+			m.font_names = PackedStringArray(["Menlo", "SF Mono", "Consolas", "monospace"])
+			_fonts[weight] = m
 		else:
-			f.font_names = PackedStringArray(["Avenir Next", "Avenir", "Helvetica Neue", "Segoe UI", "Arial"])
-			f.font_weight = {"medium": 500, "demibold": 600, "bold": 700}.get(weight, 900)
-		_fonts[weight] = f
+			var f := FontVariation.new()
+			f.base_font = load(HUD_FAMILIES[hud_family])
+			f.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): WEIGHTS.get(weight, 900)}
+			f.fallbacks = [symbols()]
+			_fonts[weight] = f
 	return _fonts[weight]
+
+
+## Neither family has the HUD's marks (⇄ ✦ ◆ ⚔ ▲ ▸); the system symbol fonts do, on Apple and Windows.
+static func symbols() -> Font:
+	if not _fonts.has("_symbols"):
+		var s := SystemFont.new()
+		s.font_names = PackedStringArray(["Apple Symbols", "Hiragino Sans", "Segoe UI Symbol", "Segoe UI", "DejaVu Sans"])
+		_fonts["_symbols"] = s
+	return _fonts["_symbols"]
 
 
 func _draw() -> void:
