@@ -15,3 +15,6 @@ releases/
 # Swift oracle build
 .build/
 .swiftpm/
+
+# Creator mood references: may be third-party images, kept on disk only (public repo)
+UniverseBible/ArtReferences/Scenarios/*.jpeg

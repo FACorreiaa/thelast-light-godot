@@ -13,7 +13,8 @@ repository yet; copy them here and fill in the filenames.
 ## Scenario references (added 2026-11-19)
 
 The creator's mood images for each chapter's places, in `Scenarios/`. They set the feel of a region, not its
-layout. They are references only and never ship in the game: some may be third-party images.
+layout. They are references only and never ship in the game: some may be third-party images, so they stay on disk and
+out of git (this repository is public).
 
 | File | Region | Feel |
 |---|---|---|
