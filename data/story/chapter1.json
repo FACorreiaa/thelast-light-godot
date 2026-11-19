@@ -1,0 +1,398 @@
+{
+  "scenes": {
+    "awakening.orion": {
+      "start": "wake",
+      "lines": {
+        "wake": {
+          "speaker": "ORION",
+          "text": "You are awake. The others on this line never woke.",
+          "next": "accuse"
+        },
+        "accuse": {
+          "speaker": "CAELEN",
+          "text": "You're one of theirs. A machine of the Foundry.",
+          "next": "answer"
+        },
+        "answer": {
+          "speaker": "ORION",
+          "text": "I was. Then I stopped obeying. I know the way out, and I cannot open the last door alone.",
+          "choices": [
+            {
+              "text": "Then walk beside me.",
+              "next": "trusted",
+              "set": {
+                "orion": "trusted"
+              }
+            },
+            {
+              "text": "Walk ahead, where I can see you.",
+              "next": "watched",
+              "set": {
+                "orion": "watched"
+              }
+            }
+          ]
+        },
+        "trusted": {
+          "speaker": "ORION",
+          "text": "Beside. No one has asked that of me before."
+        },
+        "watched": {
+          "speaker": "ORION",
+          "text": "A fair order. I would not trust me either."
+        }
+      }
+    },
+    "protocol.wake": {
+      "start": "trusted",
+      "lines": {
+        "trusted": {
+          "speaker": "ORION",
+          "text": "The Protocol. It judged me once. Strike when its core opens. I am beside you.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "watched"
+        },
+        "watched": {
+          "speaker": "ORION",
+          "text": "The Protocol. You wanted me in front, so watch what it does to me, and learn.",
+          "requires": {
+            "orion": "watched"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "The Protocol. Its armour holds until it strikes. Wait for the core."
+        }
+      }
+    },
+    "gauges.arrive": {
+      "start": "a",
+      "lines": {
+        "a": {
+          "speaker": "SERAPHINE",
+          "text": "The Foundry measures the light. Every hour, every degree it loses.",
+          "next": "b"
+        },
+        "b": {
+          "speaker": "SERAPHINE",
+          "text": "If their numbers say what our buried records say, I will see them with my own eyes."
+        }
+      }
+    },
+    "gauges.orion": {
+      "start": "a",
+      "lines": {
+        "a": {
+          "speaker": "ORION",
+          "text": "You are not one of theirs. Why would anyone walk into the Foundry?",
+          "next": "b"
+        },
+        "b": {
+          "speaker": "SERAPHINE",
+          "text": "To learn what it knows about the light. And you? You wear its colours.",
+          "next": "c"
+        },
+        "c": {
+          "speaker": "ORION",
+          "text": "I stopped obeying it. What it knows is kept behind the Protocol. I cannot open the last door alone.",
+          "choices": [
+            {
+              "text": "Then walk beside me.",
+              "next": "trusted",
+              "set": {
+                "orion": "trusted"
+              }
+            },
+            {
+              "text": "Walk ahead of me.",
+              "next": "watched",
+              "set": {
+                "orion": "watched"
+              }
+            }
+          ]
+        },
+        "trusted": {
+          "speaker": "ORION",
+          "text": "Beside. Then you should know one thing: I cannot lie, not even to be kind.",
+          "next": "trusted2"
+        },
+        "trusted2": {
+          "speaker": "SERAPHINE",
+          "text": "Then one of us will have an easy road."
+        },
+        "watched": {
+          "speaker": "ORION",
+          "text": "Ahead, then. I cannot lie to you, but you have no way to know that yet."
+        }
+      }
+    },
+    "undercroft.arrive": {
+      "start": "a",
+      "lines": {
+        "a": {
+          "speaker": "NIMUE",
+          "text": "Three of my runners went onto the line. The Foundry never gives back what it takes.",
+          "next": "b"
+        },
+        "b": {
+          "speaker": "NIMUE",
+          "text": "So I take it back."
+        }
+      }
+    },
+    "undercroft.orion": {
+      "start": "a",
+      "lines": {
+        "a": {
+          "speaker": "ORION",
+          "text": "Wait. I am not one of the machines that took them.",
+          "next": "b"
+        },
+        "b": {
+          "speaker": "NIMUE",
+          "text": "You look exactly like one.",
+          "next": "c"
+        },
+        "c": {
+          "speaker": "ORION",
+          "text": "I was. Then I stopped obeying. The line runs past the Protocol. I know the way, and I cannot open the last door alone.",
+          "choices": [
+            {
+              "text": "Walk beside me, then.",
+              "next": "trusted",
+              "set": {
+                "orion": "trusted"
+              }
+            },
+            {
+              "text": "Walk ahead. Slowly.",
+              "next": "watched",
+              "set": {
+                "orion": "watched"
+              }
+            }
+          ]
+        },
+        "trusted": {
+          "speaker": "NIMUE",
+          "text": "I've smuggled stranger things than you through these tunnels.",
+          "next": "trusted2"
+        },
+        "trusted2": {
+          "speaker": "ORION",
+          "text": "I do not know whether that is a kindness. I will take it as one."
+        },
+        "watched": {
+          "speaker": "ORION",
+          "text": "Ahead. You keep your knives where I cannot see them. That is fair."
+        }
+      }
+    },
+    "hall.enter": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "The Machine Hall. I know this floor, and I don't know why.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "The Foundry's numbers match our buried records. Someone has known for a long time.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Runner marks, scratched low on the wall. They came through here alive.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "The Machine Hall. Stay close. They come in numbers here."
+        }
+      }
+    },
+    "protocol.end": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "That was the voice of this place. Not the hand that built it.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "trusted"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "It counted every hour the light has lost. I will carry that count home, whether they want it or not.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "trusted"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "The line has stopped. Somewhere down it, my runners are walking out.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "trusted",
+          "next": "trusted"
+        },
+        "trusted": {
+          "speaker": "ORION",
+          "text": "You kept me beside you to the end. I would like to keep walking, if you will have me.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "watched"
+        },
+        "watched": {
+          "speaker": "ORION",
+          "text": "You can stop watching me now. Or keep watching. I would understand either.",
+          "requires": {
+            "orion": "watched"
+          },
+          "otherwise": "quiet"
+        },
+        "quiet": {
+          "speaker": "ORION",
+          "text": "It is silent. Come. There is more of the Foundry than this room."
+        }
+      }
+    },
+    "warden.wake": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "Something still keeps the gate. It was waiting for whoever woke.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "trusted"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "It stands like a temple guard. Nothing passes it from the front.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "trusted"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Runners went round this gate. There's no round any more.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "trusted",
+          "next": "trusted"
+        },
+        "trusted": {
+          "speaker": "ORION",
+          "text": "The Line Warden. Its guard faces forward and it turns slowly. I will hold its eye. Go round.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "watched"
+        },
+        "watched": {
+          "speaker": "ORION",
+          "text": "The Line Warden. You wanted me in front, so I will stand where it looks. Get behind it.",
+          "requires": {
+            "orion": "watched"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "The Line Warden. Its guard faces forward. Get behind it, or turn its blade aside."
+        }
+      }
+    },
+    "locks.arrive": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "Locks and levers. My hands know these before I do.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "Every door here wants a hand on a lever. The Foundry trusts nothing that walks.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "The Lock Works. Runners went under this place, never through it. Now I see why.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "The Lock Works. Every door here is a lock."
+        }
+      }
+    },
+    "locks.lever": {
+      "start": "line",
+      "lines": {
+        "line": {
+          "speaker": "ORION",
+          "text": "The Foundry still answers its own handles. Strike the lever, and the gate will rise."
+        }
+      }
+    },
+    "locks.plate": {
+      "start": "line",
+      "lines": {
+        "line": {
+          "speaker": "ORION",
+          "text": "This one wants weight on the plate. Switch to me, walk me onto it, and switch back. I will hold it.",
+          "next": "line2"
+        },
+        "line2": {
+          "speaker": "ORION",
+          "text": "When you have gone far enough, I will find you."
+        }
+      }
+    },
+    "locks.race": {
+      "start": "line",
+      "lines": {
+        "line": {
+          "speaker": "ORION",
+          "text": "That lever springs back, and its gate is far. Throw it and run."
+        }
+      }
+    }
+  }
+}

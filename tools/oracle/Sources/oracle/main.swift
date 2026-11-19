@@ -217,6 +217,63 @@ case "rng":
     write(lines.joined(separator: "\n"), to: "\(repo)/tests/golden/rng.txt")
     print("rng: \(lines.count) lines")
 
+case "story":
+    // Every scene played under several choice policies and starting flags: the lines shown, the
+    // choices offered, and the state at the end. The GDScript Story runner must give the same.
+    let repo = args.dropFirst().first ?? "."
+    var scenes: [String: StoryScene] = [:]
+    for c in Chapter.all {
+        let url = URL(fileURLWithPath: "\(repo)/data/story/\(c.id).json")
+        guard let data = try? Data(contentsOf: url), let lib = try? StoryLibrary(json: data) else { continue }
+        scenes.merge(lib.scenes) { first, _ in first }
+    }
+    let library = StoryLibrary(scenes: scenes)
+    // Every flag value any choice or line can set, so later scenes see each branch.
+    var values: [String: Set<String>] = [:]
+    for scene in scenes.values {
+        for line in scene.lines.values {
+            for (k, v) in line.set ?? [:] { values[k, default: []].insert(v) }
+            for ch in line.choices ?? [] { for (k, v) in ch.set ?? [:] { values[k, default: []].insert(v) } }
+            for (k, v) in line.requires ?? [:] { values[k, default: []].insert(v) }
+            for ch in line.choices ?? [] { for (k, v) in ch.requires ?? [:] { values[k, default: []].insert(v) } }
+        }
+    }
+    let keys = values.keys.sorted()
+    var starts: [StoryState] = [StoryState()]
+    for n in 0..<4 {
+        var st = StoryState()
+        for k in keys {
+            let vs = values[k]!.sorted()
+            st.flags[k] = vs[n % vs.count]
+        }
+        starts.append(st)
+    }
+    for lead in ["caelen", "seraphine", "nimue"] {
+        var st = StoryState()
+        st.flags["lead"] = lead
+        starts.append(st)
+    }
+    var out: [[String: Any]] = []
+    for id in scenes.keys.sorted() {
+        for (si, start) in starts.enumerated() {
+            for policy in 0..<3 {
+                guard var runner = StoryRunner(sceneID: id, library: library, state: start) else { continue }
+                var steps: [String] = []
+                var n = 0
+                while let line = runner.line, n < 200 {
+                    let offered = runner.choices
+                    steps.append("\(line.speaker)|\(line.text)|\(offered.map(\.text).joined(separator: "/"))")
+                    if offered.isEmpty { runner.advance() } else { runner.choose((n + policy) % offered.count) }
+                    n += 1
+                }
+                out.append(["scene": id, "start": si, "policy": policy, "startFlags": start.flags,
+                            "steps": steps, "flags": runner.state.flags, "seen": runner.state.seen.sorted()])
+            }
+        }
+    }
+    write(JSON.write(["problems": library.problems(), "runs": out], indent: false), to: "\(repo)/tests/golden/story.json")
+    print("story: \(scenes.count) scenes, \(out.count) runs, \(library.problems().count) problems")
+
 case "dump":
     let rest = Array(args.dropFirst())
     guard rest.count == 2, let run = allRuns.first(where: { $0.id == rest[0] }), let target = Int(rest[1]) else {

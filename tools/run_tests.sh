@@ -23,5 +23,6 @@ tools/check_sim.sh || fail=1
 "$GODOT" --headless --path . --import >/dev/null 2>&1
 run '^doubles: [0-9]+ checked, 0 mismatched' -s res://tests/check_doubles.gd
 run '^rng: [0-9]+ calls, 0 mismatched' -s res://tests/test_rng.gd
+run '^story: [0-9]+ runs, 0 mismatched' -s res://tests/test_story.gd
 run '^replay: ([0-9]+)/\1 runs match' -s res://tests/replay.gd -- "$@"
 exit $fail

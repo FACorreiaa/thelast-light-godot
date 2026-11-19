@@ -1,0 +1,359 @@
+{
+  "scenes": {
+    "road.arrive": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "Dawnfaith land. Their seal was in the Cinder King's ledger. I want to know what they bought.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "orion"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "Home. I'm coming back with a Foundry machine at my side. No one will sing for that.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "orion"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Sanctuary land. They sold their bread to the Cinder King. Let's see who else they deal with.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral",
+          "next": "orion"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "Dawnfaith land. The road is watched.",
+          "next": "orion"
+        },
+        "orion": {
+          "speaker": "ORION",
+          "text": "These ones believe. Hurting them will not make them stop. It makes them faster."
+        }
+      }
+    },
+    "bells.arrive": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "Bells, and no one ringing them.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "The hour bells. Once, everyone below knew the time by them.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Runners set their routes by these bells. They've been quiet a long time.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "The bells where the hours were rung."
+        }
+      }
+    },
+    "bells.order": {
+      "start": "open",
+      "lines": {
+        "open": {
+          "speaker": "ORION",
+          "text": "Each bell carries its hour. Ring them in order, first to last. One out of turn, and they all fall silent."
+        }
+      }
+    },
+    "bells.race": {
+      "start": "open",
+      "lines": {
+        "open": {
+          "speaker": "ORION",
+          "text": "These fall silent on their own. Clear the way first, then ring all three before the first goes quiet."
+        }
+      }
+    },
+    "cloister.arrive": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "Every wall is lit, and it's still dimmer here than it should be.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "The cloister where I learned to read the light. The lamps were brighter then.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Runners slept here when the roads were bad. The doors were open then.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "A cloister. Every wall is lit."
+        }
+      }
+    },
+    "cloister.halo": {
+      "start": "line",
+      "lines": {
+        "line": {
+          "speaker": "ORION",
+          "text": "Above us. When the light gathers on it, turn your back. Whoever looks at it will not see for a moment."
+        }
+      }
+    },
+    "sworn.wake": {
+      "start": "shield",
+      "lines": {
+        "shield": {
+          "speaker": "SWORN SHIELD",
+          "text": "We swore it together.",
+          "next": "spear"
+        },
+        "spear": {
+          "speaker": "SWORN SPEAR",
+          "text": "We keep it together.",
+          "next": "caelen"
+        },
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "Two of them, and one oath.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "trusted"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "They mean every word of it. That's what frightens me.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "trusted"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Bribe one, and the other still says no. That's why runners went round.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "trusted",
+          "next": "trusted"
+        },
+        "trusted": {
+          "speaker": "ORION",
+          "text": "If one falls alone, the other raises it. Wear them down evenly, and bring them down together.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "watched"
+        },
+        "watched": {
+          "speaker": "ORION",
+          "text": "If one falls alone, the other raises it. They must fall within moments of each other.",
+          "requires": {
+            "orion": "watched"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "If one falls alone, the other raises it."
+        }
+      }
+    },
+    "sworn.raised": {
+      "start": "vow",
+      "lines": {
+        "vow": {
+          "speaker": "SWORN SHIELD",
+          "text": "Not while one of us stands.",
+          "next": "orion"
+        },
+        "orion": {
+          "speaker": "ORION",
+          "text": "Too far apart. Strike the one with more left, and finish them together."
+        }
+      }
+    },
+    "stair.arrive": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "A long way up. Whoever built this wanted you tired when you got there.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "The Choir Stair. They used to sing the hours from these steps. No one is singing.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Long stair, no exits. Runners hate a place like this.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "The Choir Stair. A long way up."
+        }
+      }
+    },
+    "stair.listen": {
+      "start": "trusted",
+      "lines": {
+        "trusted": {
+          "speaker": "ORION",
+          "text": "Someone at the top has been listening to us all the way up. I am beside you.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "other"
+        },
+        "other": {
+          "speaker": "ORION",
+          "text": "Someone at the top has been listening to us all the way up. I will go first."
+        }
+      }
+    },
+    "oracle.wake": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "You were listening all the way up. Then you know why I came.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "oracle"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "The ledgers had our seal on them. I want to know what was bought with it.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "oracle"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "You've been listening. Then you know what I'm here for.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral",
+          "next": "oracle"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "Someone is waiting for us.",
+          "next": "oracle"
+        },
+        "oracle": {
+          "speaker": "LAST ORACLE",
+          "text": "I have seen how this ends. The light goes out, and everyone is finally still.",
+          "next": "oracle2"
+        },
+        "oracle2": {
+          "speaker": "LAST ORACLE",
+          "text": "I will not stop it. I will only make it gentle."
+        }
+      }
+    },
+    "oracle.end": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "She was certain. That's what frightened me.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "orion"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "She spoke for the light as if it had already finished speaking.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "orion"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "No ledger up here. Nothing to buy. Just someone who wanted it all over.",
+          "requires": {
+            "lead": "nimue"
+          },
+          "otherwise": "neutral",
+          "next": "orion"
+        },
+        "neutral": {
+          "speaker": "ORION",
+          "text": "She is beaten.",
+          "next": "orion"
+        },
+        "orion": {
+          "speaker": "ORION",
+          "text": "She was sure. Being sure is not the same as being right.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "orion2"
+        },
+        "orion2": {
+          "speaker": "ORION",
+          "text": "You watch me for lies. Watch the certain ones too."
+        }
+      }
+    }
+  }
+}
