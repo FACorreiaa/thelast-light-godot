@@ -1,0 +1,343 @@
+{
+  "name": "The Drowned Approach",
+  "width": 5600.0,
+  "start": {
+    "x": 120.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -40.0,
+        "maxX": 900.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 900.0,
+        "minY": -40.0,
+        "maxX": 1140.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 1
+    },
+    {
+      "box": {
+        "minX": 1140.0,
+        "minY": -40.0,
+        "maxX": 1720.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 1720.0,
+        "minY": -40.0,
+        "maxX": 1960.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": -1
+    },
+    {
+      "box": {
+        "minX": 1960.0,
+        "minY": -40.0,
+        "maxX": 2700.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 2240.0,
+        "minY": 96.0,
+        "maxX": 2420.0,
+        "maxY": 110.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 2700.0,
+        "minY": -40.0,
+        "maxX": 2900.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 1
+    },
+    {
+      "box": {
+        "minX": 2900.0,
+        "minY": -40.0,
+        "maxX": 3060.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 3060.0,
+        "minY": -40.0,
+        "maxX": 3260.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": -1
+    },
+    {
+      "box": {
+        "minX": 3260.0,
+        "minY": -40.0,
+        "maxX": 4200.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 3600.0,
+        "minY": 76.0,
+        "maxX": 3780.0,
+        "maxY": 90.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 4200.0,
+        "minY": -40.0,
+        "maxX": 4440.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 1
+    },
+    {
+      "box": {
+        "minX": 4440.0,
+        "minY": -40.0,
+        "maxX": 4640.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 4640.0,
+        "minY": -40.0,
+        "maxX": 4880.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": -1
+    },
+    {
+      "box": {
+        "minX": 4880.0,
+        "minY": -40.0,
+        "maxX": 5800.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    }
+  ],
+  "hazards": [
+    {
+      "box": {
+        "minX": 3880.0,
+        "minY": 0.0,
+        "maxX": 3916.0,
+        "maxY": 150.0
+      },
+      "damage": 12.0,
+      "period": 150,
+      "onFrames": 70,
+      "phase": 0,
+      "warning": 30
+    }
+  ],
+  "levers": [],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [
+    {
+      "x": 2000.0,
+      "y": 0.0
+    },
+    {
+      "x": 3300.0,
+      "y": 0.0
+    },
+    {
+      "x": 4500.0,
+      "y": 0.0
+    }
+  ],
+  "pickups": [
+    {
+      "id": 1,
+      "pos": {
+        "x": 2330.0,
+        "y": 140.0
+      },
+      "secret": false
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 3690.0,
+        "y": 120.0
+      },
+      "secret": true
+    }
+  ],
+  "enemies": [
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 1450.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 2500.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "forgedSoldier",
+      "pos": {
+        "x": 3500.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "sentryCore",
+      "pos": {
+        "x": 4100.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "scrapDrone",
+      "pos": {
+        "x": 5100.0,
+        "y": 0.0
+      }
+    },
+    {
+      "kind": "forgedSoldier",
+      "pos": {
+        "x": 5300.0,
+        "y": 0.0
+      }
+    }
+  ],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 60.0,
+      "y": 0.0
+    }
+  },
+  "boss": null,
+  "twin": null,
+  "scenes": [],
+  "exitX": 5500.0,
+  "killY": -260.0,
+  "eclipsePeriod": 300,
+  "eclipseWarning": 50
+}

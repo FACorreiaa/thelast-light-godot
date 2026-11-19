@@ -95,6 +95,23 @@
         ]
       },
       "title": "The Dawnfaith"
+    },
+    {
+      "ending": "The way up is open. (Draft chapter: more to come.)",
+      "id": "chapter4",
+      "number": 4,
+      "route": {
+        "caelen": [
+          "eclipse_approach"
+        ],
+        "nimue": [
+          "eclipse_approach"
+        ],
+        "seraphine": [
+          "eclipse_approach"
+        ]
+      },
+      "title": "The Eclipse Engine"
     }
   ],
   "factions": [
@@ -162,7 +179,8 @@
     "sun_cloister",
     "cloister_gate",
     "choir_stair",
-    "oracles_terrace"
+    "oracles_terrace",
+    "eclipse_approach"
   ],
   "swiftTag": "swift-final"
 }

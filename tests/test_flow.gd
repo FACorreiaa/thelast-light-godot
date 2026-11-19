@@ -265,7 +265,8 @@ func _run() -> void:
 	for c: Dictionary in list:
 		check(int(c.start) == total, "chapter %s starts where the last ended" % c.id)
 		total += (c.names as Array).size()
-	check(list.size() == 3 and total == app.scene.level_names().size(), "the chapter list covers the run")
+	var chapters: int = (JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json")).chapters as Array).size()
+	check(list.size() == chapters and total == app.scene.level_names().size(), "the chapter list covers the run")
 	var last: Dictionary = list[-1]
 	app.play_chapter(total - 1)
 	app.result = app.scene._level_result()

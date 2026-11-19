@@ -322,8 +322,13 @@ func _build(level: Level) -> void:
 		node.add_child(_shape(SkPath.rounded_rect(0, 0, w, h, 3.0 if platform.one_way else 0.0),
 			Palette.MID if platform.one_way else Palette.FLOOR,
 			Sk.with_alpha(Palette.CYAN, 0.25) if platform.one_way else CLEAR))
-		node.add_child(_shape(SkPath.rect(0, h - 2, w, 2),
-			Sk.with_alpha(Palette.GOLD if platform.moves() else Palette.CYAN, 0.55), CLEAR, 1, 1))
+		# Eclipse ground (placeholder look): gold-edged in the light, violet-edged in shadow.
+		var edge := Palette.GOLD if platform.moves() else Palette.CYAN
+		if platform.eclipse != 0:
+			edge = Palette.IVORY if platform.eclipse > 0 else Palette.VIOLET
+		var edge_h := 2.0 if platform.eclipse == 0 else 4.0
+		node.add_child(_shape(SkPath.rect(0, h - edge_h, w, edge_h),
+			Sk.with_alpha(edge, 0.55 if platform.eclipse == 0 else 0.95), CLEAR, 1, 1))
 		node.position = Vector2(box.min_x, box.min_y)
 		Sk.z(node, -3 if platform.one_way else -5)
 		world_node.add_child(node)
@@ -694,7 +699,10 @@ func _draw_level() -> void:
 	_draw_strikes()
 	_draw_puzzles(level)
 	for i: int in platform_nodes.keys():
-		if world.platforms[i].moves():
+		var p := world.platforms[i]
+		if p.eclipse != 0:
+			_draw_eclipse_ground(i, p, level)
+		elif p.moves():
 			var box := world.platform_boxes[i]
 			platform_nodes[i].position = Vector2(box.min_x, box.min_y)
 	for i in level.hazards.size():
@@ -712,6 +720,20 @@ func _draw_level() -> void:
 		lamp.fill_color = Palette.CYAN if lit else Palette.BODY
 		lamp.stroke_color = Sk.with_alpha(Palette.CYAN, 1.0 if lit else 0.35)
 		lamp.glow_width = 6.0 if lit else 0.0
+
+
+## Eclipse ground that is not there shows as a faint outline where it will form; ground about to go flickers.
+func _draw_eclipse_ground(i: int, p: Level.Platform, level: Level) -> void:
+	var node: Node2D = platform_nodes[i]
+	var box := p.box_at(world.frame)
+	node.position = Vector2(box.min_x, box.min_y)
+	var there := world.platform_boxes[i].min_y > -50000.0
+	if not there:
+		node.modulate.a = 0.3
+	elif level.frames_to_eclipse_swap(world.frame) <= level.eclipse_warning:
+		node.modulate.a = 1.0 if world.frame % 8 < 4 else 0.45
+	else:
+		node.modulate.a = 1.0
 
 
 func _draw_puzzles(level: Level) -> void:
@@ -1262,6 +1284,11 @@ func _react(events: Array) -> void:
 					Effects.dust(world_node, Vector2(box.center().x, box.min_y), 5, 20)
 				shake = maxf(shake, 3.0 if e["opening"] else 2.0)
 				sound.play("heavyHit", 0.35)
+			"eclipse":
+				# The light and shadow swap: a low pulse and a tremor.
+				shake = maxf(shake, 2.0)
+				sound.play("heavyHit", 0.25)
+				haptics.rigid(0.4)
 			"discord":
 				# Out of turn: every bell of that gate falls silent with a jangle.
 				for g in world.level.gates:
