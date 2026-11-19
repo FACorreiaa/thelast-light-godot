@@ -240,8 +240,8 @@ func _init() -> void:
 					% [crowd, fights, period, w.is_complete, fell, w.controlled().pos.x])
 
 	# Every level with eclipse phases, every lead, walking and fighting, a few seeds: it finishes, and no one on
-	# the heroes' side drops through a gap where eclipse ground was, except when knocked there by a hit (which
-	# throws anyone over any pit). Ordinary pits keep Swift's rules and are not counted.
+	# the heroes' side drops through a gap where eclipse ground was, except after a hit since they last stood
+	# (a knockback throws anyone over any pit, on the ground or in the air). Ordinary pits keep Swift's rules and are not counted.
 	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
 	for id: String in index.levels:
 		var level := Level.load_id(id)
@@ -259,8 +259,10 @@ func _init() -> void:
 						if w.is_over or w.is_complete:
 							break
 						for f: Fighter in w.fighters:
-							if f.team == "hero" and f.on_ground:
+							if f.team == "hero" and f.on_ground and f.state != Fighter.St.HITSTUN:
 								grounded[f.id] = f.state
+							elif f.team == "hero" and f.state == Fighter.St.HITSTUN:
+								grounded[f.id] = Fighter.St.HITSTUN
 						w.step(pilot.input_for(w))
 						for f: Fighter in w.fighters:
 							if f.team != "hero":
