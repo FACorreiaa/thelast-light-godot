@@ -42,6 +42,7 @@ var frozen := false:
 		if not v:
 			input.poll()
 		controls.take_presses()
+		_pending = {}
 		_pause_requested = false
 		# Menus sit over a clean picture: no HUD, no on-screen buttons.
 		hud.visible = not v
@@ -249,6 +250,9 @@ func _touch(index: int, pressed: bool, point: Vector2) -> void:
 
 
 var _pause_requested := false
+## Presses waiting for the next simulation step. A rendered frame can run no step (on a 120 Hz screen every
+## other one does, since the simulation runs at 60), so a press is kept until a step takes it.
+var _pending: Dictionary = {}
 
 
 ## World units are scaled so about the same slice of the level shows on a phone, a tablet and a Mac window.
@@ -504,6 +508,7 @@ func _process(delta: float) -> void:
 		if reading.attack or reading.jump:
 			story.advance()
 		controls.take_presses()
+		_pending = {}
 		accumulator = 0.0
 		_draw_frame()
 		_after_frame(delta)
@@ -521,11 +526,19 @@ func _process(delta: float) -> void:
 	if world.is_over and not presses.is_empty() and not reading.restart:
 		_restart(false)
 		presses = {}
+	if reading.restart:
+		_pending = {}
+	for pad: int in presses:
+		_pending[pad] = true
+	for pair: Array in [[reading.jump, TouchControls.Pad.JUMP], [reading.attack, TouchControls.Pad.ATTACK],
+			[reading.dodge, TouchControls.Pad.DODGE], [reading.special, TouchControls.Pad.SPECIAL],
+			[reading.switch_hero, TouchControls.Pad.SWITCH_HERO]]:
+		if pair[0]:
+			_pending[pair[1]] = true
 	var inp := InputFrame.make(reading.move_x if reading.move_x != 0.0 else controls.move_x,
-		reading.jump or presses.has(TouchControls.Pad.JUMP), reading.jump_held or controls.jump_held,
-		reading.attack or presses.has(TouchControls.Pad.ATTACK), reading.dodge or presses.has(TouchControls.Pad.DODGE),
-		reading.special or presses.has(TouchControls.Pad.SPECIAL),
-		reading.switch_hero or presses.has(TouchControls.Pad.SWITCH_HERO))
+		_pending.has(TouchControls.Pad.JUMP), reading.jump_held or controls.jump_held,
+		_pending.has(TouchControls.Pad.ATTACK), _pending.has(TouchControls.Pad.DODGE),
+		_pending.has(TouchControls.Pad.SPECIAL), _pending.has(TouchControls.Pad.SWITCH_HERO))
 	var step := 1.0 / Tuning.FRAMES_PER_SECOND
 	var steps := 0
 	while accumulator >= step and steps < 4 and not story.is_active():
@@ -535,6 +548,7 @@ func _process(delta: float) -> void:
 		_react(world.step(frame_input))
 		# A press belongs to one simulation frame only.
 		inp = InputFrame.make(inp.move_x, false, inp.jump_held, false, false, false, false)
+		_pending = {}
 		accumulator -= step
 		steps += 1
 	if steps == 4:
