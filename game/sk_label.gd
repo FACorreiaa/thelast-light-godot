@@ -76,11 +76,12 @@ static func font_for(weight: String) -> Font:
 	return _fonts[weight]
 
 
-## Neither family has the HUD's marks (⇄ ✦ ◆ ⚔ ▲ ▸); the system symbol fonts do, on Apple and Windows.
+## Neither family has the HUD's marks (⇄ ✦ ◆ ⚔ ▲ ▸). Hiragino Sans first: it is where CoreText takes them
+## from for Swift, so they keep their size; Segoe UI Symbol on Windows.
 static func symbols() -> Font:
 	if not _fonts.has("_symbols"):
 		var s := SystemFont.new()
-		s.font_names = PackedStringArray(["Apple Symbols", "Hiragino Sans", "Segoe UI Symbol", "Segoe UI", "DejaVu Sans"])
+		s.font_names = PackedStringArray(["Hiragino Sans", "Apple Symbols", "Segoe UI Symbol", "Segoe UI", "DejaVu Sans"])
 		_fonts["_symbols"] = s
 	return _fonts["_symbols"]
 
