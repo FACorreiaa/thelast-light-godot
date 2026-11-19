@@ -38,3 +38,30 @@ jobs:
 
       - name: Replay shard ${{ matrix.shard }}/8
         run: tools/run_tests.sh --pilot --shard=${{ matrix.shard }}/8
+
+  # The same suite on Windows: the shipped Steam build runs there, so the sim must be bit-exact on MSVC too.
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Godot
+        run: |
+          base=https://github.com/godotengine/godot-builds/releases/download/$GODOT_VERSION
+          zip=Godot_v${GODOT_VERSION}_win64.exe.zip
+          curl -fsSL -o "$RUNNER_TEMP/$zip" "$base/$zip"
+          curl -fsSL -o "$RUNNER_TEMP/SHA512-SUMS.txt" "$base/SHA512-SUMS.txt"
+          (cd "$RUNNER_TEMP" && grep " $zip\$" SHA512-SUMS.txt | sha512sum -c -)
+          unzip -q "$RUNNER_TEMP/$zip" -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}_win64_console.exe" >> "$GITHUB_ENV"
+
+      - name: Suite, shard ${{ matrix.shard }}/4
+        run: tools/run_tests.sh --pilot --shard=${{ matrix.shard }}/4
