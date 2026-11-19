@@ -53,35 +53,57 @@ static func box(fill: Color, radius: float, border := Color(0, 0, 0, 0), border_
 
 
 ## Makes `c` act on a tap, as a SwiftUI button does: on release inside it, not on touch-down, and not when the
-## finger moved off or dragged (a scroll). Only mouse buttons are read: on a phone Godot turns each touch
-## into one (input_devices/pointing/emulate_mouse_from_touch, on by default), and reading the touch as well
-## would act twice. `down(bool)` is told when the press starts and ends, for a pressed look.
-static func on_tap(c: Control, action: Callable, down := Callable()) -> void:
+## finger moved off or dragged. Only mouse buttons are read: on a phone Godot turns each touch into one
+## (input_devices/pointing/emulate_mouse_from_touch, on by default), and reading the touch as well would act
+## twice. `down(bool)` is told when the press starts and ends, for a pressed look. With `drag(Vector2)`, a
+## press that turns into a drag passes its movement on, and so does the mouse wheel, so a list made of these
+## still scrolls.
+static func on_tap(c: Control, action: Callable, down := Callable(), drag := Callable()) -> void:
 	c.mouse_filter = Control.MOUSE_FILTER_STOP
-	var state := {"down": false, "at": Vector2.ZERO}
+	var state := {"down": false, "dragging": false, "at": Vector2.ZERO}
 	var lift := func() -> void:
-		state.down = false
-		if down.is_valid():
+		if state.down and down.is_valid():
 			down.call(false)
+		state.down = false
 	c.gui_input.connect(func(e: InputEvent) -> void:
-		if e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+		if e is InputEventMouseButton:
 			var m := e as InputEventMouseButton
-			c.accept_event()
-			if m.pressed:
-				state.down = true
-				state.at = m.position
-				if down.is_valid():
-					down.call(true)
-			elif state.down:
+			if m.button_index == MOUSE_BUTTON_LEFT:
+				c.accept_event()
+				if m.pressed:
+					state.down = true
+					state.dragging = false
+					state.at = m.position
+					if down.is_valid():
+						down.call(true)
+				else:
+					var tapped: bool = state.down and Rect2(Vector2.ZERO, c.size).has_point(m.position)
+					lift.call()
+					state.dragging = false
+					if tapped:
+						action.call()
+			elif drag.is_valid() and m.pressed and m.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+				c.accept_event()
+				drag.call(Vector2(0, WHEEL_STEP if m.button_index == MOUSE_BUTTON_WHEEL_UP else -WHEEL_STEP) * m.factor)
+		elif e is InputEventMouseMotion and (state.down or state.dragging):
+			var mm := e as InputEventMouseMotion
+			if state.down and mm.position.distance_to(state.at) > TAP_SLOP:
 				lift.call()
-				if Rect2(Vector2.ZERO, c.size).has_point(m.position):
-					action.call()
-		elif e is InputEventMouseMotion and state.down:
-			if (e as InputEventMouseMotion).position.distance_to(state.at) > TAP_SLOP:
-				lift.call())
+				if drag.is_valid():
+					state.dragging = true
+					# The movement so far, so the list keeps up with the finger.
+					drag.call(mm.position - state.at)
+					return
+			if state.dragging:
+				c.accept_event()
+				drag.call(mm.relative))
 	c.mouse_exited.connect(func() -> void:
 		if state.down:
 			lift.call())
+
+
+## Points one wheel notch scrolls.
+const WHEEL_STEP := 40.0
 
 
 ## How far, in points, a finger may move before a tap becomes a drag.
@@ -90,7 +112,7 @@ const TAP_SLOP := 10.0
 
 ## A plain button around `content`: a container, so wrapped text inside it lays out at the width it is given.
 ## No chrome of its own unless `normal` is given; dims slightly while pressed.
-static func button(content: Control, on_press: Callable, normal: StyleBox = null) -> PanelContainer:
+static func button(content: Control, on_press: Callable, normal: StyleBox = null, drag := Callable()) -> PanelContainer:
 	var b := PanelContainer.new()
 	b.add_theme_stylebox_override("panel", normal if normal != null else StyleBoxEmpty.new())
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -98,5 +120,5 @@ static func button(content: Control, on_press: Callable, normal: StyleBox = null
 	for c in content.find_children("*", "Control", true, false):
 		(c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(content)
-	on_tap(b, on_press, func(pressed: bool) -> void: b.modulate = Color(1, 1, 1, 0.7) if pressed else Color.WHITE)
+	on_tap(b, on_press, func(pressed: bool) -> void: b.modulate = Color(1, 1, 1, 0.7) if pressed else Color.WHITE, drag)
 	return b

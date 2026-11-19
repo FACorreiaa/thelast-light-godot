@@ -344,6 +344,9 @@ static func _knob(d: int) -> Texture2D:
 
 
 func _chapter_panel(close: Callable) -> void:
+	var scroll := ScrollContainer.new()
+	# The rows take the finger, so they move the list themselves when it drags.
+	var scroll_by := func(delta: Vector2) -> void: scroll.scroll_vertical -= int(round(delta.y))
 	var list := _vbox(8)
 	for entry: Dictionary in app.scene.chapter_list():
 		var head := UI.label("CHAPTER %d  ·  %s" % [entry.number, String(entry.title).to_upper()], 11, Color(1, 1, 1, 0.5), "heavy", 2)
@@ -357,10 +360,9 @@ func _chapter_panel(close: Callable) -> void:
 		var names: Array = entry.names
 		for i in names.size():
 			var note := "opening" if int(entry.start) == 0 and i == 0 else ""
-			list.add_child(_chapter_row(str(i + 1), names[i], note, app.play_chapter.bind(int(entry.start) + i)))
-	list.add_child(_chapter_row("·", "Training Room", "waves", app.training_room))
+			list.add_child(_chapter_row(str(i + 1), names[i], note, app.play_chapter.bind(int(entry.start) + i), scroll_by))
+	list.add_child(_chapter_row("·", "Training Room", "waves", app.training_room, scroll_by))
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	# SwiftUI's indicator is hidden at rest; the list still scrolls by drag or wheel.
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
@@ -369,7 +371,7 @@ func _chapter_panel(close: Callable) -> void:
 	_panel_frame("CHAPTERS", close, [scroll] as Array[Control])
 
 
-func _chapter_row(number: String, name: String, note: String, action: Callable) -> Control:
+func _chapter_row(number: String, name: String, note: String, action: Callable, drag: Callable) -> Control:
 	var row := _hbox(12)
 	var n := UI.label(number, 13, GOLD, "heavy")
 	n.custom_minimum_size.x = 18
@@ -391,7 +393,7 @@ func _chapter_row(number: String, name: String, note: String, action: Callable) 
 	var style := UI.box(Sk.with_alpha(CYAN, 0.07), 8)
 	style.content_margin_left = 14
 	style.content_margin_right = 14
-	return UI.button(row, action, style)
+	return UI.button(row, action, style, drag)
 
 
 func _results_screen() -> void:

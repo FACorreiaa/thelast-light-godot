@@ -123,8 +123,13 @@ func _run() -> void:
 		var second := _control(app, app.scene.level_names()[1])
 		check(second != null, "the chapter list shows the second level")
 		if second != null:
-			await _touch(_center_of(second), Vector2(0, -40))
+			var scroll := app.menu_root.find_children("*", "ScrollContainer", true, false)[0] as ScrollContainer
+			var before := scroll.scroll_vertical
+			await _touch(_center_of(second), Vector2(0, -60))
 			check(app.screen == GameApp.Screen.TITLE and app.sheet == GameApp.Sheet.CHAPTERS, "scrolling the list starts nothing")
+			check(scroll.scroll_vertical > before, "a finger drag scrolls the chapter list (%d -> %d)" % [before, scroll.scroll_vertical])
+			scroll.scroll_vertical = 0
+			await _frames(2)
 			await _touch(_center_of(_control(app, app.scene.level_names()[1])))
 			check(app.screen == GameApp.Screen.PLAYING and app.scene.current_level() == 1, "a tap on a level plays it")
 	app.screen = GameApp.Screen.TITLE
