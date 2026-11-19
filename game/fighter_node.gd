@@ -252,6 +252,23 @@ func _build_lamplighter() -> void:
 	blade(100, Palette.EMBER, Vector2(8, 80))
 
 
+## Port-only placeholder (DRAFT-012, PROPOSED): the Mason. Broad and stooped under a stone-grey cowl, a
+## mason's apron, and a long hammer whose head is a block of the Engine's own stone. Pixel verdict pending.
+func _build_mason() -> void:
+	leg(-13, 50, 50, 15)
+	leg(13, 50, 50, 15)
+	part(SkPath.rounded_rect(-28, 46, 56, 54, 8))
+	part(SkPath.polygon([Vector2(-20, 62), Vector2(20, 62), Vector2(16, 20), Vector2(-16, 20)]), 1)
+	part(SkPath.rounded_rect(-33, 90, 66, 14, 6), 1)
+	part(SkPath.polygon([Vector2(-14, 100), Vector2(16, 100), Vector2(12, 128), Vector2(-10, 130)]), 1)
+	eye = lit(SkPath.rect(2, 114, 9, 2.5), Palette.RED, 3)
+	blade(110, Palette.STEEL, Vector2(10, 72))
+	var head := SkShape.make(SkPath.rounded_rect(-15, -9, 30, 18, 3), Palette.BODY, Palette.STEEL, 2.5)
+	head.position = Vector2(0, 110)
+	Sk.z(head, 4)
+	weapon_pivot.add_child(head)
+
+
 ## A small gold sun on the chest: the Dawnfaith's mark.
 func _sun_mark(point: Vector2, radius: float = 4.0) -> void:
 	lit(SkPath.circle(radius), Palette.GOLD, 3, point)
@@ -892,6 +909,7 @@ func _weapon_length() -> float:
 		"cinderKing": return 110
 		"lineWarden": return 96
 		"lamplighter": return 100
+		"mason": return 110
 		"swornShield": return 60
 		"swornSpear": return 140
 		"zealot": return 50

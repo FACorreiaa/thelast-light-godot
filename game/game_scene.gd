@@ -1049,6 +1049,9 @@ static func boss_title(kind: String) -> Array:
 			return ["THE SWORN", ["RISING"], "If one falls alone, the other raises it.  Bring them down together."]
 		"lineWarden":
 			return ["THE LINE WARDEN", ["OVERDRIVE"], "Its guard faces forward.  Get behind it, or parry to break its stance."]
+		# Port-only placeholder (DRAFT-012): name, phase and tip await the creator's verdict.
+		"mason":
+			return ["THE MASON", ["THE KEYSTONE"], "When he strikes the floor, get onto a ledge.  His hammer still reaches you there."]
 		"lastOracle":
 			return ["THE LAST ORACLE", ["THE DUSK", "THE ENDING"], "Gold light: look away.  Dark light: face her."]
 	return ["THE PROTOCOL", ["ASCENSION", "EXECUTION"], "Strike only when the core opens.  Jump the surge.  Dodge the charge."]

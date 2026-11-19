@@ -102,6 +102,9 @@ var partner_regroup_distance: float
 var partner_stranded_height: float
 var partner_stranded_frames: int
 var revive_fraction: float
+var mason_quake_from: float
+var mason_quake_chance: float
+var mason_shift_every: int
 
 var drone_attack_gap: Specs.IntRange
 var soldier_attack_gap: Specs.IntRange
@@ -124,6 +127,7 @@ var sworn_spear_attack_gap: Specs.IntRange
 var oracle_attack_gap: Specs.IntRange
 var cinder_attack_gap: Specs.IntRange
 var partner_attack_gap: Specs.IntRange
+var mason_attack_gap: Specs.IntRange
 
 var caelen: Specs.FighterSpec
 var seraphine: Specs.FighterSpec
@@ -151,6 +155,7 @@ var lamplighter: Specs.FighterSpec
 var sworn_shield: Specs.FighterSpec
 var sworn_spear: Specs.FighterSpec
 var cinder_king: Specs.FighterSpec
+var mason: Specs.FighterSpec
 
 
 static func load_default() -> Tuning:
@@ -256,6 +261,9 @@ static func from_data(d: Dictionary) -> Tuning:
 	t.partner_stranded_height = float(d["partnerStrandedHeight"])
 	t.partner_stranded_frames = int(d["partnerStrandedFrames"])
 	t.revive_fraction = float(d["reviveFraction"])
+	t.mason_quake_from = float(d["masonQuakeFrom"])
+	t.mason_quake_chance = float(d["masonQuakeChance"])
+	t.mason_shift_every = int(d["masonShiftEvery"])
 	t.drone_attack_gap = Specs.IntRange.from_data(d["droneAttackGap"])
 	t.soldier_attack_gap = Specs.IntRange.from_data(d["soldierAttackGap"])
 	t.sentry_attack_gap = Specs.IntRange.from_data(d["sentryAttackGap"])
@@ -277,6 +285,7 @@ static func from_data(d: Dictionary) -> Tuning:
 	t.oracle_attack_gap = Specs.IntRange.from_data(d["oracleAttackGap"])
 	t.cinder_attack_gap = Specs.IntRange.from_data(d["cinderAttackGap"])
 	t.partner_attack_gap = Specs.IntRange.from_data(d["partnerAttackGap"])
+	t.mason_attack_gap = Specs.IntRange.from_data(d["masonAttackGap"])
 	t.caelen = Specs.FighterSpec.from_data(d["caelen"])
 	t.seraphine = Specs.FighterSpec.from_data(d["seraphine"])
 	t.nimue = Specs.FighterSpec.from_data(d["nimue"])
@@ -303,6 +312,7 @@ static func from_data(d: Dictionary) -> Tuning:
 	t.sworn_shield = Specs.FighterSpec.from_data(d["swornShield"])
 	t.sworn_spear = Specs.FighterSpec.from_data(d["swornSpear"])
 	t.cinder_king = Specs.FighterSpec.from_data(d["cinderKing"])
+	t.mason = Specs.FighterSpec.from_data(d["mason"])
 	return t
 
 
@@ -361,5 +371,7 @@ func spec(kind: String) -> Specs.FighterSpec:
 			return sworn_spear
 		"cinderKing":
 			return cinder_king
+		"mason":
+			return mason
 	push_error("Tuning: no spec for %s" % kind)
 	return null

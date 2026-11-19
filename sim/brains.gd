@@ -28,6 +28,11 @@ const LAMPLIGHTER_DOUSE := 1
 const LAMPLIGHTER_EMBER := 2
 const LAMPLIGHTER_CALL := 3
 const LAMPLIGHTER_SNUFF := 4
+# Port-only (the final chapter): the Mason.
+const MASON_HAMMER := 0
+const MASON_SHIFT := 1
+const MASON_QUAKE := 2
+const MASON_CALL := 3
 const SWORN_SHIELD_BASH := 0
 const SWORN_SHIELD_LIGHT := 2
 const SWORN_SPEAR_THRUST := 0
@@ -86,6 +91,8 @@ static func think(brain: String, me: Fighter, foes: Array[Fighter], allies: Arra
 			return warden(me, foes, allies, tuning, rng)
 		"LamplighterBrain":
 			return lamplighter(me, foes, allies, tuning, rng)
+		"MasonBrain":
+			return mason(me, foes, allies, tuning, rng)
 		"SwornShieldBrain":
 			return sworn_shield(me, foes, allies, tuning, rng)
 		"SwornSpearBrain":
@@ -562,6 +569,60 @@ static func lamplighter(me: Fighter, foes: Array[Fighter], allies: Array[Fighter
 			and rng.double_half_open(0.0, 1.0) < tuning.lamplighter_ember_chance:
 		me.next_attack = LAMPLIGHTER_EMBER
 	else:
+		return _mv(dir)
+	return _mv(dir * FACING_NUDGE, true)
+
+
+## Port-only: the Mason (DRAFT-012, PROPOSED). Walks the hero down to hammer them. Every few attacks he
+## shifts the eclipse (the next swap comes at once) and follows with a quake: columns under each hero, lower
+## than a ledge's top, so the ledges that stand after the swap are the shelter. From afar he quakes now and
+## then. Overdrive: calls help when none is left beside him.
+static func mason(me: Fighter, foes: Array[Fighter], allies: Array[Fighter], tuning: Tuning,
+		rng: SeededRandom) -> InputFrame:
+	var target := _nearest(foes, me)
+	if target == null:
+		return InputFrame.neutral()
+	if me.ai_cooldown > 0:
+		me.ai_cooldown -= 1
+	if not me.is_actionable():
+		return InputFrame.neutral()
+	var dx := target.pos.x - me.pos.x
+	var dir: float = 1.0 if dx >= 0.0 else -1.0
+	var gap := absf(dx) - me.spec.width / 2.0 - target.spec.width / 2.0
+	var close: bool = gap < me.spec.attacks[MASON_HAMMER].reach - 10.0
+	if me.ai_cooldown != 0:
+		return _mv(dir * FACING_NUDGE if close else dir)
+	me.ai_cooldown = rng.int_closed(tuning.mason_attack_gap.lower, tuning.mason_attack_gap.upper)
+
+	# The quake that follows a shift.
+	if me.ai_aux2 > 0:
+		me.ai_aux2 = 0
+		me.next_attack = MASON_QUAKE
+		return _mv(dir * FACING_NUDGE, true)
+	if me.phase >= 2:
+		var alone := true
+		for a: Fighter in allies:
+			if a.id != me.id and a.is_alive():
+				alone = false
+				break
+		if alone and me.ai_aux3 == 0:
+			me.ai_aux3 = 5
+			me.next_attack = MASON_CALL
+			return _mv(dir * FACING_NUDGE, true)
+		if me.ai_aux3 > 0:
+			me.ai_aux3 -= 1
+	me.ai_aux += 1
+	if me.ai_aux >= tuning.mason_shift_every:
+		me.ai_aux = 0
+		me.ai_aux2 = 1
+		me.next_attack = MASON_SHIFT
+		return _mv(dir * FACING_NUDGE, true)
+	if close:
+		me.next_attack = MASON_HAMMER
+	elif gap > tuning.mason_quake_from and rng.double_half_open(0.0, 1.0) < tuning.mason_quake_chance:
+		me.next_attack = MASON_QUAKE
+	else:
+		me.ai_aux -= 1
 		return _mv(dir)
 	return _mv(dir * FACING_NUDGE, true)
 
