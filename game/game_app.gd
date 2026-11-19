@@ -64,6 +64,9 @@ func _ready() -> void:
 		story.begin(args[i + 1])
 		for _n in (int(args[i + 2]) if i + 2 < args.size() else 0):
 			story.advance()
+	i = args.find("--smoke")
+	if i >= 0 and i + 1 < args.size():
+		_smoke(int(args[i + 1]))
 	i = args.find("--menu")
 	if i >= 0 and i + 1 < args.size():
 		match args[i + 1]:
@@ -82,6 +85,17 @@ func _ready() -> void:
 					"chapter_number": 1, "chapter_title": c.title, "ending": c.ending if end else "", "chapter_start": 0,
 					"is_final": false, "seconds": 263.0, "defeated": 14, "downs": 1, "found": 3, "hidden": 5}
 				screen = Screen.RESULTS
+
+
+## `--smoke N`: after N frames, print where the app is and quit. Exported builds are checked this way on
+## machines no one looks at (CI's Windows runner): the line proves the game loaded and ran, not just started.
+func _smoke(frames: int) -> void:
+	for _f in frames:
+		await get_tree().process_frame
+	var w: World = scene.world
+	print("smoke: screen=%s level=%d sim_frame=%d story=%s" % [Screen.keys()[screen], scene.current_level(),
+			w.frame if w != null else -1, "active" if story.is_active() else "idle"])
+	get_tree().quit()
 
 
 ## Godot's default ui_accept and ui_cancel are keyboard only; a gamepad's A and B join them, so menus work

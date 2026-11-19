@@ -149,6 +149,9 @@ func _ready() -> void:
 	ui_layer.add_child(hud)
 	if show_touch:
 		ui_layer.add_child(controls)
+	else:
+		# Never in the tree on desktop, so nothing else frees it (or the shapes and labels it built).
+		tree_exited.connect(controls.free)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 	_build_scenery()

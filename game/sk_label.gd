@@ -77,11 +77,11 @@ static func font_for(weight: String) -> Font:
 
 
 ## Neither family has the HUD's marks (⇄ ✦ ◆ ⚔ ▲ ▸). Hiragino Sans first: it is where CoreText takes them
-## from for Swift, so they keep their size; Segoe UI Symbol on Windows.
+## from for Swift, so they keep their size; Segoe UI Symbol on Windows; Noto/DejaVu on Linux.
 static func symbols() -> Font:
 	if not _fonts.has("_symbols"):
 		var s := SystemFont.new()
-		s.font_names = PackedStringArray(["Hiragino Sans", "Apple Symbols", "Segoe UI Symbol", "Segoe UI", "DejaVu Sans"])
+		s.font_names = PackedStringArray(["Hiragino Sans", "Apple Symbols", "Segoe UI Symbol", "Segoe UI", "Noto Sans Symbols 2", "Noto Sans Symbols", "DejaVu Sans"])
 		_fonts["_symbols"] = s
 	return _fonts["_symbols"]
 

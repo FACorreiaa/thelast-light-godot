@@ -1,7 +1,7 @@
 name: windows-export
 
-# Exports the Windows build with the official templates and runs the exported exe headless through a
-# level, the title and a story scene, failing on any script error. Uploads the exe for a hand test.
+# Exports the Windows build with the official templates, smoke-runs a debug export headless through the
+# title, the faction pick, a level and a story scene, and uploads the release exe for a hand test.
 
 on:
   push:
@@ -47,14 +47,30 @@ jobs:
           "$GODOT" --headless --path . --export-release "Windows" build/windows/TheLastLight.exe
           ls -la build/windows
 
-      - name: Smoke-run the exported exe
+      # A debug export with its console wrapper, so script errors reach stdout (a release exe is a GUI
+      # program and reports little). `--smoke N` makes the game print where it is after N frames and quit,
+      # so each run must show it really loaded and ran: the expected screen, level and story state.
+      - name: Smoke-run a debug export
         run: |
+          mkdir -p build/windows-debug
+          "$GODOT" --headless --path . --export-debug "Windows" build/windows-debug/TheLastLight.exe
+          exe=build/windows-debug/TheLastLight.console.exe
+          test -f "$exe"
           fail=0
-          for args in "" "--menu factions" "--demo --level 4" "--level 0 --scene awakening.orion 2"; do
-            out=$(build/windows/TheLastLight.exe --headless --quit-after 600 -- $args --save-dir "$RUNNER_TEMP/save" 2>&1) || { echo "exit $? for [$args]"; fail=1; }
-            if grep -qE "SCRIPT ERROR|Parse Error|Failed to load" <<<"$out"; then echo "$out"; fail=1; fi
-            echo "ok [$args]"
-          done
+          check() {  # check <expected smoke line regex> <game args...>
+            local want=$1; shift
+            local out code=0
+            out=$("$exe" --headless -- "$@" --smoke 300 --save-dir "$RUNNER_TEMP/save-$RANDOM" 2>&1) || code=$?
+            if [[ $code -ne 0 ]] || ! grep -qE "$want" <<<"$out" || grep -qE "SCRIPT ERROR|Parse Error|Failed to load|^ERROR:" <<<"$out"; then
+              echo "FAILED [$*] exit $code"; echo "$out"; fail=1
+            else
+              echo "ok [$*] $(grep '^smoke:' <<<"$out")"
+            fi
+          }
+          check '^smoke: screen=TITLE level=0 sim_frame=0 story=idle'
+          check '^smoke: screen=FACTION_PICK ' --menu factions
+          check '^smoke: screen=PLAYING level=4 sim_frame=[1-9][0-9]* story=idle' --demo --level 4
+          check '^smoke: screen=PLAYING level=0 .* story=active' --level 0 --scene awakening.orion 2
           exit $fail
 
       - uses: actions/upload-artifact@v4

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Exports the iOS project, puts the arm64 simulator engine into it, builds it and installs it on a simulator.
-#   tools/ios_sim.sh [simulator UDID] [-- game args...]
+#   tools/ios_sim.sh [simulator UDID]   (default: the simulator named "LastLight iPhone")
 # Then run it: xcrun simctl launch <UDID> com.fernandocorreia.lastlight.gdspike -- --menu factions
 #
 # The official 4.7.2 templates ship an x86_64-only simulator libgodot.a, which the iOS 26 simulator on
@@ -13,8 +13,9 @@ cd "$(dirname "$0")/.."
 GODOT=${GODOT:-godot}
 SIM_LIB=${SIM_LIB:-/Volumes/PortableSSD/Work/godot-build/godot/bin/libgodot.ios.template_release.arm64.simulator.a}
 DERIVED=${DERIVED:-/Volumes/PortableSSD/Work/godot-build/dd-sim}
-UDID=${1:-$(xcrun simctl list devices booted | grep -oE '[0-9A-F-]{36}' | head -1)}
-[[ -n "$UDID" ]] || { echo "No booted simulator; pass a UDID." >&2; exit 1; }
+# Never "the first booted simulator": other sessions run their UI tests on theirs. Use ours by name.
+UDID=${1:-$(xcrun simctl list devices | grep -F "LastLight iPhone (" | grep -oE '[0-9A-F-]{36}' | head -1)}
+[[ -n "$UDID" ]] || { echo 'No "LastLight iPhone" simulator; create one or pass a UDID.' >&2; exit 1; }
 [[ -f "$SIM_LIB" ]] || { echo "Missing $SIM_LIB; see the comment at the top." >&2; exit 1; }
 
 mkdir -p build/ios
