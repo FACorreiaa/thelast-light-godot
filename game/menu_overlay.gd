@@ -29,6 +29,8 @@ var safe_insets := Rect2()
 ## Key -> what it does on the current screen (Return, Escape, digits), standing in for SwiftUI's
 ## keyboardShortcut. The top sheet's keys win over the screen's.
 var _keys: Dictionary = {}
+## The screen's main button, where a gamepad starts.
+var _primary: Control
 
 
 func _init(p_app: GameApp) -> void:
@@ -48,6 +50,7 @@ func _rebuild() -> void:
 		remove_child(c)
 		c.queue_free()
 	_keys = {}
+	_primary = null
 	match app.screen:
 		GameApp.Screen.TITLE:
 			_backdrop(0.72)
@@ -65,12 +68,47 @@ func _rebuild() -> void:
 		# A sheet's keys replace the screen's underneath it.
 		_keys = {}
 		var close := func() -> void: app.sheet = GameApp.Sheet.NONE
-		UI.on_tap(_backdrop(0.5), close)
+		UI.on_tap(_backdrop(0.5), close, Callable(), Callable(), false)
 		if app.sheet == GameApp.Sheet.SETTINGS:
 			_settings_panel(close)
 		else:
 			_chapter_panel(close)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_focus_first.call_deferred()
+
+
+## A gamepad needs somewhere to start: the screen's primary button, else the first thing that takes focus.
+## The top sheet's controls come last in the tree, so they win.
+func _focus_first() -> void:
+	var all: Array[Control] = []
+	for c in find_children("*", "Control", true, false):
+		var k := c as Control
+		if k.focus_mode == Control.FOCUS_ALL and k.is_visible_in_tree():
+			all.append(k)
+	if all.is_empty():
+		return
+	if app.sheet != GameApp.Sheet.NONE:
+		# The sheet's own controls: those inside the last panel built.
+		var panel := get_child(get_child_count() - 1)
+		for k in all:
+			if panel.is_ancestor_of(k) and not k is HSlider:
+				k.grab_focus()
+				return
+	if _primary != null and is_instance_valid(_primary):
+		_primary.grab_focus()
+	else:
+		all[0].grab_focus()
+
+
+func _input(event: InputEvent) -> void:
+	UI.note_input(event)
+	if not is_visible_in_tree() or not (event is InputEventJoypadButton) or not event.pressed:
+		return
+	var b := (event as InputEventJoypadButton).button_index
+	# B goes back, as Escape does; Start also leaves the pause menu.
+	if (b == JOY_BUTTON_B or (b == JOY_BUTTON_START and app.screen == GameApp.Screen.PAUSED)) and _keys.has(KEY_ESCAPE):
+		get_viewport().set_input_as_handled()
+		(_keys[KEY_ESCAPE] as Callable).call()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -131,6 +169,8 @@ func _menu_button(title: String, action: Callable, primary := false, shortcut :=
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if shortcut != KEY_NONE:
 		_keys[shortcut] = action
+	if primary:
+		_primary = b
 	return b
 
 
@@ -250,7 +290,15 @@ func _settings_panel(close: Callable) -> void:
 	slider.step = 0.01
 	slider.value = app.settings.volume
 	slider.custom_minimum_size.y = 28
-	slider.focus_mode = Control.FOCUS_NONE
+	slider.focus_mode = Control.FOCUS_ALL
+	var ring := UI._ring()
+	slider.draw.connect(func() -> void:
+		if UI.navigating and slider.has_focus():
+			slider.draw_style_box(ring, Rect2(Vector2(0, 2), slider.size - Vector2(0, 4))))
+	slider.focus_entered.connect(slider.queue_redraw)
+	slider.focus_exited.connect(slider.queue_redraw)
+	var empty := StyleBoxEmpty.new()
+	slider.add_theme_stylebox_override("focus", empty)
 	var track := UI.box(Color(1, 1, 1, 0.18), 2)
 	track.content_margin_top = 2
 	track.content_margin_bottom = 2
@@ -366,6 +414,7 @@ func _chapter_panel(close: Callable) -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	# SwiftUI's indicator is hidden at rest; the list still scrolls by drag or wheel.
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	scroll.follow_focus = true
 	scroll.custom_minimum_size.y = minf(260.0, size.y - 136.0)
 	scroll.add_child(list)
 	_panel_frame("CHAPTERS", close, [scroll] as Array[Control])

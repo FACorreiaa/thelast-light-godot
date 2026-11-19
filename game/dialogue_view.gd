@@ -16,13 +16,14 @@ func _init(p_story: StoryPresenter) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dim.color = Color(0, 0, 0, 0.35)
 	_dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	UI.on_tap(_dim, func() -> void: story.advance())
+	UI.on_tap(_dim, func() -> void: story.advance(), Callable(), Callable(), false)
 	add_child(_dim)
 	_panel.add_theme_stylebox_override("panel", UI.box(Color(0.02, 0.04, 0.08, 0.94), 12, Sk.with_alpha(UI.CYAN, 0.35), 1, 18))
 	_column.add_theme_constant_override("separation", 10)
 	_panel.add_child(_column)
 	add_child(_panel)
 	story.changed.connect(_refresh)
+	UI.relay.navigating_changed.connect(_focus_answer)
 	resized.connect(_place)
 	_place()
 	_refresh()
@@ -65,7 +66,10 @@ func _refresh() -> void:
 	if choices.is_empty():
 		var more := UI.label("continue  ▸", 12, Color(1, 1, 1, 0.5), "semibold")
 		more.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		_column.add_child(UI.button(more, story.advance))
+		var more_button := UI.button(more, story.advance)
+		# Only answers take focus: continuing is attack or jump in the game, or a tap anywhere.
+		more_button.focus_mode = Control.FOCUS_NONE
+		_column.add_child(more_button)
 	else:
 		for i in choices.size():
 			var row := HBoxContainer.new()
@@ -83,7 +87,7 @@ func _refresh() -> void:
 			row.alignment = BoxContainer.ALIGNMENT_CENTER
 			var b := UI.button(pad, story.choose.bind(i), UI.box(Sk.with_alpha(UI.CYAN, 0.1), 8, Sk.with_alpha(UI.CYAN, 0.5)))
 			_column.add_child(b)
-
+	_focus_answer.call_deferred()
 
 ## Bottom centre, at most 620 points wide, 24 in from the sides and 20 up from the bottom; it grows upward
 ## to fit the text.
@@ -98,6 +102,20 @@ func _place() -> void:
 	_panel.offset_right = w / 2.0
 	_panel.offset_bottom = -20.0
 	_panel.offset_top = -20.0
+
+
+## With a gamepad the answers are picked by moving between them: start on the first, whether the pad was
+## in use when the question came up or is picked up while it waits.
+func _focus_answer() -> void:
+	if not visible or _choice_count == 0 or not UI.navigating:
+		return
+	var owner := get_viewport().gui_get_focus_owner()
+	if owner != null and is_ancestor_of(owner):
+		return
+	for c in _column.get_children():
+		if (c as Control).focus_mode == Control.FOCUS_ALL:
+			(c as Control).grab_focus()
+			return
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

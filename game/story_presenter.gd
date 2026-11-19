@@ -9,6 +9,7 @@ signal changed
 var runner: Story.Runner
 var state := Story.State.new()
 var library: Story.Library
+var _chose_on := -1
 
 
 func _init() -> void:
@@ -38,6 +39,9 @@ func begin(id: String) -> bool:
 
 
 func advance() -> void:
+	# The press that picked an answer (A on a gamepad is also jump) must not also skip the reply.
+	if Engine.get_process_frames() == _chose_on:
+		return
 	if runner != null:
 		runner.advance()
 	_settle()
@@ -45,6 +49,7 @@ func advance() -> void:
 
 
 func choose(index: int) -> void:
+	_chose_on = Engine.get_process_frames()
 	if runner != null:
 		runner.choose(index)
 	_settle()

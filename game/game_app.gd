@@ -35,6 +35,7 @@ var menus: MenuOverlay
 
 func _ready() -> void:
 	var args := OS.get_cmdline_user_args()
+	_add_pad_to_ui_actions()
 	scene.story = story
 	add_child(scene)
 	scene.apply_settings(settings)
@@ -81,6 +82,17 @@ func _ready() -> void:
 					"chapter_number": 1, "chapter_title": c.title, "ending": c.ending if end else "", "chapter_start": 0,
 					"is_final": false, "seconds": 263.0, "defeated": 14, "downs": 1, "found": 3, "hidden": 5}
 				screen = Screen.RESULTS
+
+
+## Godot's default ui_accept and ui_cancel are keyboard only; a gamepad's A and B join them, so menus work
+## with a pad alone (the d-pad and left stick are already in ui_up/down/left/right).
+static func _add_pad_to_ui_actions() -> void:
+	for pair in [["ui_accept", JOY_BUTTON_A], ["ui_cancel", JOY_BUTTON_B]]:
+		var e := InputEventJoypadButton.new()
+		e.device = -1
+		e.button_index = pair[1]
+		if not InputMap.action_has_event(pair[0], e):
+			InputMap.action_add_event(pair[0], e)
 
 
 func _layout() -> void:

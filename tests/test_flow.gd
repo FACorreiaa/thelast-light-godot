@@ -50,6 +50,17 @@ func _touch(at: Vector2, drag := Vector2.ZERO) -> void:
 	await _frames(3)
 
 
+## A gamepad button pressed and let go.
+func _pad(button: JoyButton) -> void:
+	for pressed in [true, false]:
+		var b := InputEventJoypadButton.new()
+		b.device = 0
+		b.button_index = button
+		b.pressed = pressed
+		Input.parse_input_event(b)
+		await _frames(2)
+
+
 ## The tappable control around the label reading `text`.
 func _control(app: GameApp, text: String) -> Control:
 	for l: Label in app.menu_root.find_children("*", "Label", true, false):
@@ -133,6 +144,25 @@ func _run() -> void:
 			await _touch(_center_of(_control(app, app.scene.level_names()[1])))
 			check(app.screen == GameApp.Screen.PLAYING and app.scene.current_level() == 1, "a tap on a level plays it")
 	app.screen = GameApp.Screen.TITLE
+	await _frames(3)
+
+	# A gamepad alone can get through the menus: focus starts on the main button, the d-pad moves, A acts,
+	# B goes back. The ring shows only while the pad is in use.
+	check(root.gui_get_focus_owner() == _control(app, "CONTINUE"), "focus starts on the main button")
+	var steps := 0
+	while root.gui_get_focus_owner() != _control(app, "CHAPTERS") and steps < 4:
+		await _pad(JOY_BUTTON_DPAD_DOWN)
+		steps += 1
+	check(UI.navigating, "a pad press switches to navigating")
+	check(steps == 2, "the d-pad walks down the buttons: CONTINUE, NEW GAME, CHAPTERS (%d presses)" % steps)
+	await _pad(JOY_BUTTON_A)
+	check(app.sheet == GameApp.Sheet.CHAPTERS, "A opens what has focus")
+	await _frames(2)
+	check(root.gui_get_focus_owner() != null and app.menus.is_ancestor_of(root.gui_get_focus_owner()), "focus moves into the sheet")
+	await _pad(JOY_BUTTON_B)
+	check(app.sheet == GameApp.Sheet.NONE, "B closes the sheet")
+	await _touch(Vector2(4, 4))
+	check(not UI.navigating, "a touch hides the focus ring again")
 
 	app.new_game()
 	check(app.screen == GameApp.Screen.FACTION_PICK, "new game opens the faction pick")
@@ -175,6 +205,25 @@ func _run() -> void:
 		await _frames(10)
 		check(app.scene.world.frame > f0, "the world moves again after the scene")
 
+	# A choice picked with a pad: the press that picks must not also skip the reply.
+	app.story.forget(["awakening.orion"])
+	app.story.begin("awakening.orion")
+	app.story.advance()
+	app.story.advance()
+	check(not app.story.runner.choices().is_empty(), "the Orion scene reaches its question")
+	UI.navigating = true
+	await _frames(3)
+	var answer := root.gui_get_focus_owner()
+	check(answer != null and app.dialogue.is_ancestor_of(answer), "with a pad the first answer has focus")
+	await _pad(JOY_BUTTON_A)
+	check(app.story.is_active() and String(app.story.runner.line.text).begins_with("Beside"), "A picks the answer and the reply shows: %s" % (app.story.runner.line.get("text", "(ended)") if app.story.is_active() else "(ended)"))
+	app.story.choose(0)
+	app.story.advance()
+	check(app.story.is_active(), "an advance in the same frame as a choice is ignored")
+	while app.story.is_active():
+		app.story.advance()
+		await _frames(1)
+	UI.navigating = false
 	await _touch(_pause_button(app))
 	await _frames(2)
 	check(app.screen == GameApp.Screen.PAUSED and app.scene.frozen, "the pause button pauses, and pausing freezes")
@@ -186,6 +235,10 @@ func _run() -> void:
 	app.resume()
 	await _frames(5)
 	check(app.screen == GameApp.Screen.PLAYING, "a tap behind the pause menu does not re-pause on resume")
+	app.pause()
+	await _frames(2)
+	await _pad(JOY_BUTTON_START)
+	check(app.screen == GameApp.Screen.PLAYING, "Start leaves the pause menu")
 	app.pause()
 	app.sheet = GameApp.Sheet.SETTINGS
 	var s := app.settings.copy()

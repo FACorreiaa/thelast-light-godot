@@ -6,6 +6,68 @@ extends RefCounted
 const CYAN := Color(0.35, 0.92, 1.0)
 static var _fonts: Dictionary = {}
 
+## Whether the player is moving through menus with a gamepad or the arrow keys, not pointing. The focus ring
+## shows only then; a tap or click hides it again.
+static var navigating := false:
+	set(v):
+		if navigating == v:
+			return
+		navigating = v
+		relay.navigating_changed.emit()
+## Holds the signal, since a static var cannot be a signal of its own.
+static var relay := _Relay.new()
+
+
+class _Relay:
+	extends RefCounted
+	signal navigating_changed
+
+
+## Tracks how the player is driving the menus. MenuOverlay feeds it every input event.
+static func note_input(e: InputEvent) -> void:
+	if e is InputEventJoypadButton or (e is InputEventJoypadMotion and absf((e as InputEventJoypadMotion).axis_value) > 0.5):
+		navigating = true
+	elif e is InputEventKey and e.pressed and (e.is_action("ui_up") or e.is_action("ui_down") or e.is_action("ui_left") \
+			or e.is_action("ui_right") or e.is_action("ui_focus_next") or e.is_action("ui_focus_prev")):
+		navigating = true
+	elif e is InputEventMouseButton or e is InputEventScreenTouch:
+		navigating = false
+
+
+## The ring drawn around whatever has focus while navigating.
+static func _ring() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.draw_center = false
+	s.set_border_width_all(2)
+	s.border_color = CYAN
+	s.set_corner_radius_all(10)
+	s.corner_detail = 8
+	s.anti_aliasing = true
+	s.expand_margin_left = 3
+	s.expand_margin_right = 3
+	s.expand_margin_top = 3
+	s.expand_margin_bottom = 3
+	return s
+
+
+## Lets a gamepad or the keyboard reach `c`: focusable, a ring while it has focus and the player is
+## navigating, and `ui_accept` (A, Enter, Space) acts.
+static func focusable(c: Control, action: Callable) -> void:
+	c.focus_mode = Control.FOCUS_ALL
+	var ring := _ring()
+	c.draw.connect(func() -> void:
+		if navigating and c.has_focus():
+			c.draw_style_box(ring, Rect2(Vector2.ZERO, c.size)))
+	c.focus_entered.connect(c.queue_redraw)
+	c.focus_exited.connect(c.queue_redraw)
+	relay.navigating_changed.connect(func() -> void:
+		if is_instance_valid(c) and c.has_focus():
+			c.queue_redraw())
+	c.gui_input.connect(func(e: InputEvent) -> void:
+		if e.is_action_pressed("ui_accept") and not e.is_echo():
+			c.accept_event()
+			action.call())
+
 
 ## The system font at a SwiftUI weight ("regular", "medium", "semibold", "bold", "heavy"), with optional
 ## tracking in points.
@@ -58,8 +120,10 @@ static func box(fill: Color, radius: float, border := Color(0, 0, 0, 0), border_
 ## twice. `down(bool)` is told when the press starts and ends, for a pressed look. With `drag(Vector2)`, a
 ## press that turns into a drag passes its movement on, and so does the mouse wheel, so a list made of these
 ## still scrolls.
-static func on_tap(c: Control, action: Callable, down := Callable(), drag := Callable()) -> void:
+static func on_tap(c: Control, action: Callable, down := Callable(), drag := Callable(), focus := true) -> void:
 	c.mouse_filter = Control.MOUSE_FILTER_STOP
+	if focus:
+		focusable(c, action)
 	var state := {"down": false, "dragging": false, "at": Vector2.ZERO}
 	var lift := func() -> void:
 		if state.down and down.is_valid():
