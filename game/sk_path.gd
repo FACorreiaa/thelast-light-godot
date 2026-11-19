@@ -102,6 +102,11 @@ static func circle(r: float) -> SkPath:
 	return ellipse(-r, -r, r * 2.0, r * 2.0)
 
 
+## SKShapeNode(ellipseOf:): centred on the origin.
+static func ellipse_of(w: float, h: float) -> SkPath:
+	return ellipse(-w / 2.0, -h / 2.0, w, h)
+
+
 ## SKShapeNode(rectOf:cornerRadius:): centred on the origin.
 static func rect_of(w: float, h: float, r: float = 0.0) -> SkPath:
 	return rounded_rect(-w / 2.0, -h / 2.0, w, h, r)

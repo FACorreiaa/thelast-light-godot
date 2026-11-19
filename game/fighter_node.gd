@@ -75,6 +75,14 @@ func _init(p_kind: String) -> void:
 	_add_glows()
 
 
+## Members made up front but only parented by the builders that use them are freed with the node.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		for n: Node in [zone, weapon_pivot]:
+			if is_instance_valid(n) and n.get_parent() == null:
+				n.free()
+
+
 # MARK: Building
 
 
@@ -204,6 +212,387 @@ func _build_forged_soldier() -> void:
 	Sk.z(plate, 4)
 	figure.add_child(plate)
 	shield = plate
+
+
+## The Line Warden: a tall soldier frame, a tower shield held forward and a long blade. The shield dims when it
+## drops its guard, the same as a Forged Soldier's.
+func _build_line_warden() -> void:
+	leg(-11, 52, 52, 14)
+	leg(11, 52, 52, 14)
+	part(SkPath.rounded_rect(-24, 50, 48, 58, 6))
+	# Shoulder plates and a narrow helm.
+	part(SkPath.rounded_rect(-30, 96, 60, 14, 5), 1)
+	part(SkPath.rounded_rect(-10, 108, 22, 24, 4), 1)
+	eye = lit(SkPath.rect(0, 120, 12, 3), Palette.RED, 4)
+	# A line of red down its chest: the line it keeps.
+	lit(SkPath.rect(-1.5, 56, 3, 40), Palette.RED, 2)
+	blade(96, Palette.RED, Vector2(6, 88))
+	var tower := SkShape.make(SkPath.rounded_rect(22, 14, 13, 104, 4), Palette.BODY, Palette.STEEL, 2.5)
+	Sk.z(tower, 4)
+	var boss := SkShape.make(SkPath.rounded_rect(26, 60, 5, 14, 2))
+	light(boss, Palette.RED, 2)
+	tower.add_child(boss)
+	figure.add_child(tower)
+	shield = tower
+
+
+## The Lamplighter: tall and thin in a long coat and a wide hat, a hooked pole with a snuffer, and a shuttered
+## lantern at his hip that is the only light he keeps.
+func _build_lamplighter() -> void:
+	leg(-7, 46, 46, 9)
+	leg(7, 46, 46, 9)
+	part(SkPath.polygon([Vector2(-13, 98), Vector2(13, 98), Vector2(20, 30), Vector2(-20, 30)]))
+	part(SkPath.ellipse(-9, 96, 18, 18), 1)
+	# The brim, wide enough to keep his face in shadow.
+	part(SkPath.rounded_rect(-22, 110, 44, 5, 2), 2)
+	part(SkPath.rounded_rect(-10, 114, 20, 10, 3), 2)
+	eye = lit(SkPath.rect(1, 103, 7, 2), Palette.EMBER, 3)
+	var lantern := lit(SkPath.rounded_rect(-4, -6, 8, 12, 2), Palette.EMBER, 4, Vector2(-16, 44))
+	Sk.z(lantern, 3)
+	blade(100, Palette.EMBER, Vector2(8, 80))
+
+
+## A small gold sun on the chest: the Dawnfaith's mark.
+func _sun_mark(point: Vector2, radius: float = 4.0) -> void:
+	lit(SkPath.circle(radius), Palette.GOLD, 3, point)
+
+
+## Zealot: lean, hooded, a short tunic over bare legs, a curved blade held ready.
+func _build_zealot() -> void:
+	leg(-6, 38, 38, 8)
+	leg(6, 38, 38, 8)
+	part(SkPath.polygon([Vector2(-10, 68), Vector2(10, 68), Vector2(14, 30), Vector2(-14, 30)]))
+	part(SkPath.polygon([Vector2(-9, 66), Vector2(9, 68), Vector2(4, 86), Vector2(-6, 84)]), 1)
+	eye = lit(SkPath.circle(1.8), Palette.GOLD, 2, Vector2(5, 76))
+	_sun_mark(Vector2(0, 54))
+	blade(50, Palette.GOLD, Vector2(6, 56))
+
+
+## Radiant Acolyte: long robe, a small halo, a staff topped with a sun.
+func _build_radiant_acolyte() -> void:
+	part(SkPath.polygon([Vector2(-8, 64), Vector2(9, 64), Vector2(15, 0), Vector2(-15, 0)]))
+	part(SkPath.ellipse(-8, 62, 17, 17), 1)
+	var ring := SkShape.make(SkPath.circle(10), CLEAR, Palette.GOLD, 1.5, 3)
+	ring.position = Vector2(0, 84)
+	ring.scale.y = 0.35
+	Sk.z(ring, 2)
+	figure.add_child(ring)
+	eye = lit(SkPath.circle(1.8), Palette.GOLD, 2, Vector2(6, 71))
+	blade(54, Palette.IVORY, Vector2(8, 44))
+	var sun := SkShape.make(SkPath.circle(5))
+	sun.position = Vector2(0, 54)
+	light(sun, Palette.GOLD, 6)
+	weapon.add_child(sun)
+
+
+## Solar Guard: broad armour, a round sun shield held forward, a short mace.
+func _build_solar_guard() -> void:
+	leg(-10, 46, 46, 13)
+	leg(10, 46, 46, 13)
+	part(SkPath.rounded_rect(-21, 44, 42, 46, 6))
+	part(SkPath.rounded_rect(-26, 82, 52, 12, 5), 1)
+	part(SkPath.rounded_rect(-10, 92, 21, 20, 6), 1)
+	eye = lit(SkPath.rect(1, 100, 9, 2.5), Palette.GOLD, 3)
+	blade(58, Palette.GOLD, Vector2(4, 64))
+	var disc := SkShape.make(SkPath.ellipse_of(16, 70), Palette.BODY, Palette.GOLD, 2.5)
+	disc.position = Vector2(28, 58)
+	Sk.z(disc, 4)
+	var boss := SkShape.make(SkPath.circle(4))
+	light(boss, Palette.GOLD, 4)
+	disc.add_child(boss)
+	figure.add_child(disc)
+	shield = disc
+
+
+## The Sworn Shield: broad plate under a gold sash, a crested helm, a short blade, and a great round shield with a
+## sun on its boss. The sash is the half of the vow the Spear wears too.
+func _build_sworn_shield() -> void:
+	leg(-12, 50, 50, 15)
+	leg(12, 50, 50, 15)
+	part(SkPath.rounded_rect(-25, 48, 50, 54, 7))
+	part(SkPath.rounded_rect(-31, 92, 62, 14, 6), 1)
+	part(SkPath.rounded_rect(-11, 104, 23, 24, 7), 1)
+	# A crest along the helm.
+	lit(SkPath.rounded_rect(-9, 127, 18, 4, 2), Palette.GOLD, 2)
+	eye = lit(SkPath.rect(1, 114, 10, 2.5), Palette.GOLD, 3)
+	lit(SkPath.polygon([Vector2(-22, 98), Vector2(-14, 100), Vector2(22, 56), Vector2(14, 54)]), Palette.GOLD, 2)
+	blade(60, Palette.GOLD, Vector2(4, 72))
+	var disc := SkShape.make(SkPath.circle(34), Palette.BODY, Palette.GOLD, 3)
+	disc.position = Vector2(30, 66)
+	Sk.z(disc, 4)
+	var sun := SkShape.make(SkPath.circle(8))
+	light(sun, Palette.GOLD, 5)
+	disc.add_child(sun)
+	for n in 8:
+		var a := float(n) * PI / 4.0
+		var dir := Vector2(cos(a), sin(a))
+		disc.add_child(SkShape.make(SkPath.line(dir * 12.0, dir * 24.0), CLEAR, Sk.with_alpha(Palette.GOLD, 0.7), 2))
+	figure.add_child(disc)
+	shield = disc
+
+
+## The Sworn Spear: lean, in a long tabard under the same gold sash, a tall crested helm, and a spear longer than
+## it is tall.
+func _build_sworn_spear() -> void:
+	leg(-7, 48, 48, 10)
+	leg(7, 48, 48, 10)
+	part(SkPath.polygon([Vector2(-15, 102), Vector2(15, 102), Vector2(18, 26), Vector2(-18, 26)]))
+	part(SkPath.rounded_rect(-20, 92, 40, 11, 5), 1)
+	part(SkPath.rounded_rect(-9, 101, 19, 25, 6), 1)
+	lit(SkPath.polygon([Vector2(-4, 124), Vector2(4, 124), Vector2(-10, 142)]), Palette.GOLD, 2)
+	eye = lit(SkPath.rect(1, 112, 9, 2.5), Palette.GOLD, 3)
+	lit(SkPath.polygon([Vector2(15, 98), Vector2(8, 100), Vector2(-18, 56), Vector2(-11, 54)]), Palette.GOLD, 2)
+	blade(140, Palette.GOLD, Vector2(6, 70))
+	var point := SkShape.make(SkPath.polygon([Vector2(-5, 136), Vector2(0, 156), Vector2(5, 136)]))
+	light(point, Palette.GOLD, 4)
+	weapon.add_child(point)
+
+
+## Halo Disciple: a robed figure that floats, its robe trailing to a point, under a wide halo.
+func _build_halo_disciple() -> void:
+	part(SkPath.polygon([Vector2(-9, 54), Vector2(10, 54), Vector2(6, 6), Vector2(-2, -10), Vector2(-8, 8)]))
+	part(SkPath.ellipse(-7, 52, 16, 16), 1)
+	eye = lit(SkPath.circle(1.8), Palette.GOLD, 2, Vector2(5, 61))
+	var ring := SkShape.make(SkPath.circle(20), CLEAR, Palette.GOLD, 3, 3)
+	ring.position = Vector2(0, 62)
+	Sk.z(ring, -1)
+	figure.add_child(ring)
+	halo = ring
+	blade(40, Palette.GOLD, Vector2(6, 40))
+
+
+## The Last Oracle: tall, in a long ivory robe with a gold hem, veiled, under a great halo of rays; a tall staff
+## crowned with a sun. Her halo gathers gold before a flare and turns dark before an eclipse.
+func _build_last_oracle() -> void:
+	part(SkPath.polygon([Vector2(-12, 108), Vector2(13, 108), Vector2(26, 0), Vector2(-26, 0)]))
+	lit(SkPath.rect(-26, 0, 52, 4), Palette.GOLD, 3)
+	part(SkPath.ellipse(-11, 104, 23, 24), 1)
+	# A veil over the face: no eyes, one thin line of light.
+	eye = lit(SkPath.rect(-2, 114, 13, 2), Palette.GOLD, 3)
+	var ring := SkShape.make(SkPath.circle(30), CLEAR, Palette.GOLD, 3, 4)
+	ring.position = Vector2(0, 118)
+	Sk.z(ring, -1)
+	for i in 12:
+		var angle := float(i) * PI / 6.0
+		var ray := SkShape.make(SkPath.rect(-1, 0, 2, 10), Palette.GOLD, CLEAR)
+		ray.position = Vector2(cos(angle) * 32.0, sin(angle) * 32.0)
+		ray.rotation = angle - PI / 2.0
+		ring.add_child(ray)
+	figure.add_child(ring)
+	halo = ring
+	blade(104, Palette.IVORY, Vector2(10, 70))
+	var sun := SkShape.make(SkPath.circle(8))
+	sun.position = Vector2(0, 104)
+	light(sun, Palette.GOLD, 8)
+	weapon.add_child(sun)
+
+
+## Sentry Core: a floating shell around one red lens.
+func _build_sentry_core() -> void:
+	part(SkPath.ellipse(-20, 0, 40, 40))
+	part(SkPath.polygon([Vector2(-18, 30), Vector2(-34, 46), Vector2(-14, 38)]), -1)
+	eye = lit(SkPath.circle(7), Palette.RED, 5, Vector2(9, 20))
+	zone.line_width = 1
+	Sk.z(zone, -3)
+	zone.visible = false
+	add_child(zone)
+
+
+## Dogma Frame: a thin standing frame with a halo, and a faint circle showing how far its shield reaches.
+func _build_dogma_frame() -> void:
+	leg(-7, 44, 44, 7)
+	leg(7, 44, 44, 7)
+	part(SkPath.rounded_rect(-11, 42, 22, 52, 4))
+	# The ring is its eye, not the `halo` member: sync() must not restyle it.
+	var ring := SkShape.make(SkPath.circle(17), CLEAR, Palette.EMBER, 3, 4)
+	ring.position = Vector2(0, 100)
+	Sk.z(ring, 2)
+	figure.add_child(ring)
+	eye = ring
+	var reach := SkShape.make(SkPath.circle(Tuning.load_default().dogma_frame.ward_radius),
+			Sk.with_alpha(Palette.EMBER, 0.04), Sk.with_alpha(Palette.EMBER, 0.3), 1)
+	reach.position = Vector2(0, 55)
+	Sk.z(reach, -4)
+	add_child(reach)
+	aura = reach
+
+
+## The Protocol: a tower of plate on two pillars, a red visor, and a core in its chest that opens.
+func _build_the_protocol() -> void:
+	leg(-40, 96, 96, 34)
+	leg(40, 96, 96, 34)
+	part(SkPath.rounded_rect(-75, 84, 150, 120, 14))
+	part(SkPath.polygon([Vector2(-92, 176), Vector2(-60, 214), Vector2(60, 214), Vector2(92, 176), Vector2(70, 160), Vector2(-70, 160)]), 1)
+	part(SkPath.rounded_rect(-30, 204, 64, 46, 8), 1)
+	var arm := part(SkPath.rounded_rect(52, 70, 30, 100, 10), 2)
+	arm.stroke_color = Sk.with_alpha(Palette.RED, 0.6)
+	eye = lit(SkPath.rect(-2, 226, 34, 6), Palette.RED, 5)
+	var heart := SkShape.make(SkPath.circle(20), CLEAR, Color.WHITE, 3)
+	heart.position = Vector2(6, 138)
+	Sk.z(heart, 3)
+	figure.add_child(heart)
+	core = heart
+
+	zone.line_width = 2
+	Sk.z(zone, -3)
+	zone.visible = false
+	add_child(zone)
+
+	# Flames under the feet, lit while it flies.
+	for x: float in [-40.0, 40.0]:
+		var flame := SkShape.make(SkPath.polygon([Vector2(-14, 0), Vector2(14, 0), Vector2(0, -46)]), Palette.EMBER, Palette.GOLD, 1, 8)
+		flame.position = Vector2(x, 2)
+		Sk.z(flame, -2)
+		flame.visible = false
+		figure.add_child(flame)
+		thrusters.append(flame)
+
+
+## Seraphine: an ivory gown, a crown of gold rays, a staff with a sun at its head.
+func _build_seraphine() -> void:
+	part(SkPath.polygon([Vector2(-8, 66), Vector2(9, 66), Vector2(15, 0), Vector2(-17, 0)]))
+	part(SkPath.ellipse(-8, 66, 18, 18), 1)
+	for i in 5:
+		var angle := PI / 2.0 + float(i - 2) * 0.38
+		var ray := lit(SkPath.rect(-0.9, 0, 1.8, 8), Palette.GOLD, 2, Vector2(1.0 + cos(angle) * 10.0, 75.0 + sin(angle) * 10.0))
+		ray.rotation = angle - PI / 2.0
+	eye = lit(SkPath.circle(1.8), Palette.GOLD, 2, Vector2(7, 76))
+	blade(64, Palette.GOLD, Vector2(6, 50))
+	var sun := SkShape.make(SkPath.circle(5))
+	sun.position = Vector2(0, 64)
+	light(sun, Palette.GOLD, 5)
+	weapon.add_child(sun)
+
+
+## Nimue: black and violet, long hair, a red lantern carried low, short throwing blades.
+func _build_nimue() -> void:
+	leg(-5, 30, 30, 7)
+	leg(5, 30, 30, 7)
+	part(SkPath.rounded_rect(-9, 28, 18, 34, 5))
+	part(SkPath.polygon([Vector2(-8, 78), Vector2(4, 80), Vector2(-4, 66), Vector2(-14, 40), Vector2(-17, 50)]), -1)
+	part(SkPath.ellipse(-7, 62, 17, 17), 1)
+	eye = lit(SkPath.circle(1.8), Palette.VIOLET, 2, Vector2(6, 72))
+	var lantern := lit(SkPath.rounded_rect(-3, -4, 6, 8, 2), Palette.LANTERN, 5, Vector2(-12, 22))
+	var glow := Effects.glow(Palette.LANTERN, 46, 0.5)
+	glow.position = lantern.position
+	Sk.z(glow, 1.5)
+	figure.add_child(glow)
+	blade(30, Palette.VIOLET, Vector2(6, 48))
+
+
+# MARK: The Lantern Cities
+
+
+## Ember eyes under a hood or brim.
+func _ember_eyes(point: Vector2, gap: float = 5.0) -> void:
+	var pair := Node2D.new()
+	for dx: float in [0.0, gap]:
+		var dot := SkShape.make(SkPath.circle(1.6))
+		dot.position = Vector2(point.x + dx, point.y)
+		light(dot, Palette.EMBER, 2)
+		pair.add_child(dot)
+	Sk.z(pair, 2)
+	figure.add_child(pair)
+
+
+## Ratborn: small and hunched, hood forward, a short knife.
+func _build_ratborn() -> void:
+	leg(-6, 20, 20, 7)
+	leg(6, 20, 20, 7)
+	part(SkPath.polygon([Vector2(-12, 18), Vector2(10, 18), Vector2(16, 40), Vector2(4, 50), Vector2(-12, 42)]))
+	part(SkPath.polygon([Vector2(-2, 44), Vector2(22, 50), Vector2(12, 60), Vector2(-4, 56)]), 1)
+	_ember_eyes(Vector2(11, 51), 4)
+	blade(22, Palette.EMBER, Vector2(10, 30))
+
+
+## Lantern Gunner: a long coat, a wide brim, a lantern held ready to throw.
+func _build_lantern_gunner() -> void:
+	leg(-6, 30, 30, 8)
+	leg(6, 30, 30, 8)
+	part(SkPath.polygon([Vector2(-15, 14), Vector2(15, 14), Vector2(11, 62), Vector2(-11, 62)]))
+	part(SkPath.ellipse(-8, 60, 16, 16), 1)
+	part(SkPath.rect(-17, 72, 34, 4), 2)
+	_ember_eyes(Vector2(3, 67))
+	var lantern := lit(SkPath.rounded_rect(-4, -5, 8, 10, 2), Palette.EMBER, 5, Vector2(18, 40))
+	var glow := Effects.glow(Palette.EMBER, 54, 0.5)
+	glow.position = lantern.position
+	Sk.z(glow, 1.5)
+	figure.add_child(glow)
+
+
+## Smuggler Brute: a wall of a body, a small head, a cargo hook.
+func _build_smuggler_brute() -> void:
+	leg(-14, 40, 40, 16)
+	leg(14, 40, 40, 16)
+	part(SkPath.rounded_rect(-30, 36, 60, 52, 14))
+	part(SkPath.ellipse(-9, 84, 20, 20), 1)
+	_ember_eyes(Vector2(3, 94))
+	# A strap of lanterns across the chest.
+	var lamps: Array[float] = [-16.0, -4.0, 8.0]
+	for n in lamps.size():
+		lit(SkPath.circle(2.5), Palette.EMBER, 3, Vector2(lamps[n], 70.0 - float(n) * 6.0))
+	blade(70, Palette.EMBER, Vector2(20, 70))
+
+
+## Night Weaver: tall and thin, a cloak that ends in threads.
+func _build_night_weaver() -> void:
+	leg(-4, 26, 26, 6)
+	leg(4, 26, 26, 6)
+	part(SkPath.polygon([Vector2(-16, 10), Vector2(-8, 18), Vector2(0, 8), Vector2(8, 18), Vector2(16, 10), Vector2(9, 70), Vector2(-9, 70)]))
+	part(SkPath.polygon([Vector2(-9, 66), Vector2(9, 66), Vector2(6, 86), Vector2(-2, 90)]), 1)
+	eye = lit(SkPath.rect(0, 77, 6, 2), Palette.VIOLET, 3)
+	# Threads of light between the hands.
+	var thread := SkPath.new().move_to(Vector2(-12, 44)).add_quad(Vector2(14, 44), Vector2(1, 30))
+	var line := SkShape.make(thread, CLEAR, Sk.with_alpha(Palette.VIOLET, 0.8), 1, 2)
+	Sk.z(line, 3)
+	figure.add_child(line)
+
+
+## The Cinder King: a long coat over a broad frame, a crown of embers, lanterns on chains, a long cane.
+func _build_cinder_king() -> void:
+	leg(-16, 50, 50, 16)
+	leg(16, 50, 50, 16)
+	part(SkPath.polygon([Vector2(-40, 6), Vector2(40, 6), Vector2(34, 112), Vector2(46, 124), Vector2(-46, 124), Vector2(-34, 112)]))
+	part(SkPath.ellipse(-13, 120, 26, 26), 1)
+	_ember_eyes(Vector2(3, 134), 6)
+	# The crown: points of ember light.
+	var points: Array[float] = [-12.0, -6.0, 0.0, 6.0, 12.0]
+	for n in points.size():
+		var x := points[n]
+		var tall := 14.0 if n == 2 else 9.0
+		lit(SkPath.polygon([Vector2(x - 3.0, 144), Vector2(x + 3.0, 144), Vector2(x, 144.0 + tall)]), Palette.EMBER, 4)
+	# Lanterns hanging from the belt.
+	for x: float in [-28.0, -10.0, 26.0]:
+		var chain := SkShape.make(SkPath.rect(x - 0.5, 52, 1, 14), CLEAR, Sk.with_alpha(Palette.GOLD, 0.6))
+		Sk.z(chain, 2)
+		figure.add_child(chain)
+		lit(SkPath.rounded_rect(x - 4.0, 42, 8, 10, 2), Palette.EMBER, 5)
+	var glow := Effects.glow(Palette.EMBER, 120, 0.35)
+	glow.position = Vector2(0, 50)
+	Sk.z(glow, -1.5)
+	figure.add_child(glow)
+	blade(110, Palette.GOLD, Vector2(30, 96))
+
+
+## A Weaver's image: the same figure, thinner, flickering.
+func _build_weaver_image() -> void:
+	_build_night_weaver()
+	for node in body_parts:
+		node.fill_color = Sk.with_alpha(Palette.VIOLET, 0.12)
+		node.stroke_color = Sk.with_alpha(Palette.VIOLET, 0.7)
+	figure.modulate.a = 0.7
+	var flicker := figure.create_tween().set_loops()
+	flicker.tween_property(figure, "modulate:a", 0.45, 0.25)
+	flicker.tween_property(figure, "modulate:a", 0.75, 0.35)
+
+
+## Nimue's stand-in: her outline in lantern light, see-through.
+func _build_decoy() -> void:
+	_build_nimue()
+	for node in body_parts:
+		node.fill_color = Sk.with_alpha(Palette.VIOLET, 0.18)
+		node.stroke_color = Sk.with_alpha(Palette.VIOLET, 0.8)
+	figure.modulate.a = 0.75
 
 
 # MARK: Glows and ghosts
