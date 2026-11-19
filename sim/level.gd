@@ -240,8 +240,10 @@ func eclipse_light(frame: int) -> bool:
 func frames_to_eclipse_swap(frame: int) -> int:
 	if eclipse_period <= 0:
 		return -1
+	@warning_ignore("integer_division")
 	var half := eclipse_period / 2
-	return half - frame % eclipse_period % half
+	var m := frame % eclipse_period
+	return half - m if m < half else eclipse_period - m
 
 
 ## Whether platform `p` is solid on `frame`.

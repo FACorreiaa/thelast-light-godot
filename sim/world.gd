@@ -605,7 +605,8 @@ func _integrate(f: Fighter, inp: InputFrame, events: Array) -> void:
 		if not f.on_ground:
 			f.on_ground = true
 			events.append({"case": "landed", "id": f.id})
-		if f.team == "hero" and f.is_alive() and not platforms[support].moves():
+		# Eclipse ground is not safe: a respawn there could land on nothing (port-only; Swift has none).
+		if f.team == "hero" and f.is_alive() and not platforms[support].moves() and not _over_eclipse(f):
 			f.last_safe = f.pos.copy()
 	else:
 		f.on_ground = false
@@ -624,6 +625,13 @@ func _navigate(f: Fighter, inp: InputFrame, leader: Fighter) -> void:
 	var half := f.spec.width / 2.0
 	var y := f.pos.y
 
+	# Port-only: standing on eclipse ground that is about to go, get off it first.
+	var escape := eclipse_escape(f)
+	if escape != 0.0:
+		inp.move_x = escape
+		inp.attack = false
+		return
+
 	# The leader is on a floor just above: try to jump up to it.
 	if leader != null and leader.on_ground and leader.pos.y - y > 40.0 and absf(leader.pos.x - f.pos.x) < 140.0 \
 			and f.spec.jump_speed > 0.0:
@@ -640,6 +648,11 @@ func _navigate(f: Fighter, inp: InputFrame, leader: Fighter) -> void:
 		if h.is_on(frame) or h.frames_until_on(frame) < 45:
 			inp.move_x = 0.0
 			return
+
+	# Port-only: eclipse ground that is gone or will go before the partner is across.
+	if eclipse_blocks(f, dir):
+		inp.move_x = 0.0
+		return
 
 	for i in platform_boxes.size():
 		var b := platform_boxes[i]
@@ -1502,6 +1515,75 @@ func plate_under(f: Fighter) -> Level.Plate:
 		if f.pos.x >= p.x0 and f.pos.x <= p.x1 and absf(f.pos.y - p.top) < 2.0:
 			return p
 	return null
+
+
+## Port-only (no Swift counterpart): true when eclipse ground starting just ahead of `f`, moving `dir`, is gone
+## now or will go before `f` has walked across it at its run speed. Always false on a level without eclipse
+## phases. Assumes eclipse ground of opposite phases never touches (that needs a jump, not a wait).
+func eclipse_blocks(f: Fighter, dir: float) -> bool:
+	if level == null or level.eclipse_period <= 0:
+		return false
+	var half := f.spec.width / 2.0
+	var left := level.frames_to_eclipse_swap(frame)
+	for i in platforms.size():
+		var p: Level.Platform = platforms[i]
+		if p.eclipse == 0:
+			continue
+		var b := p.box_at(frame)
+		var ahead := b.min_x - (f.pos.x + half) if dir > 0.0 else (f.pos.x - half) - b.max_x
+		# Behind, too far ahead, or at another height: not in the way.
+		var behind := f.pos.x > b.max_x if dir > 0.0 else f.pos.x < b.min_x
+		if behind or ahead > 60.0 or absf(b.max_y - f.pos.y) > 40.0:
+			continue
+		if not level.eclipse_solid(p, frame):
+			return true
+		# Already standing over it: getting off in time is eclipse_escape's job.
+		if (f.pos.x >= b.min_x) if dir > 0.0 else (f.pos.x <= b.max_x):
+			continue
+		var cross := (b.max_x - b.min_x + f.spec.width + Sw.max_d(ahead, 0.0)) / Sw.max_d(f.spec.run_speed, 1.0)
+		return float(left) < cross * Tuning.FRAMES_PER_SECOND + ECLIPSE_MARGIN
+	return false
+
+
+## Frames of slack eclipse_blocks wants before a swap: enough to cross and, if a swing starts on the way, for
+## eclipse_escape (which allows 12 frames less) to still get clear.
+const ECLIPSE_MARGIN := 48.0
+
+
+## Port-only: true when any part of `f`'s width is over eclipse ground at its feet. Always false on a level
+## without eclipse phases, so Swift's levels keep their safe spots.
+func _over_eclipse(f: Fighter) -> bool:
+	if level == null or level.eclipse_period <= 0:
+		return false
+	var half := f.spec.width / 2.0
+	for p: Level.Platform in platforms:
+		if p.eclipse != 0 and f.pos.x + half > p.box.min_x and f.pos.x - half < p.box.max_x \
+				and absf(p.box.max_y - f.pos.y) < 2.0:
+			return true
+	return false
+
+
+## Port-only: when any part of `f` stands on eclipse ground that will go before it could walk clear, the way to
+## the nearer end (-1 or 1); otherwise 0. Always 0 on a level without eclipse phases. Its slack is a little less
+## than eclipse_blocks wants for stepping on, so a hero who stepped on in time never turns back halfway.
+func eclipse_escape(f: Fighter) -> float:
+	if level == null or level.eclipse_period <= 0 or not f.on_ground:
+		return 0.0
+	var half := f.spec.width / 2.0
+	var left := float(level.frames_to_eclipse_swap(frame))
+	for i in platforms.size():
+		if platforms[i].eclipse == 0:
+			continue
+		var b := platform_boxes[i]
+		if not (f.pos.x + half > b.min_x and f.pos.x - half < b.max_x and absf(b.max_y - f.pos.y) < 2.0):
+			continue
+		var to_left := Sw.max_d(0.0, f.pos.x + half - b.min_x + 2.0)
+		var to_right := Sw.max_d(0.0, b.max_x - (f.pos.x - half) + 2.0)
+		var dir := -1.0 if to_left < to_right else 1.0
+		var frames := Sw.min_d(to_left, to_right) / Sw.max_d(f.spec.run_speed, 1.0) * Tuning.FRAMES_PER_SECOND
+		if left < frames + ECLIPSE_MARGIN - 12.0:
+			return dir
+	return 0.0
 
 
 ## Where an eclipsed platform's box waits while it is not there: far below everything, so nothing touches it.

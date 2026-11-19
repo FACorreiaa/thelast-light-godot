@@ -18,9 +18,19 @@ static func _plat(x0: float, x1: float, top: float, eclipse := 0) -> Dictionary:
 		"travel": {"x": 0.0, "y": 0.0}, "period": 0, "eclipse": eclipse}
 
 
-## Floors with two gaps: the first bridged only in the light, the second only in shadow.
-static func room(period := 240) -> Level:
-	return Level.from_data({
+## Floors with two gaps: the first bridged only in the light, the second only in shadow. With `crowd`, Orion
+## follows and a Scrap Drone waits just past each bridge, so the bridges are crossed mid-fight.
+static func room(period := 240, crowd := false) -> Level:
+	var d := room_data(period)
+	if crowd:
+		d.partner = {"kind": "orion", "pos": {"x": 60.0, "y": 0.0}}
+		d.enemies = [{"kind": "scrapDrone", "pos": {"x": 560.0, "y": 0.0}},
+			{"kind": "scrapDrone", "pos": {"x": 1160.0, "y": 0.0}}]
+	return Level.from_data(d)
+
+
+static func room_data(period: int) -> Dictionary:
+	return ({
 		"name": "Eclipse test", "width": 2600.0, "start": {"x": 120.0, "y": 0.0},
 		"platforms": [_plat(-200, 600, 0), _plat(600, 800, 0, 1), _plat(800, 1200, 0), _plat(1200, 1400, 0, -1),
 			_plat(1400, 2600, 0)],
@@ -81,20 +91,82 @@ func _init() -> void:
 	hero = w.controlled()
 	check(hero.pos.x > 420.0 and _there(w, 1), "and forms once the hero is clear (x %.0f)" % hero.pos.x)
 
-	# The autopilot waits for the ground and crosses both bridges without falling, walking and fighting.
-	for fights in [false, true]:
-		for period in [240, 300, 360]:
-			w = World.from_level(room(period), "caelen", t, 1)
-			var pilot := Autopilot.new(fights)
-			var fell := false
-			for i in 60 * 60:
-				if w.is_over or w.is_complete:
-					break
-				for e: Dictionary in w.step(pilot.input_for(w)):
-					if e.case == "fell":
-						fell = true
-			check(w.is_complete and not fell, "autopilot (fights %s, period %d) crosses: complete %s, fell %s, x %.0f"
-				% [fights, period, w.is_complete, fell, w.controlled().pos.x])
+	# Orion reaches the light bridge 30 frames before it goes, with the lead parked across it: he waits.
+	w = World.from_level(room(240, true), "caelen", t, 1)
+	for f: Fighter in w.fighters:
+		if f.team == "enemy":
+			f.hp = 0.0
+	w.controlled().pos.x = 1000.0
+	var orion: Fighter = null
+	for f: Fighter in w.fighters:
+		if f.team == "hero" and f.id != w.controlled_id:
+			orion = f
+	orion.pos.x = 560.0
+	w.frame = 90
+	var dropped := false
+	for i in 320:
+		w.step(InputFrame.neutral())
+		orion = w.fighter(orion.id)
+		if orion.pos.y < -20.0:
+			dropped = true
+	check(orion != null and not dropped and orion.pos.x > 800.0,
+		"Orion waits for the bridge and crosses after (dropped %s, x %.0f)" % [dropped, orion.pos.x])
+
+	# An odd period: the light lasts half (rounded down), and the countdown always reaches the real swap.
+	var odd := room(301)
+	var bad := 0
+	for f in 903:
+		var n := odd.frames_to_eclipse_swap(f)
+		if n < 1 or odd.eclipse_light(f) != odd.eclipse_light(f + n - 1) or odd.eclipse_light(f) == odd.eclipse_light(f + n):
+			bad += 1
+	check(bad == 0, "odd period: the countdown lands on every swap (%d frames wrong)" % bad)
+
+	# The autopilot waits for the ground and crosses both bridges without falling, walking and fighting, and
+	# with Orion following and drones to fight beside the bridges nobody falls either.
+	for crowd in [false, true]:
+		for fights in [false, true]:
+			for period in [240, 301, 360]:
+				w = World.from_level(room(period, crowd), "caelen", t, 1)
+				var pilot := Autopilot.new(fights)
+				var fell: Array = []
+				for i in 60 * 90:
+					if w.is_over or w.is_complete:
+						break
+					for e: Dictionary in w.step(pilot.input_for(w)):
+						if e.case == "fell" or (e.case == "died" and w.fighter(e.id) != null and w.fighter(e.id).team == "hero"):
+							fell.append(e.id)
+					for f: Fighter in w.fighters:
+						if f.team == "hero" and f.pos.y < -20.0 and not fell.has("drop %d" % f.id):
+							fell.append("drop %d" % f.id)
+				check(w.is_complete and fell.is_empty(), "autopilot (crowd %s, fights %s, period %d) crosses: complete %s, fell %s, x %.0f"
+					% [crowd, fights, period, w.is_complete, fell, w.controlled().pos.x])
+
+	# Every level with eclipse phases, every lead, walking and fighting, a few seeds: it finishes, and walking the
+	# lead never drops through eclipse ground (it waits). A swing's lunge or a jump can still carry a fighter over
+	# ground that has gone, as over any pit; Swift's own levels have the same falls under the autopilot.
+	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
+	for id: String in index.levels:
+		var level := Level.load_id(id)
+		if level.eclipse_period <= 0:
+			continue
+		for lead in ["caelen", "seraphine", "nimue"]:
+			for fights in [false, true]:
+				for seed in [1, 2, 3]:
+					w = World.from_level(level, lead, t, seed)
+					var pilot := Autopilot.new(fights)
+					var lead_drops := 0
+					var was_low := false
+					for i in 60 * 180:
+						if w.is_over or w.is_complete:
+							break
+						w.step(pilot.input_for(w))
+						var me := w.controlled()
+						var under := me != null and me.pos.y < -20.0
+						if under and not was_low:
+							lead_drops += 1
+						was_low = under
+					check(w.is_complete and (fights or lead_drops == 0), "%s (%s, fights %s, seed %d): complete %s, lead drops %d"
+						% [id, lead, fights, seed, w.is_complete, lead_drops])
 
 	print("eclipse: %d checks, %d failed" % [checks, failed])
 	quit(1 if failed > 0 else 0)
