@@ -26,6 +26,57 @@ func _frames(n: int) -> void:
 		await process_frame
 
 
+## A finger down at `at`, moved by `drag`, and lifted, as a phone sends it.
+func _touch(at: Vector2, drag := Vector2.ZERO) -> void:
+	var down := InputEventScreenTouch.new()
+	down.index = 0
+	down.position = at
+	down.pressed = true
+	Input.parse_input_event(down)
+	await _frames(2)
+	if drag != Vector2.ZERO:
+		for k in range(1, 5):
+			var d := InputEventScreenDrag.new()
+			d.index = 0
+			d.position = at + drag * (k / 4.0)
+			d.relative = drag / 4.0
+			Input.parse_input_event(d)
+			await _frames(1)
+	var up := InputEventScreenTouch.new()
+	up.index = 0
+	up.position = at + drag
+	up.pressed = false
+	Input.parse_input_event(up)
+	await _frames(3)
+
+
+## The tappable control around the label reading `text`.
+func _control(app: GameApp, text: String) -> Control:
+	for l: Label in app.menu_root.find_children("*", "Label", true, false):
+		if l.text == text and l.is_visible_in_tree():
+			var c: Node = l
+			while c != null and not (c is Control and (c as Control).mouse_filter == Control.MOUSE_FILTER_STOP):
+				c = c.get_parent()
+			return c
+	return null
+
+
+## Where on screen, in pixels, the HUD's pause button is.
+func _pause_button(app: GameApp) -> Vector2:
+	var ui := app.scene._ui_scale()
+	var h := app.scene.get_viewport_rect().size.y
+	var w := app.scene.get_viewport_rect().size.x
+	for y in range(0, int(h / ui), 4):
+		for x in range(int(w / ui) - 1, 0, -4):
+			if app.scene.hud.action_at(Vector2(x, y)) == Hud.Action.PAUSE:
+				return Vector2(x * ui, h - y * ui)
+	return Vector2(-1, -1)
+
+
+func _center_of(c: Control) -> Vector2:
+	return c.get_global_rect().get_center()
+
+
 func _launch() -> GameApp:
 	var app: GameApp = load("res://game/game.tscn").instantiate()
 	root.add_child(app)
@@ -34,10 +85,49 @@ func _launch() -> GameApp:
 
 
 func _run() -> void:
+	# Headless starts with a tiny window; lay out at the project's phone-landscape size so taps land where
+	# a player's would.
+	print("window was ", root.size)
+	root.size = Vector2i(1311, 603)
+	await _frames(1)
 	var app := await _launch()
+	check(app.menu_root.size.x > 800.0, "the menus lay out at phone width: %s" % app.menu_root.size)
 	check(app.screen == GameApp.Screen.TITLE, "starts on the title")
 	check(not app.has_progress(), "a fresh save has no progress")
 	check(app.scene.frozen, "the game is frozen behind the title")
+
+	# Real touches through the menus: one tap acts once, on release, and a drag is not a tap.
+	var settings_button := _control(app, "SETTINGS")
+	check(settings_button != null, "the title has a settings button")
+	if settings_button != null:
+		await _touch(_center_of(settings_button))
+		await _frames(3)
+		check(app.sheet == GameApp.Sheet.SETTINGS, "one tap opens settings and leaves it open")
+
+		var sw: Control = null
+		for l: Label in app.menu_root.find_children("*", "Label", true, false):
+			if l.text == "Screen shake":
+				sw = l.get_parent().get_child(l.get_parent().get_child_count() - 1)
+		check(sw != null and app.settings.screen_shake, "settings show the shake switch, on")
+		if sw != null:
+			await _touch(_center_of(sw))
+			check(not app.settings.screen_shake, "one tap on a switch turns it off, once")
+			await _touch(_center_of(sw), Vector2(0, 40))
+			check(not app.settings.screen_shake, "a drag across a switch does not flip it")
+		await _touch(Vector2(4, 4))
+		check(app.sheet == GameApp.Sheet.NONE, "a tap outside the panel closes it")
+	var chapters_button := _control(app, "CHAPTERS")
+	if chapters_button != null:
+		await _touch(_center_of(chapters_button))
+		check(app.sheet == GameApp.Sheet.CHAPTERS, "one tap opens the chapters")
+		var second := _control(app, app.scene.level_names()[1])
+		check(second != null, "the chapter list shows the second level")
+		if second != null:
+			await _touch(_center_of(second), Vector2(0, -40))
+			check(app.screen == GameApp.Screen.TITLE and app.sheet == GameApp.Sheet.CHAPTERS, "scrolling the list starts nothing")
+			await _touch(_center_of(_control(app, app.scene.level_names()[1])))
+			check(app.screen == GameApp.Screen.PLAYING and app.scene.current_level() == 1, "a tap on a level plays it")
+	app.screen = GameApp.Screen.TITLE
 
 	app.new_game()
 	check(app.screen == GameApp.Screen.FACTION_PICK, "new game opens the faction pick")
@@ -56,6 +146,18 @@ func _run() -> void:
 		check(app.scene.world.frame == f0, "the world holds still while someone speaks")
 		app.pause()
 		check(app.screen == GameApp.Screen.PLAYING, "no pause menu over a scene")
+		var changes := [0]
+		var count := func() -> void: changes[0] += 1
+		app.story.changed.connect(count)
+		var pause_at := _pause_button(app)
+		await _touch(pause_at)
+		await _frames(3)
+		check(app.screen == GameApp.Screen.PLAYING and not app.scene._pause_requested, "the pause button does nothing over a scene")
+		var before: int = changes[0]
+		if app.story.is_active() and app.story.runner.choices().is_empty():
+			await _touch(Vector2(10, 10))
+			check(changes[0] - before == 1, "one tap on the dimmed game moves the scene on one line, not two")
+		app.story.changed.disconnect(count)
 		var n := 0
 		while app.story.is_active() and n < 100:
 			if app.story.runner.choices().is_empty():
@@ -68,11 +170,18 @@ func _run() -> void:
 		await _frames(10)
 		check(app.scene.world.frame > f0, "the world moves again after the scene")
 
-	app.pause()
-	check(app.screen == GameApp.Screen.PAUSED and app.scene.frozen, "pause freezes")
+	await _touch(_pause_button(app))
+	await _frames(2)
+	check(app.screen == GameApp.Screen.PAUSED and app.scene.frozen, "the pause button pauses, and pausing freezes")
 	var f1 := app.scene.world.frame
 	await _frames(10)
 	check(app.scene.world.frame == f1, "nothing moves while paused")
+	# A tap on the menu where the pause button sits must not pause again once play resumes.
+	await _touch(_pause_button(app))
+	app.resume()
+	await _frames(5)
+	check(app.screen == GameApp.Screen.PLAYING, "a tap behind the pause menu does not re-pause on resume")
+	app.pause()
 	app.sheet = GameApp.Sheet.SETTINGS
 	var s := app.settings.copy()
 	s.difficulty = Settings.Difficulty.HARD

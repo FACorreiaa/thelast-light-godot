@@ -30,7 +30,7 @@ var result: Dictionary = {}
 var menu_layer := CanvasLayer.new()
 var menu_root := Control.new()
 var dialogue: DialogueView
-var menus: Control
+var menus: MenuOverlay
 
 
 func _ready() -> void:
@@ -41,12 +41,13 @@ func _ready() -> void:
 	menu_layer.layer = 10
 	add_child(menu_layer)
 	menu_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Glyphs are rasterised at their size times the menu's scale (3x on a phone), not scaled up blurry.
+	menu_root.oversampling_with_scale = CanvasItem.OVERSAMPLING_WITH_SCALE_ENABLED
 	menu_layer.add_child(menu_root)
 	dialogue = DialogueView.new(story)
 	menu_root.add_child(dialogue)
-	if ResourceLoader.exists("res://game/menu_overlay.gd"):
-		menus = load("res://game/menu_overlay.gd").new(self)
-		menu_root.add_child(menus)
+	menus = MenuOverlay.new(self)
+	menu_root.add_child(menus)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -88,6 +89,14 @@ func _layout() -> void:
 	menu_root.scale = Vector2(ui, ui)
 	menu_root.position = Vector2.ZERO
 	menu_root.size = size / ui
+	if menus != null:
+		# Menus keep their content inside the safe area, as SwiftUI does; their backdrops still fill the screen.
+		var inset := scene.safe_insets()
+		menus.safe_insets = inset
+		menus.offset_left = inset.position.x
+		menus.offset_top = inset.position.y
+		menus.offset_right = -inset.size.x
+		menus.offset_bottom = -inset.size.y
 
 
 func _on_level_completed(p_result: Dictionary) -> void:

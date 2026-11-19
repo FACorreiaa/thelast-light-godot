@@ -38,9 +38,11 @@ var frozen := false:
 	set(v):
 		frozen = v
 		accumulator = 0.0
-		# Keys held while a menu was open do not count as new presses.
+		# Keys held while a menu was open, and taps queued before it, do not count as new presses.
 		if not v:
 			input.poll()
+		controls.take_presses()
+		_pause_requested = false
 		# Menus sit over a clean picture: no HUD, no on-screen buttons.
 		hud.visible = not v
 		controls.visible = not v
@@ -141,6 +143,8 @@ func _ready() -> void:
 	dusk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.add_child(dusk)
 	add_child(sound)
+	# HUD text is drawn in points and scaled; rasterise it at the scaled size so it stays sharp.
+	ui_layer.oversampling_with_scale = CanvasItem.OVERSAMPLING_WITH_SCALE_ENABLED
 	overlay.add_child(ui_layer)
 	ui_layer.add_child(hud)
 	if show_touch:
@@ -183,18 +187,23 @@ func _ui_scale() -> float:
 	return maxf(0.5, minf(size.y / 402.0, size.x / 700.0))
 
 
+## The screen's safe area as (left, top, right, bottom) insets in points: clear of a notch or home bar.
+func safe_insets() -> Rect2:
+	var size := get_viewport_rect().size
+	var ui := _ui_scale()
+	var safe := Rect2(Vector2.ZERO, size)
+	if OS.has_feature("mobile"):
+		var area := DisplayServer.get_display_safe_area()
+		safe = Rect2(area.position, area.size)
+	return Rect2(safe.position.x / ui, safe.position.y / ui, (size.x - safe.end.x) / ui, (size.y - safe.end.y) / ui)
+
+
 func _layout() -> void:
 	var size := get_viewport_rect().size
 	var ui := _ui_scale()
 	ui_layer.position = Vector2(0, size.y)
 	ui_layer.scale = Vector2(ui, -ui)
-	# Safe area as (left, top, right, bottom) in points.
-	var safe := Rect2(Vector2.ZERO, size)
-	if OS.has_feature("mobile"):
-		var area := DisplayServer.get_display_safe_area()
-		safe = Rect2(area.position, area.size)
-	var insets := Rect2(safe.position.x / ui, safe.position.y / ui,
-		(size.x - safe.end.x) / ui, (size.y - safe.end.y) / ui)
+	var insets := safe_insets()
 	hud.layout(size / ui, insets)
 	controls.layout(size / ui, insets)
 
@@ -205,6 +214,12 @@ func _to_points(pixel: Vector2) -> Vector2:
 
 
 func _input(event: InputEvent) -> void:
+	# Behind a menu or a story panel the game takes no new touches; those belong to the panel. Lifting a
+	# finger still counts, so a stick held when the menu opened does not stay held.
+	var blocked := frozen or (story != null and story.is_active())
+	if blocked and ((event is InputEventScreenTouch and event.pressed) or event is InputEventScreenDrag
+			or (event is InputEventMouseButton and event.pressed) or event is InputEventMouseMotion):
+		return
 	if event is InputEventScreenTouch:
 		var t := event as InputEventScreenTouch
 		_touch(t.index, t.pressed, _to_points(t.position))

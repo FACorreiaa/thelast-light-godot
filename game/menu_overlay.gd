@@ -23,6 +23,9 @@ const FACTION_CARDS := [
 ]
 
 var app: GameApp
+## The safe-area insets this overlay is placed within (left, top, right, bottom), in points. Backdrops reach
+## past them to the screen's edges.
+var safe_insets := Rect2()
 ## Key -> what it does on the current screen (Return, Escape, digits), standing in for SwiftUI's
 ## keyboardShortcut. The top sheet's keys win over the screen's.
 var _keys: Dictionary = {}
@@ -62,11 +65,7 @@ func _rebuild() -> void:
 		# A sheet's keys replace the screen's underneath it.
 		_keys = {}
 		var close := func() -> void: app.sheet = GameApp.Sheet.NONE
-		var dim := _backdrop(0.5)
-		dim.mouse_filter = Control.MOUSE_FILTER_STOP
-		dim.gui_input.connect(func(e: InputEvent) -> void:
-			if _is_press(e):
-				close.call())
+		UI.on_tap(_backdrop(0.5), close)
 		if app.sheet == GameApp.Sheet.SETTINGS:
 			_settings_panel(close)
 		else:
@@ -85,11 +84,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		(_keys[k] as Callable).call()
 
 
-static func _is_press(e: InputEvent) -> bool:
-	return (e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT and e.pressed) \
-		or (e is InputEventScreenTouch and e.pressed)
-
-
 # MARK: Pieces
 
 
@@ -97,6 +91,10 @@ func _backdrop(opacity: float) -> ColorRect:
 	var r := ColorRect.new()
 	r.color = Color(0, 0, 0, opacity)
 	r.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	r.offset_left = -safe_insets.position.x
+	r.offset_top = -safe_insets.position.y
+	r.offset_right = safe_insets.size.x
+	r.offset_bottom = safe_insets.size.y
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(r)
 	return r
@@ -311,24 +309,21 @@ func _segmented(names: Array, chosen: int, pick: Callable) -> Control:
 	track.add_theme_stylebox_override("panel", ts)
 	var row := _hbox(2)
 	var segments: Array[PanelContainer] = []
+	var paint := func(sel: int) -> void:
+		for j in segments.size():
+			segments[j].add_theme_stylebox_override("panel", UI.box(Color(1, 1, 1, 0.24), 6) if j == sel else StyleBoxEmpty.new())
 	for i in names.size():
 		var l := UI.label(String(names[i]), 13, Color.WHITE, "semibold")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		l.custom_minimum_size.y = 28
-		var b := UI.button(l, func() -> void: pass, StyleBoxEmpty.new())
+		var b := UI.button(l, func() -> void:
+			paint.call(i)
+			pick.call(i), StyleBoxEmpty.new())
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		segments.append(b)
 		row.add_child(b)
-	var paint := func(sel: int) -> void:
-		for j in segments.size():
-			segments[j].add_theme_stylebox_override("panel", UI.box(Color(1, 1, 1, 0.24), 6) if j == sel else StyleBoxEmpty.new())
 	paint.call(chosen)
-	for i in segments.size():
-		segments[i].gui_input.connect(func(e: InputEvent) -> void:
-			if _is_press(e):
-				paint.call(i)
-				pick.call(i))
 	track.add_child(row)
 	return track
 
@@ -533,15 +528,8 @@ func _faction_card(card: Dictionary, choose: Callable, portrait_h: float) -> Con
 		(c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# A card dips slightly when pressed, and chooses on release.
 	box.resized.connect(func() -> void: box.pivot_offset = box.size / 2.0)
-	box.gui_input.connect(func(e: InputEvent) -> void:
-		if e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT \
-				or e is InputEventScreenTouch:
-			if e.pressed:
-				box.create_tween().tween_property(box, "scale", Vector2(0.97, 0.97), 0.12).set_ease(Tween.EASE_OUT)
-			else:
-				box.scale = Vector2.ONE
-				if box.get_global_rect().has_point(box.get_global_mouse_position()) or e is InputEventScreenTouch:
-					choose.call())
+	UI.on_tap(box, choose, func(pressed: bool) -> void:
+		box.create_tween().tween_property(box, "scale", Vector2(0.97, 0.97) if pressed else Vector2.ONE, 0.12).set_ease(Tween.EASE_OUT))
 	return box
 
 
@@ -591,15 +579,11 @@ class Switch:
 		on = p_on
 		custom_minimum_size = Vector2(51, 31)
 		size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		mouse_filter = Control.MOUSE_FILTER_STOP
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-
-	func _gui_input(e: InputEvent) -> void:
-		if MenuOverlay._is_press(e):
-			accept_event()
+		UI.on_tap(self, func() -> void:
 			on = not on
 			queue_redraw()
-			toggled.emit(on)
+			toggled.emit(on))
 
 	func _draw() -> void:
 		var h := size.y
@@ -613,9 +597,10 @@ class Switch:
 		draw_circle(Vector2(x, h / 2.0), h / 2.0 - 2.0, Color.WHITE, true, -1.0, true)
 
 
-## The lead standing in the card: the same figure as in the game, idling, in its own small world.
+## The lead standing in the card: the same figure as in the game, idling, in its own small world. Drawn
+## into a viewport at the card's real pixel size, so it stays sharp under the menu's scale.
 class Portrait:
-	extends SubViewportContainer
+	extends TextureRect
 	var world: World
 	var node: FighterNode
 	var holder := Node2D.new()
@@ -623,9 +608,10 @@ class Portrait:
 	var viewport := SubViewport.new()
 
 	func _init(kind: String) -> void:
-		stretch = true
 		size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		stretch_mode = TextureRect.STRETCH_SCALE
 		world = World.training(Tuning.load_default(), 1, 0.0, 400.0)
 		id = world.spawn(kind, 200.0, 0.0, 1)
 		world.control(id)
@@ -636,8 +622,13 @@ class Portrait:
 		node = FighterNode.new(kind)
 		holder.add_child(node)
 		viewport.add_child(holder)
+		texture = viewport.get_texture()
 
 	func _process(_delta: float) -> void:
+		var k := get_global_transform_with_canvas().get_scale().x
+		var px := Vector2i(maxi(1, int(round(size.x * k))), maxi(1, int(round(size.y * k))))
+		if viewport.size != px:
+			viewport.size = px
 		world.step(InputFrame.neutral())
 		var f := world.fighter(id)
 		if f == null:
@@ -645,6 +636,6 @@ class Portrait:
 		node.sync(f, world.frame)
 		node.position = Vector2.ZERO
 		# Centred, feet near the bottom, with room above for a crown or hair. The world is y-up.
-		var s := minf(1.1, (size.y - 16.0) / (f.spec.height + 34.0))
+		var s := minf(1.1, (size.y - 16.0) / (f.spec.height + 34.0)) * k
 		holder.scale = Vector2(s, -s)
-		holder.position = Vector2(size.x / 2.0, size.y - 8.0)
+		holder.position = Vector2(size.x / 2.0, size.y - 8.0) * k

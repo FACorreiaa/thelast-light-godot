@@ -16,7 +16,7 @@ func _init(p_story: StoryPresenter) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dim.color = Color(0, 0, 0, 0.35)
 	_dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_dim.gui_input.connect(_on_dim_input)
+	UI.on_tap(_dim, func() -> void: story.advance())
 	add_child(_dim)
 	_panel.add_theme_stylebox_override("panel", UI.box(Color(0.02, 0.04, 0.08, 0.94), 12, Sk.with_alpha(UI.CYAN, 0.35), 1, 18))
 	_column.add_theme_constant_override("separation", 10)
@@ -98,12 +98,6 @@ func _place() -> void:
 	_panel.offset_right = w / 2.0
 	_panel.offset_bottom = -20.0
 	_panel.offset_top = -20.0
-
-
-func _on_dim_input(event: InputEvent) -> void:
-	if (event is InputEventMouseButton and (event as InputEventMouseButton).pressed) \
-			or (event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed):
-		story.advance()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
