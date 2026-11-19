@@ -886,6 +886,8 @@ func _apply_effects(events: Array) -> void:
 				_dazzle(me, float(e["radius"]), int(e["daze"]), true, events)
 			"eclipse":
 				_dazzle(me, float(e["radius"]), int(e["daze"]), false, events)
+			"shift":
+				_shift_eclipse(int(e["warning"]), events)
 			"douse":
 				var reach := float(e["range"])
 				if level != null:
@@ -1639,6 +1641,18 @@ func eclipse_escape(f: Fighter) -> float:
 	return 0.0
 
 
+## Port-only: a "shift" effect pulls the next swap forward so it comes in `warning` frames; it never pushes a swap
+## that is already closer further away. No effect on a level without eclipse phases. Only fair where every piece
+## of eclipse ground has solid floor under it (tests/test_eclipse.gd holds levels to that).
+func _shift_eclipse(warning: int, events: Array) -> void:
+	if level == null or level.eclipse_period <= 0:
+		return
+	var left := eclipse_swap_in()
+	if left > warning:
+		eclipse_offset += left - warning
+	events.append({"case": "shift", "in": mini(left, warning)})
+
+
 ## Where an eclipsed platform's box waits while it is not there: far below everything, so nothing touches it.
 static func _eclipsed(p: Level.Platform) -> Box:
 	return p.box.offset(0.0, -100000.0)
@@ -1666,6 +1680,9 @@ func _eclipse_platforms(events: Array) -> void:
 		var nb := p.box_at(frame + 1)
 		if there:
 			platform_deltas[i] = Vec2.new(nb.min_x - platform_boxes[i].min_x, nb.min_y - platform_boxes[i].min_y)
+		elif p.one_way:
+			# One-way ground cannot trap anyone (it holds only what falls onto it), so it forms regardless.
+			platform_deltas[i] = Vec2.zero()
 		else:
 			var blocked := false
 			for f in fighters:

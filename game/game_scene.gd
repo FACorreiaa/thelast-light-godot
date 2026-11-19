@@ -1289,6 +1289,11 @@ func _react(events: Array) -> void:
 				shake = maxf(shake, 2.0)
 				sound.play("heavyHit", 0.25)
 				haptics.rigid(0.4)
+			"shift":
+				# Something pulled the swap forward: a heavier pulse than the rhythm's own.
+				shake = maxf(shake, 5.0)
+				sound.play("heavyHit", 0.5)
+				haptics.rigid(0.7)
 			"discord":
 				# Out of turn: every bell of that gate falls silent with a jangle.
 				for g in world.level.gates:

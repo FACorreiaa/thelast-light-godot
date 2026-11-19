@@ -13,8 +13,8 @@ func check(ok: bool, what: String) -> void:
 		print("FAIL ", what)
 
 
-static func _plat(x0: float, x1: float, top: float, eclipse := 0) -> Dictionary:
-	return {"box": {"minX": x0, "minY": top - 40.0, "maxX": x1, "maxY": top}, "oneWay": false,
+static func _plat(x0: float, x1: float, top: float, eclipse := 0, one_way := false) -> Dictionary:
+	return {"box": {"minX": x0, "minY": top - (14.0 if one_way else 40.0), "maxX": x1, "maxY": top}, "oneWay": one_way,
 		"travel": {"x": 0.0, "y": 0.0}, "period": 0, "eclipse": eclipse}
 
 
@@ -37,6 +37,21 @@ static func room_data(period: int) -> Dictionary:
 		"hazards": [], "levers": [], "plates": [], "gates": [], "checkpoints": [], "pickups": [], "enemies": [],
 		"partner": null, "boss": null, "twin": null, "scenes": [], "exitX": 2400.0, "killY": -260.0,
 		"eclipsePeriod": period, "eclipseWarning": 40})
+
+
+## True when anyone placed in the level (boss, twin, enemies) has an attack with a shift effect.
+static func _shifts(lv: Level, t: Tuning) -> bool:
+	var kinds: Array = []
+	for pl: Level.Placement in lv.enemies:
+		kinds.append(pl.kind)
+	for pl: Level.Placement in [lv.boss, lv.twin]:
+		if pl != null:
+			kinds.append(pl.kind)
+	for k: String in kinds:
+		for a: Specs.AttackSpec in t.spec(k).attacks:
+			if a.effect is Dictionary and String(a.effect.get("case", "")) == "shift":
+				return true
+	return false
 
 
 static func _there(w: World, i: int) -> bool:
@@ -111,6 +126,89 @@ func _init() -> void:
 			dropped = true
 	check(orion != null and not dropped and orion.pos.x > 800.0,
 		"Orion waits for the bridge and crosses after (dropped %s, x %.0f)" % [dropped, orion.pos.x])
+
+	# Shift: the next swap is pulled forward to the warning, never pushed back, and the swap then comes on time.
+	var arena := Level.from_data({
+		"name": "Eclipse arena", "width": 1800.0, "start": {"x": 300.0, "y": 0.0},
+		"platforms": [_plat(-200, 2000, 0), _plat(600, 800, 96, 1, true), _plat(1000, 1200, 96, -1, true)],
+		"hazards": [], "levers": [], "plates": [], "gates": [], "checkpoints": [], "pickups": [], "enemies": [],
+		"partner": null, "boss": null, "twin": null, "scenes": [], "exitX": 1700.0, "killY": -260.0,
+		"eclipsePeriod": 300, "eclipseWarning": 40})
+	w = World.from_level(arena, "caelen", t, 1)
+	for i in 10:
+		w.step(InputFrame.neutral())
+	var ev: Array = []
+	w._shift_eclipse(40, ev)
+	check(w.eclipse_swap_in() == 40 and ev.size() == 1 and ev[0].case == "shift", "shift pulls the swap to 40 frames (%d)" % w.eclipse_swap_in())
+	for i in 30:
+		w.step(InputFrame.neutral())
+	w._shift_eclipse(40, ev)
+	check(w.eclipse_swap_in() == 10, "a shift never pushes a closer swap away (%d)" % w.eclipse_swap_in())
+	var swapped_at := -1
+	for i in 20:
+		for e: Dictionary in w.step(InputFrame.neutral()):
+			if e.case == "eclipse" and swapped_at < 0:
+				swapped_at = i
+	check(swapped_at == 9, "and the swap comes when it said (step %d)" % swapped_at)
+	check(w.to_canon().has("eclipseOffset"), "the offset is part of the state once it moves")
+
+	# One-way eclipse ledges form over someone standing under them, and a shift drops a hero on a ledge to the
+	# floor without a fall.
+	w = World.from_level(arena, "caelen", t, 1)
+	hero = w.controlled()
+	hero.pos.x = 1100.0
+	var shadow_ledge := 2
+	for i in 160:
+		w.step(InputFrame.neutral())
+	check(_there(w, shadow_ledge), "the shadow ledge forms with a hero under it")
+	w = World.from_level(arena, "caelen", t, 1)
+	hero = w.controlled()
+	hero.pos = Vec2.new(700.0, 96.0)
+	for i in 20:
+		w.step(InputFrame.neutral())
+	hero = w.controlled()
+	check(hero.on_ground and hero.pos.y == 96.0, "a hero stands on the light ledge (y %.0f)" % hero.pos.y)
+	w._shift_eclipse(30, ev)
+	var fell_events := 0
+	for i in 90:
+		for e: Dictionary in w.step(InputFrame.neutral()):
+			if e.case == "fell":
+				fell_events += 1
+	hero = w.controlled()
+	check(hero.on_ground and hero.pos.y == 0.0 and fell_events == 0 and hero.hp == hero.spec.max_hp,
+		"after the shift they land on the floor, unhurt (y %.0f, falls %d, hp %.0f)" % [hero.pos.y, fell_events, hero.hp])
+
+	# A floor strike below a ledge's top misses a hero on the ledge and hits one on the floor.
+	for on_ledge in [true, false]:
+		w = World.from_level(arena, "caelen", t, 1)
+		hero = w.controlled()
+		hero.pos = Vec2.new(700.0, 96.0 if on_ledge else 0.0)
+		for i in 5:
+			w.step(InputFrame.neutral())
+		w.strikes.append(Strike.make(Box.new(640.0, -4.0, 760.0, 90.0), 10, 30, 10.0))
+		for i in 60:
+			w.step(InputFrame.neutral())
+		hero = w.controlled()
+		var hit: bool = hero.hp < hero.spec.max_hp
+		check(hit != on_ledge, "a floor strike %s a hero %s" % ["misses" if on_ledge else "hits", "on the ledge" if on_ledge else "on the floor"])
+
+	# Fairness: a level where anything can shift the rhythm has solid floor under every piece of eclipse ground.
+	for id: String in (JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json")).levels as Array):
+		var lv := Level.load_id(id)
+		if lv.eclipse_period <= 0 or not _shifts(lv, t):
+			continue
+		var bare: Array = []
+		for p: Level.Platform in lv.platforms:
+			if p.eclipse == 0:
+				continue
+			var under := false
+			for q: Level.Platform in lv.platforms:
+				if q.eclipse == 0 and not q.one_way and q.box.min_x <= p.box.min_x and q.box.max_x >= p.box.max_x \
+						and q.box.max_y < p.box.max_y and p.box.max_y - q.box.max_y <= 200.0:
+					under = true
+			if not under:
+				bare.append("%.0f-%.0f" % [p.box.min_x, p.box.max_x])
+		check(bare.is_empty(), "%s shifts the rhythm, so all its eclipse ground has floor under it: bare %s" % [id, bare])
 
 	# An odd period: the light lasts half (rounded down), and the countdown always reaches the real swap.
 	var odd := room(301)
