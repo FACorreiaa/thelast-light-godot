@@ -1703,7 +1703,8 @@ func eclipse_clear(f: Fighter) -> float:
 		return 0.0
 	for i in platforms.size():
 		var p: Level.Platform = platforms[i]
-		if p.eclipse == 0 or p.one_way or platform_boxes[i].min_y > -50000.0:
+		# Only ground that should be there now; gone by the rhythm, its space is open to walk through.
+		if p.eclipse == 0 or p.one_way or platform_boxes[i].min_y > -50000.0 or not eclipse_solid(p):
 			continue
 		var b := p.box_at(frame)
 		if f.hurtbox().intersects(b):

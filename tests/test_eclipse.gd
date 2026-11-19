@@ -239,6 +239,45 @@ func _init() -> void:
 				check(w.is_complete and fell.is_empty(), "autopilot (crowd %s, fights %s, period %d) crosses: complete %s, fell %s, x %.0f"
 					% [crowd, fights, period, w.is_complete, fell, w.controlled().pos.x])
 
+	# A tall eclipse wall is a phase gate: shut in its phase, open in the other, with no gate code. Ground that
+	# should be there but is held off by someone standing in its space sends them out; ground gone by the rhythm
+	# does not, so its space can be walked through.
+	var gated := Level.from_data({
+		"name": "Eclipse gate", "width": 2000.0, "start": {"x": 400.0, "y": 0.0},
+		"platforms": [_plat(-200, 2000, 0), {"box": {"minX": 600.0, "minY": 0.0, "maxX": 640.0, "maxY": 200.0},
+			"oneWay": false, "travel": {"x": 0.0, "y": 0.0}, "period": 0, "eclipse": 1}],
+		"hazards": [], "levers": [], "plates": [], "gates": [], "checkpoints": [], "pickups": [], "enemies": [],
+		"partner": null, "boss": null, "twin": null, "scenes": [], "exitX": 1900.0, "killY": -260.0,
+		"eclipsePeriod": 300, "eclipseWarning": 40})
+	w = World.from_level(gated, "caelen", t, 1)
+	hero = w.controlled()
+	for i in 140:
+		w.step(InputFrame.make(1.0, false, false))
+	hero = w.controlled()
+	check(hero.pos.x < 600.0, "a light wall stops a walker in the light (x %.0f)" % hero.pos.x)
+	for i in 100:
+		w.step(InputFrame.make(1.0, false, false))
+	hero = w.controlled()
+	check(hero.pos.x > 700.0, "and lets them through in shadow (x %.0f)" % hero.pos.x)
+	w = World.from_level(gated, "caelen", t, 1)
+	hero = w.controlled()
+	for i in 160:
+		w.step(InputFrame.neutral())
+	w.controlled().pos.x = 620.0
+	w.step(InputFrame.neutral())
+	check(w.eclipse_clear(w.controlled()) == 0.0, "no one is sent out of a wall's space while it is gone by the rhythm")
+	for i in 150:
+		w.step(InputFrame.neutral())
+	check(not _there(w, 1) and w.eclipse_clear(w.controlled()) != 0.0,
+		"the wall waits for whoever stands in its space in the light, and sends them out (there %s)" % _there(w, 1))
+	var waited := 0
+	while not _there(w, 1) and waited < 120:
+		w.step(InputFrame.make(w.eclipse_clear(w.controlled()), false, false))
+		waited += 1
+	hero = w.controlled()
+	check(_there(w, 1) and (hero.pos.x < 600.0 or hero.pos.x > 640.0),
+		"and forms once they are out (%d frames, x %.0f)" % [waited, hero.pos.x])
+
 	# Every level with eclipse phases, every lead, walking and fighting, a few seeds: it finishes, and no one on
 	# the heroes' side drops through a gap where eclipse ground was, except after a hit since they last stood
 	# (a knockback throws anyone over any pit, on the ground or in the air). Ordinary pits keep Swift's rules and are not counted.
