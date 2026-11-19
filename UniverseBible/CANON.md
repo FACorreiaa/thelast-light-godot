@@ -80,7 +80,8 @@ All six conflicts from the v0.1 audit were decided on 2026-11-16 (DEC-006 to DEC
 - Whether a conscious machine can develop or receive supernatural ability.
 - Which endings, if any, later become history.
 - Who the Last Oracle is relative to Seraphine.
-- What the Eclipse Engine physically is, where it is, and how far along it is.
+- What the Eclipse Engine physically is and where it is, beyond DEC-016: in the 2D game it is a half-built structure over a
+  drowned city, unfinished (WORKING). The city's name and history, and what the Engine does when finished, stay open.
 
 ## RETIRED
 

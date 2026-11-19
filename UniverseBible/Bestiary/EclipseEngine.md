@@ -8,4 +8,7 @@ reality shifts and a catastrophic finale.
   in-world explanation separately if it matters.
 - **Decided (DEC-011):** game text names it without saying it is a running machine. The 2D game's chapter end:
   "The Protocol is silent. It was only a voice. The Eclipse Engine has not stopped."
-- **UNKNOWN:** what it is physically, where it is, and how far along it is.
+- **WORKING (DEC-016, 2026-11-19):** in the 2D game's final chapter it is a work in progress: a vast half-built structure
+  rising over a drowned city under the eclipse. It is not finished, so it can be stopped. The chapter climbs it and the
+  boss guards its heart.
+- **UNKNOWN:** the drowned city's name and history, what the Engine does when finished, and who designed it beyond the AI.
