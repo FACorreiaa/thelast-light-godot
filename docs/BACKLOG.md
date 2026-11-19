@@ -30,7 +30,16 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
 ## Still to build (from the Swift plans)
 
 1. **The final chapter: the Eclipse Engine.** Chapter 1 ends on it as a hook, and the boss roster names it the final
-   boss ("a world without life"; mechanics: multi-stage, reality shifts). No levels, enemies or boss yet.
+   boss ("a world without life"; mechanics: multi-stage, reality shifts).
+   - Decided (DEC-016, DEC-017): a half-built structure over a drowned city, six levels, eclipse phases, personal
+     epilogues.
+   - Built: the eclipse-phase mechanic in the sim (`tests/test_eclipse.gd`), its placeholder drawing, and the first
+     level, the Drowned Approach. Chapter 4 is in `index.json`, so every lead reaches it after Chapter 3, with a
+     placeholder ending line.
+   - Waiting on the creator: DRAFT-012 in `UniverseBible/Games/TheLastLight2D.md` (route, enemies, the Mason, the
+     Heart, what beating it does, ten claims).
+   - Next in code, before the levels that need them: jumps planned around the rhythm, eclipse ground in boss
+     arenas, phase gates, moving eclipse ground.
 2. **The other four heroes as playable kits:** Elyra (Engineer, Foundry: control and debuff), Valen (Paladin,
    Dawnfaith: tank and protect), Lira (Scholar, Dawnfaith: buff and strike) and Jax (Broker, Lantern Cities: steal
    and burst). The owner brief says all eight become playable. The cast sheet says Jax needs a new name, because a
