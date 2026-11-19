@@ -8,6 +8,8 @@ extends SceneTree
 ##            run at its first mismatch
 ## --pilot   the GDScript Autopilot drives instead: its input must equal the recorded one each step
 ## --shard=I/N  only runs whose index in runs.json is I mod N (CI splits the suite this way)
+## --dir=NAME  replay tests/NAME instead of tests/golden (golden_godot: the port's own levels, recorded by
+##            tools/record_golden.gd; their events field is "#<hash>")
 ## --run=A,B  only these runs; --dump=N writes the canonical state after N steps to
 ##            user://dump-<id>-<N>.json, in the oracle's `f:<dec>:<hex>` float form, for
 ##            tools/diff_state.py against `oracle dump <id> <N>`
@@ -18,6 +20,7 @@ var _only: PackedStringArray = []
 var _dump := -1
 var _shard := 0
 var _shards := 1
+var _dir := "golden"
 
 
 func _init() -> void:
@@ -26,6 +29,8 @@ func _init() -> void:
 			_frame0 = true
 		elif a == "--pilot":
 			_pilot = true
+		elif a.begins_with("--dir="):
+			_dir = a.trim_prefix("--dir=")
 		elif a.begins_with("--run="):
 			_only = a.trim_prefix("--run=").split(",", false)
 		elif a.begins_with("--shard="):
@@ -34,7 +39,7 @@ func _init() -> void:
 			_shards = int(p[1])
 		elif a.begins_with("--dump="):
 			_dump = int(a.trim_prefix("--dump="))
-	var runs: Array = JSON.parse_string(FileAccess.get_file_as_string("res://tests/golden/runs.json"))
+	var runs: Array = JSON.parse_string(FileAccess.get_file_as_string("res://tests/%s/runs.json" % _dir))
 	var passed := 0
 	var total := 0
 	for n in runs.size():
@@ -46,7 +51,8 @@ func _init() -> void:
 		total += 1
 		if _replay(id):
 			passed += 1
-	print("replay: %d/%d runs match%s" % [passed, total, " at step 0" if _frame0 else ""])
+	var label := "replay" if _dir == "golden" else "replay %s" % _dir
+	print("%s: %d/%d runs match%s" % [label, passed, total, " at step 0" if _frame0 else ""])
 	quit(0 if passed == total else 1)
 
 
@@ -67,7 +73,7 @@ static func make_world(header: Dictionary) -> World:
 
 
 func _replay(id: String) -> bool:
-	var lines := FileAccess.get_file_as_string("res://tests/golden/%s.trace" % id).split("\n", false)
+	var lines := FileAccess.get_file_as_string("res://tests/%s/%s.trace" % [_dir, id]).split("\n", false)
 	var header: Dictionary = JSON.parse_string(lines[0])
 	var world := make_world(header)
 	var h0 := world.state_hash()
@@ -98,10 +104,11 @@ func _replay(id: String) -> bool:
 		if got != f[0]:
 			print("MISMATCH %s step %d: %s want %s" % [id, step, got, f[0]])
 			return false
-		var want_events: Array = []
+		var want_hash := Canon.hash_hex([])
 		if f.size() > 3:
-			want_events = Canon.from_oracle_json(JSON.parse_string(f[3]))
-		if Canon.hash_hex(events) != Canon.hash_hex(want_events):
+			want_hash = f[3].trim_prefix("#") if f[3].begins_with("#") \
+				else Canon.hash_hex(Canon.from_oracle_json(JSON.parse_string(f[3])))
+		if Canon.hash_hex(events) != want_hash:
 			print("EVENTS %s step %d:\n  got  %s\n  want %s" % [id, step, _tagged(Canon.of(events)), f[3] if f.size() > 3 else "[]"])
 			return false
 	print("ok %s (%d steps)" % [id, lines.size() - 2])

@@ -29,4 +29,5 @@ run '^flow: [0-9]+ checks, 0 failed' -s res://tests/test_flow.gd
 run '^input: [0-9]+ checks, 0 failed' -s res://tests/test_input.gd
 run '^eclipse: [0-9]+ checks, 0 failed' -s res://tests/test_eclipse.gd
 run '^replay: ([0-9]+)/\1 runs match' -s res://tests/replay.gd -- "$@"
+run '^replay golden_godot: ([0-9]+)/\1 runs match' -s res://tests/replay.gd -- --dir=golden_godot "$@"
 exit $fail
