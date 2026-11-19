@@ -48,17 +48,10 @@ static func make(p_text: String, size: float, p_color: Color, weight := "heavy")
 	return l
 
 
-## The HUD family, bundled so every platform draws the same weights (Godot only reaches Avenir Next's Bold
-## face, and Windows has no Avenir). Both are SIL OFL; `--hud-font NunitoSans` picks the other one.
-const HUD_FAMILIES := {"Figtree": "res://fonts/Figtree.ttf", "NunitoSans": "res://fonts/NunitoSans.ttf"}
-static var hud_family := _family_from_args()
+## The HUD font, bundled so every platform draws the same weights (Godot only reaches Avenir Next's Bold
+## face, and Windows has no Avenir). Figtree, SIL OFL (fonts/Figtree-OFL.txt); chosen over Nunito Sans.
+const HUD_FONT := "res://fonts/Figtree.ttf"
 const WEIGHTS := {"medium": 500, "demibold": 600, "bold": 700, "heavy": 900}
-
-
-static func _family_from_args() -> String:
-	var args := OS.get_cmdline_user_args()
-	var i := args.find("--hud-font")
-	return args[i + 1] if i >= 0 and i + 1 < args.size() and HUD_FAMILIES.has(args[i + 1]) else "Figtree"
 
 
 static func font_for(weight: String) -> Font:
@@ -69,7 +62,7 @@ static func font_for(weight: String) -> Font:
 			_fonts[weight] = m
 		else:
 			var f := FontVariation.new()
-			f.base_font = load(HUD_FAMILIES[hud_family])
+			f.base_font = load(HUD_FONT)
 			f.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): WEIGHTS.get(weight, 900)}
 			f.fallbacks = [symbols()]
 			_fonts[weight] = f
