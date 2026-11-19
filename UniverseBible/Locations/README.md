@@ -48,3 +48,17 @@ Ember and amber, coal black, copper, fabric awnings, hanging lanterns, rooftops,
 
 Wilds where the light has already gone, with bioluminescent green and violet. Held back as a mystery; it can be
 mentioned.
+
+## The Eclipse Engine (DEC-016 WORKING; places PROPOSED)
+
+A vast half-built structure rising over a drowned city under the eclipse (DEC-016). The city's name and history
+are **UNKNOWN**.
+
+| Place | Status | Notes |
+|---|---|---|
+| The Drowned Approach | PROPOSED (DRAFT-012) | Flooded streets below the Engine; the first level is built as a placeholder |
+| The Scaffold Ways | PROPOSED (DRAFT-012) | The Engine's half-built frame, still being built as it is climbed |
+| The Still Quarter | PROPOSED (DRAFT-012) | A district the Engine has already "finished"; machines shaped like its people keep their routines |
+| The Mason's Span | PROPOSED (DRAFT-012) | A bridge to the Heart, kept by the machine building it |
+| The Corona Stair | PROPOSED (DRAFT-012) | The last climb, in the corona's light |
+| The Heart | PROPOSED (DRAFT-012) | The Engine's guarded heart; what beating it does is open |

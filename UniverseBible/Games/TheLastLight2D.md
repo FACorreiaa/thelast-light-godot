@@ -1,8 +1,8 @@
 # The Last Light: the 2D action-platformer
 
-The first game. Stage-based 2D action-platformer for iPhone, iPad and Mac. The code lives in this repository
-(`LastLight/`, `LastLightCore/`); the design is in
-`docs/superpowers/specs/2026-11-15-the-last-light-action-rpg-design.md`.
+The first game. Stage-based 2D action-platformer for iPhone, iPad, Windows and Mac. Since 2026-11-19 the code is
+the Godot port (`sim/`, `game/`, `data/` in `thelast-light-godot`); the Swift game (`apps/game-proto`, tag
+`swift-final`) is archived. The design is in `game-proto/docs/superpowers/specs/2026-11-15-the-last-light-action-rpg-design.md`.
 
 ## What it uses from the bible
 
@@ -12,7 +12,7 @@ The first game. Stage-based 2D action-platformer for iPhone, iPad and Mac. The c
 | Caelen, Orion | WORKING (ART); backstory PROPOSED | Lead and companion |
 | Seraphine, Nimue as other leads | WORKING (ART); arcs PROPOSED | Chosen at New Game by faction. Each has her own opening (DEC-012). Kits are gameplay, not canon: Seraphine's **Light Listens** heals, Nimue's **Lantern Trick** leaves a decoy |
 | The AI's goal | WORKING (WC-010) | Implied: a line where the others never woke |
-| The Eclipse Engine | WORKING (ART); details UNKNOWN | Hook at the end of Chapter 1 (DEC-011) |
+| The Eclipse Engine | WORKING (ART, DEC-016); most details UNKNOWN | Hook at the end of Chapter 1 (DEC-011); the final chapter climbs it (DEC-016, DEC-017, DRAFT-012) |
 | The Lantern Cities, their enemies, The Cinder King | WORKING (ART) | Chapter 2 region; the Cinder King's fight is next |
 
 ## Local canon this game has shipped
@@ -149,6 +149,83 @@ Solar Guard among them. The Cloister Gate is a mid-boss fight against the Sworn 
 
 Guards kept: nothing says how the Dawnfaith is organised (open question 6) or whether wardens always swear in
 pairs; nothing links the Sworn to the Last Oracle or to Seraphine (open question 9).
+
+## Draft: Chapter 4, The Eclipse Engine (DRAFT-012, PROPOSED)
+
+The final chapter, for every lead. Fixed already: the Engine is a vast half-built structure rising over a drowned
+city under the eclipse, unfinished, and the chapter climbs it to its guarded heart (DEC-016); six levels, eclipse
+phases as the mechanic, each lead's personal epilogue after the fight (DEC-017). **Everything below is a proposal.**
+The first level is built as a playable placeholder so the mechanic can be felt; its name and the chapter title in
+the game data are proposals too, and no story text is written yet.
+
+### Route
+
+| # | Level (proposed name) | Kind | What it shows |
+|---|---|---|---|
+| 1 | **The Drowned Approach** (built, placeholder) | Level | Flooded streets of the drowned city; the first light and shadow bridges |
+| 2 | **The Scaffold Ways** | Level | The Engine's half-built frame, climbed; eclipse ledges stacked upward |
+| 3 | **The Still Quarter** | Puzzle | A district the Engine has already "finished": gates that open only in one phase |
+| 4 | **The Mason's Span** | Mid-boss | A bridge the Engine is still building, kept by the machine building it |
+| 5 | **The Corona Stair** | Level | The last climb, in the corona's light, where the swaps come faster |
+| 6 | **The Heart** | Boss | The Engine's guarded heart |
+
+The scenario principle holds for every stop: a playable place with its own mechanic, something it reveals about
+the Foundry's AI, and a symptom of the decline (the flood, a district with no one left in it, a sun that dims).
+
+### Gameplay (not canon)
+
+- **Eclipse phases.** Ground is solid only in the light or only in shadow and swaps on the level's rhythm; ground
+  about to go flickers first, and ground will not form inside someone. Built and tested (`tests/test_eclipse.gd`).
+- **The Still Quarter** adds gates tied to a phase. **The Mason** lays and removes eclipse ground during the fight.
+  **The Heart** fights through the rhythm: (1) a steady beat; (2) floor sections unmade and rebuilt, with Stand-ins;
+  (3) swaps that come faster and out of step, ending on its last beat.
+- **Enemies.** Placeholders from the Foundry until these are agreed: the **Stand-in** (a machine in the shape of
+  someone who lived in the district, keeping their routine) and the **Scaffold Crawler** (a builder that climbs
+  the frame and drops loose parts).
+- **Current limits of the mechanic**, to clear before the levels that need them:
+  - A swing's lunge or a jump can carry a fighter over ground that has gone, as over any pit; the autopilot and
+    Orion wait and step off, but do not plan jumps around the rhythm. Ledges reached only by jumping (level 2),
+    eclipse ground in a mid-boss or boss arena (levels 4 and 6), moving eclipse ground and phase gates (level 3)
+    each need sim and autopilot work and tests first.
+  - Eclipse ground of opposite phases must not touch; crossing from one to the other would need a jump.
+  - An enemy standing on eclipse ground when it goes falls and is lost; levels place enemies on solid ground.
+
+### The open question: what beating the Heart does
+
+The chapter has to end somewhere, and this is the biggest claim in it. Three options:
+
+1. **Halted (recommended).** The Heart breaks. The Engine stands unfinished and silent over the water, and stays
+   that way. The sun is no brighter. Proposed chapter-end line: "The Engine is still. It will stay unfinished. The
+   sun is no brighter." *Consequences:* closes this game's conflict on a clear win without deciding whether the
+   decline can be reversed (UNKNOWN) or what became of the AI; later games can find the ruin. Fits the central
+   irony: they stopped something meant to save the world.
+2. **Halted, and the AI speaks.** As option 1, but the AI that built it speaks to the lead for the first time, not
+   through the Protocol. *Consequences:* a stronger finale, but the AI's own words would start to define its
+   mandate and history (UNKNOWN); every line would need its own verdict.
+3. **The lead chooses.** Break the Heart, or leave the Engine standing, unfinished, for others to study. *Consequences:*
+   the epilogues diverge and become player continuity (ALTERNATE), so no later game can assume either; twice the
+   ending writing for each lead.
+
+### New world claims in this draft, each needing a verdict
+
+1. The chapter is called **The Eclipse Engine**, and its first level **The Drowned Approach**.
+2. The drowned city was lived in once; its streets are under water now (its name and history stay UNKNOWN, DEC-016).
+3. The Engine's frame is still being built, by machines, as the heroes climb (**Scaffold Crawlers**, **the Mason**).
+4. **The Still Quarter**: a part of the city where the living were replaced by machines that need no light
+   (consistent with WC-010, which is the AI's belief, not the truth).
+5. **Stand-ins**: those machines are shaped like the people they replaced and keep their routines. Nothing says the
+   people were killed, moved or lost; that stays open.
+6. **The Mason**, the machine building the span to the Heart, is the mid-boss; it speaks no lines.
+7. **The Heart** has no face and no voice (unless option 2 is chosen).
+8. The eclipse is darker over the Engine than anywhere else in the game (a sight, not a cause: LC-002, LC-005).
+9. One line per lead on first seeing the Engine, written after the verdict on option 1, 2 or 3.
+10. **Personal epilogues** (ALTERNATE, player continuity): Caelen takes what he saw back to the Foundry; Seraphine
+    goes home to the Dawnfaith with Orion; Nimue tells the runners the way is open. None says what any of them
+    becomes later, or forces an ending to be canon.
+
+Guards kept: nothing says what the Engine does when finished, who designed it beyond the AI, or whether the AI
+survives; nothing links Orion to the AI beyond the Foundry (open questions stay open); no line says why the sun
+weakens (LC-002, LC-005); the Foundry's people stay distinct from its AI, and no faction becomes purely evil.
 
 ## Chapter 3, The Dawnfaith (DEC-015, WORKING)
 
