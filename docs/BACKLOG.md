@@ -1,0 +1,55 @@
+# The Last Light: backlog
+
+Carried over from the Swift game (`apps/game-proto`, tag `swift-final`). The Godot port is now the only codebase
+that gets new content. Sources: the action-RPG spec (`game-proto/docs/superpowers/specs/2026-11-15-the-last-light-action-rpg-design.md`),
+the cast sheet (`game-proto/docs/design/cast-sheet.md`), the universe bible (`game-proto/UniverseBible/`), and PRs #24 to #26.
+
+## What the port has (checked 2026-11-19 against `swift-final`)
+
+Nothing landed in Swift after the tag except a CI change for Xcode 27, so this is everything Swift had.
+
+- **Heroes:** Caelen, Seraphine and Nimue as leads, Orion as the companion, and Nimue's decoy. Kits match Swift.
+- **Chapters:**
+  - **1, The Foundry:** three faction openings (Awakening, Sun Gauges, Undercroft), then the Foundry Yard, the
+    Machine Hall, the Lock Works (puzzle), the Warden's Gate (mid-boss) and the Protocol.
+  - **2, The Lantern Cities:** the Ember Market, the Toll Canal, the Lantern Roofs, Lamp Row (the Lamplighter,
+    mid-boss), the Cinder Docks and the Cinder Vault (the Cinder King).
+  - **3, The Dawnfaith:** the Pilgrim Road, the Bell Tower, the Sun Cloister, the Cloister Gate (the Sworn, twin
+    mid-boss), the Choir Stair and the Oracle's Terrace (the Last Oracle).
+- **Bosses:** the Line Warden, the Protocol (Judgement, Ascension, Execution), the Lamplighter, the Cinder King,
+  the Sworn Shield and Sworn Spear, and the Last Oracle.
+- **Enemies:**
+  - The Foundry: Scrap Drone, Forged Soldier, Sentry Core, Dogma Frame.
+  - The Lantern Cities: Ratborn, Lantern Gunner, Smuggler Brute, Night Weaver and its images.
+  - The Dawnfaith: Zealot, Radiant Acolyte, Solar Guard, Halo Disciple.
+  - The training dummy.
+- **Levels:** levers, plates, gates and lamps, hazards, checkpoints, pickups, and partner hand-offs.
+- **Story:** 35 scenes, decisions and lead-specific lines.
+- **Proof:** 64 golden runs replay bit-exact against Swift, and every route is finishable by the autopilot.
+
+## Still to build (from the Swift plans)
+
+1. **The final chapter: the Eclipse Engine.** Chapter 1 ends on it as a hook, and the boss roster names it the final
+   boss ("a world without life"; mechanics: multi-stage, reality shifts). No levels, enemies or boss yet.
+2. **The other four heroes as playable kits:** Elyra (Engineer, Foundry: control and debuff), Valen (Paladin,
+   Dawnfaith: tank and protect), Lira (Scholar, Dawnfaith: buff and strike) and Jax (Broker, Lantern Cities: steal
+   and burst). The owner brief says all eight become playable. The cast sheet says Jax needs a new name, because a
+   League of Legends champion already has it.
+3. **Progression** (spec 4.7): a short ability track per hero, unlocked by story progress, with no stat grinding.
+   Not built in Swift either.
+4. **Personal epilogues** (spec 5): one ending scene per lead. Each chapter currently ends on a single line.
+5. **Bible verdicts:**
+   - DRAFT-010 holds 9 PROPOSED world claims (Lantern Cities).
+   - Character backstories are decided one character at a time (DEC-010).
+6. **Art.** The owner has said it comes last.
+   - Production characters, enemies and bosses replace the code-drawn neon placeholders.
+   - Each chapter's places become distinct playable spaces: a platforming mechanic of their own, something about
+     their faction, and a different symptom of the world's decline.
+7. **Release.**
+   - The port ships under the "LastLight GdSpike" App Store Connect record, while the real record is "The Last
+     Light - Chapter Zero" (`com.fernandocorreia.lastlight`). Move the bundle id over before strangers test it.
+   - Steam once the game is done: $100 one-time per game, refunded after $1,000 gross.
+8. **Technical leftovers:**
+   - A Windows font for the menus (SF Pro falls back to a system font there).
+   - A two-object leak at exit after the demo bot plays.
+   - Android export, if wanted.
