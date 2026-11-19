@@ -561,6 +561,14 @@ func _integrate(f: Fighter, inp: InputFrame, events: Array) -> void:
 			f.vel.x = 0.0
 			blocked = true
 
+	# Port-only: a hero's lunge or dodge stops at the edge of eclipse ground that is gone or about to go,
+	# instead of carrying them over the gap. Ordinary pits keep Swift's rule.
+	if f.team == "hero" and f.vel.x != 0.0 and (f.state == Fighter.St.ATTACK or f.state == Fighter.St.DODGE) \
+			and level != null and level.eclipse_period > 0:
+		var edge := f.pos.x + (1.0 if f.vel.x > 0.0 else -1.0) * (half + 6.0)
+		if _eclipse_edge_unsafe(f, edge):
+			f.vel.x = 0.0
+
 	# Sideways, stopped by walls.
 	var from_x := f.pos.x
 	f.pos.x += f.vel.x * dt
@@ -630,6 +638,7 @@ func _navigate(f: Fighter, inp: InputFrame, leader: Fighter) -> void:
 	if escape != 0.0:
 		inp.move_x = escape
 		inp.attack = false
+		inp.dodge = false
 		return
 
 	# The leader is on a floor just above: try to jump up to it.
@@ -1542,6 +1551,27 @@ func eclipse_blocks(f: Fighter, dir: float) -> bool:
 			continue
 		var cross := (b.max_x - b.min_x + f.spec.width + Sw.max_d(ahead, 0.0)) / Sw.max_d(f.spec.run_speed, 1.0)
 		return float(left) < cross * Tuning.FRAMES_PER_SECOND + ECLIPSE_MARGIN
+	return false
+
+
+## Port-only: true when `x`, just past `f`'s front, lies over eclipse ground that `f` is not already standing on
+## and that is gone or will go within ECLIPSE_MARGIN frames.
+func _eclipse_edge_unsafe(f: Fighter, x: float) -> bool:
+	var half := f.spec.width / 2.0
+	var soon := float(level.frames_to_eclipse_swap(frame)) < ECLIPSE_MARGIN
+	for i in platforms.size():
+		var p: Level.Platform = platforms[i]
+		if p.eclipse == 0:
+			continue
+		var b := p.box_at(frame)
+		if not (b.min_x <= x and x <= b.max_x and absf(b.max_y - f.pos.y) < 8.0):
+			continue
+		var gone := platform_boxes[i].min_y < -50000.0
+		if gone:
+			return true
+		# Standing on it already: getting off in time is eclipse_escape's job.
+		if soon and not (f.pos.x + half > b.min_x and f.pos.x - half < b.max_x):
+			return true
 	return false
 
 

@@ -141,9 +141,9 @@ func _init() -> void:
 				check(w.is_complete and fell.is_empty(), "autopilot (crowd %s, fights %s, period %d) crosses: complete %s, fell %s, x %.0f"
 					% [crowd, fights, period, w.is_complete, fell, w.controlled().pos.x])
 
-	# Every level with eclipse phases, every lead, walking and fighting, a few seeds: it finishes, and walking the
-	# lead never drops through eclipse ground (it waits). A swing's lunge or a jump can still carry a fighter over
-	# ground that has gone, as over any pit; Swift's own levels have the same falls under the autopilot.
+	# Every level with eclipse phases, every lead, walking and fighting, a few seeds: it finishes, and no one on
+	# the heroes' side drops through a gap where eclipse ground was, except when knocked there by a hit (which
+	# throws anyone over any pit). Ordinary pits keep Swift's rules and are not counted.
 	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
 	for id: String in index.levels:
 		var level := Level.load_id(id)
@@ -154,19 +154,27 @@ func _init() -> void:
 				for seed in [1, 2, 3]:
 					w = World.from_level(level, lead, t, seed)
 					var pilot := Autopilot.new(fights)
-					var lead_drops := 0
-					var was_low := false
+					var drops: Array = []
+					var below := {}
+					var grounded := {}
 					for i in 60 * 180:
 						if w.is_over or w.is_complete:
 							break
+						for f: Fighter in w.fighters:
+							if f.team == "hero" and f.on_ground:
+								grounded[f.id] = f.state
 						w.step(pilot.input_for(w))
-						var me := w.controlled()
-						var under := me != null and me.pos.y < -20.0
-						if under and not was_low:
-							lead_drops += 1
-						was_low = under
-					check(w.is_complete and (fights or lead_drops == 0), "%s (%s, fights %s, seed %d): complete %s, lead drops %d"
-						% [id, lead, fights, seed, w.is_complete, lead_drops])
+						for f: Fighter in w.fighters:
+							if f.team != "hero":
+								continue
+							var under := f.pos.y < -20.0
+							if under and not below.get(f.id, false) and grounded.get(f.id, -1) != Fighter.St.HITSTUN:
+								for p: Level.Platform in level.platforms:
+									if p.eclipse != 0 and f.pos.x > p.box.min_x and f.pos.x < p.box.max_x:
+										drops.append("%s %d at %.0f" % [Fighter.STATE_NAMES[grounded.get(f.id, 0)], f.id, f.pos.x])
+							below[f.id] = under
+					check(w.is_complete and drops.is_empty(), "%s (%s, fights %s, seed %d): complete %s, eclipse drops %s"
+						% [id, lead, fights, seed, w.is_complete, drops])
 
 	print("eclipse: %d checks, %d failed" % [checks, failed])
 	quit(1 if failed > 0 else 0)
