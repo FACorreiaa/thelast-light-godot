@@ -29,6 +29,10 @@ var mid_layer := Node2D.new()
 var world_node := Node2D.new()
 var overlay := CanvasLayer.new()
 var screen := Control.new()
+## The HUD and touch controls, in the Swift scene's points with y up.
+var ui_layer := Node2D.new()
+var controls := TouchControls.new()
+var show_touch := false
 var vignette := TextureRect.new()
 ## Darkens the room while the Last Oracle's dusk holds.
 var dusk := ColorRect.new()
@@ -77,6 +81,8 @@ func _ready() -> void:
 	lead = _arg(args, "--lead", "caelen")
 	_snapshot_dir = _arg(args, "--snapshot", "")
 	_frame_limit = int(_arg(args, "--frames", "-1"))
+	# The on-screen controls show on phones and tablets, or with --touch (the mouse acts as one finger).
+	show_touch = (OS.has_feature("mobile") or args.has("--touch")) and not demo
 	_levels = route(lead)
 	level_index = clampi(int(_arg(args, "--level", "0")), 0, _levels.size() - 1)
 	world = _make_world(1, -1, {})
@@ -102,7 +108,12 @@ func _ready() -> void:
 	dusk.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dusk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.add_child(dusk)
-	screen.add_child(hud)
+	overlay.add_child(ui_layer)
+	ui_layer.add_child(hud)
+	if show_touch:
+		ui_layer.add_child(controls)
+	get_viewport().size_changed.connect(_layout)
+	_layout()
 	_build_scenery()
 	_show_hint()
 	var hero := world.controlled()
@@ -130,6 +141,62 @@ func _make_world(seed: int, from_checkpoint: int, collected: Dictionary) -> Worl
 	if mode == Mode.ROOM:
 		return World.partner_slice(seed, t)
 	return World.from_level(Level.load_id(_levels[level_index]), lead, t, seed, from_checkpoint, collected)
+
+
+## Points per pixel for the HUD: the Swift scene's size is in points, about 874 x 402 on a phone.
+func _ui_scale() -> float:
+	var size := get_viewport_rect().size
+	return maxf(0.5, minf(size.y / 402.0, size.x / 700.0))
+
+
+func _layout() -> void:
+	var size := get_viewport_rect().size
+	var ui := _ui_scale()
+	ui_layer.position = Vector2(0, size.y)
+	ui_layer.scale = Vector2(ui, -ui)
+	# Safe area as (left, top, right, bottom) in points.
+	var safe := Rect2(Vector2.ZERO, size)
+	if OS.has_feature("mobile"):
+		var area := DisplayServer.get_display_safe_area()
+		safe = Rect2(area.position, area.size)
+	var insets := Rect2(safe.position.x / ui, safe.position.y / ui,
+		(size.x - safe.end.x) / ui, (size.y - safe.end.y) / ui)
+	hud.layout(size / ui, insets)
+	controls.layout(size / ui, insets)
+
+
+func _to_points(pixel: Vector2) -> Vector2:
+	var ui := _ui_scale()
+	return Vector2(pixel.x / ui, (get_viewport_rect().size.y - pixel.y) / ui)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		var t := event as InputEventScreenTouch
+		_touch(t.index, t.pressed, _to_points(t.position))
+	elif event is InputEventScreenDrag:
+		var d := event as InputEventScreenDrag
+		if show_touch:
+			controls.moved(d.index, _to_points(d.position))
+	elif event is InputEventMouseButton and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT \
+			and not OS.has_feature("mobile"):
+		var m := event as InputEventMouseButton
+		_touch(0, m.pressed, _to_points(m.position))
+	elif event is InputEventMouseMotion and show_touch and not OS.has_feature("mobile"):
+		controls.moved(0, _to_points((event as InputEventMouseMotion).position))
+
+
+func _touch(index: int, pressed: bool, point: Vector2) -> void:
+	if pressed:
+		if hud.action_at(point) == Hud.Action.PAUSE:
+			_pause_requested = true
+		elif show_touch:
+			controls.began(index, point)
+	elif show_touch:
+		controls.ended(index)
+
+
+var _pause_requested := false
 
 
 ## World units are scaled so about the same slice of the level shows on a phone, a tablet and a Mac window.
@@ -381,8 +448,16 @@ func _process(delta: float) -> void:
 	elif world.is_over and (reading.attack or reading.jump or demo):
 		_restart(false)
 
-	var inp := InputFrame.make(reading.move_x, reading.jump, reading.jump_held, reading.attack, reading.dodge,
-		reading.special, reading.switch_hero)
+	var presses := controls.take_presses()
+	if world.is_over and not presses.is_empty() and not reading.restart:
+		_restart(false)
+		presses = {}
+	_pause_requested = false  # The pause menu arrives with the menus port.
+	var inp := InputFrame.make(reading.move_x if reading.move_x != 0.0 else controls.move_x,
+		reading.jump or presses.has(TouchControls.Pad.JUMP), reading.jump_held or controls.jump_held,
+		reading.attack or presses.has(TouchControls.Pad.ATTACK), reading.dodge or presses.has(TouchControls.Pad.DODGE),
+		reading.special or presses.has(TouchControls.Pad.SPECIAL),
+		reading.switch_hero or presses.has(TouchControls.Pad.SWITCH_HERO))
 	var step := 1.0 / Tuning.FRAMES_PER_SECOND
 	var steps := 0
 	while accumulator >= step and steps < 4:
@@ -458,6 +533,9 @@ func _draw_frame() -> void:
 			if f.team == "hero" and f.id != hero.id and f.awake and not f.spec.is_decoy:
 				partner = f
 				break
+		var sp := hero.spec.special
+		hud.set_special([special_name(sp), hero.special_cooldown] if not sp.is_empty() else [])
+		controls.set_special(not sp.is_empty() and hero.special_cooldown == 0)
 		hud.set_heroes([hero.kind.to_upper(), hero.hp / hero.spec.max_hp],
 			[partner.kind.to_upper(), partner.hp / partner.spec.max_hp] if partner != null else [])
 	_draw_level()
@@ -467,6 +545,23 @@ func _draw_frame() -> void:
 	if b != null and b.kind == "lastOracle" and b.is_alive():
 		dusk_target = 0.4 if b.phase == 2 else (0.18 if b.phase >= 3 else 0.0)
 	dusk.modulate.a += (dusk_target - dusk.modulate.a) * 0.04
+	if b != null and b.awake and b.is_alive():
+		var title := boss_title(b.kind)
+		var phases: Array = title[1]
+		var phase := " · " + String(phases[mini(b.phase - 2, phases.size() - 1)]) if b.phase >= 2 else ""
+		var twin := world.twin()
+		if twin != null:
+			# A sworn pair: one bar each; the name says when one is down and about to be raised.
+			var rising := " · RISING" if world.vow_frames > 0 else ""
+			hud.set_boss([title[0] + rising, b.hp / b.spec.max_hp, _open(b)], [twin.hp / twin.spec.max_hp, _open(twin)])
+		else:
+			hud.set_boss([title[0] + phase, b.hp / b.spec.max_hp, b.is_open() and not b.is_guarding() and not world.is_warded(b.id)])
+	elif world.twin() != null and world.twin().awake and world.twin().is_alive():
+		var twin := world.twin()
+		hud.set_boss([boss_title(twin.kind)[0] + (" · RISING" if world.vow_frames > 0 else ""), 0.0, false],
+			[twin.hp / twin.spec.max_hp, twin.is_open()])
+	else:
+		hud.set_boss([])
 
 	shake *= 0.86
 	var jolt := Vector2.ZERO
@@ -480,6 +575,33 @@ func _draw_frame() -> void:
 		var py := (GROUND_Y - drop - camera_y * depth) * zoom + jolt.y * depth
 		layer.position = Vector2(px, size.y - py)
 		layer.scale = Vector2(zoom, -zoom)
+
+	if world.level != null:
+		hud.set_status("%s   ◆ %d/%d" % [world.level.name.to_upper(), world.collected.size(), world.level.pickups.size()])
+	else:
+		hud.set_status("TRAINING" if world.wave_number == 0 else "WAVE %d   KILLS %d" % [world.wave_number, kills])
+	hud.set_debug(_debug_text() if show_debug else "")
+
+
+static func _open(f: Fighter) -> bool:
+	return f.is_alive() and f.is_open() and not f.is_guarding()
+
+
+static func special_name(sp: Dictionary) -> String:
+	return {"command": "COMMAND", "adapt": "ADAPT", "heal": "LIGHT LISTENS", "decoy": "LANTERN TRICK"}.get(sp.get("case", ""), "")
+
+
+func _debug_text() -> String:
+	var f := world.controlled()
+	if f == null:
+		return ""
+	var ground := ("ground" + (" #%d" % f.ground_index if f.ground_index >= 0 else "")) if f.on_ground else "air"
+	var text := "pos %6.0f %5.0f\nvel %6.0f %5.0f\n%s  coyote %d\n%s f%d\nhitstop %d  frame %d" % [
+		f.pos.x, f.pos.y, f.vel.x, f.vel.y, ground, f.coyote, str(f.state_canon()), f.state_frame, world.hit_stop, world.frame]
+	var b := world.boss()
+	if b != null:
+		text += "\nboss %.0f p%d  %s f%d  %s" % [b.hp, b.phase, str(b.state_canon()), b.state_frame, "open" if b.is_open() else "armoured"]
+	return text
 
 
 func _draw_level() -> void:

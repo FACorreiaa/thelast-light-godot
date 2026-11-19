@@ -1,26 +1,44 @@
 class_name SkLabel
 extends Node2D
-## SKLabelNode: text centred on its x, sitting on its baseline. Flips itself back upright under the y-flipped
-## world layer.
+## SKLabelNode: text placed by horizontalAlignmentMode and verticalAlignmentMode (default centre, baseline),
+## with newlines making more lines. Flips itself back upright under the y-flipped layers.
+
+enum H { CENTER, LEFT, RIGHT }
+enum V { BASELINE, CENTER, TOP, BOTTOM }
 
 static var _fonts: Dictionary = {}
 
 var text := "":
 	set(v):
-		text = v
-		queue_redraw()
+		if v != text:
+			text = v
+			queue_redraw()
 var font_size := 16.0:
 	set(v):
 		font_size = v
 		queue_redraw()
 var color := Color.WHITE:
 	set(v):
-		color = v
+		if v != color:
+			color = v
+			queue_redraw()
+var h_align := H.CENTER:
+	set(v):
+		h_align = v
+		queue_redraw()
+var v_align := V.BASELINE:
+	set(v):
+		v_align = v
 		queue_redraw()
 var font: Font
+var alpha: float:
+	get:
+		return modulate.a
+	set(v):
+		modulate.a = v
 
 
-## "demibold" (AvenirNext-DemiBold) or "heavy" (AvenirNext-Heavy).
+## weight: "medium", "demibold", "bold", "heavy" (AvenirNext faces) or "mono" (Menlo).
 static func make(p_text: String, size: float, p_color: Color, weight := "heavy") -> SkLabel:
 	var l := SkLabel.new()
 	l.text = p_text
@@ -33,8 +51,11 @@ static func make(p_text: String, size: float, p_color: Color, weight := "heavy")
 static func font_for(weight: String) -> Font:
 	if not _fonts.has(weight):
 		var f := SystemFont.new()
-		f.font_names = PackedStringArray(["Avenir Next", "Avenir", "Helvetica Neue", "Segoe UI", "Arial"])
-		f.font_weight = 600 if weight == "demibold" else 900
+		if weight == "mono":
+			f.font_names = PackedStringArray(["Menlo", "SF Mono", "Consolas", "monospace"])
+		else:
+			f.font_names = PackedStringArray(["Avenir Next", "Avenir", "Helvetica Neue", "Segoe UI", "Arial"])
+			f.font_weight = {"medium": 500, "demibold": 600, "bold": 700}.get(weight, 900)
 		_fonts[weight] = f
 	return _fonts[weight]
 
@@ -42,8 +63,25 @@ static func font_for(weight: String) -> Font:
 func _draw() -> void:
 	if text == "" or font == null:
 		return
-	# Drawn at a fixed pixel size and scaled, so the text keeps its shape at any zoom.
-	var px := int(round(font_size))
-	var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2(1, -1) * (font_size / float(px)))
-	draw_string(font, Vector2(-w / 2.0, 0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, px, color)
+	# Drawn at a whole pixel size and scaled, so the text keeps its shape at any zoom.
+	var px := maxi(1, int(round(font_size)))
+	var k := font_size / float(px)
+	var lines := text.split("\n")
+	var ascent := font.get_ascent(px)
+	var descent := font.get_descent(px)
+	var line_h := font.get_height(px)
+	var block := line_h * float(lines.size() - 1) + ascent + descent
+	# Baseline of the first line, in the upright (y-down) frame, before scaling.
+	var y0 := 0.0
+	match v_align:
+		V.TOP:
+			y0 = ascent
+		V.CENTER:
+			y0 = ascent - block / 2.0
+		V.BOTTOM:
+			y0 = ascent - block
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2(k, -k))
+	for i in lines.size():
+		var w := font.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
+		var x := 0.0 if h_align == H.LEFT else (-w if h_align == H.RIGHT else -w / 2.0)
+		draw_string(font, Vector2(x, y0 + line_h * float(i)), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, px, color)
