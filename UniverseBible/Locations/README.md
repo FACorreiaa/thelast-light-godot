@@ -58,7 +58,7 @@ are **UNKNOWN**.
 |---|---|---|
 | The Drowned Approach | PROPOSED (DRAFT-012) | Flooded streets below the Engine; the first level is built as a placeholder |
 | The Scaffold Ways | PROPOSED (DRAFT-012) | The Engine's half-built frame, still being built as it is climbed |
-| The Still Quarter | PROPOSED (DRAFT-012) | A district the Engine has already "finished"; machines shaped like its people keep their routines |
+| The Still Quarter | PROPOSED (DRAFT-012) | A district where the AI's machines have replaced the living (WC-010); machines shaped like its people keep their routines |
 | The Mason's Span | PROPOSED (DRAFT-012) | A bridge to the Heart, kept by the machine building it |
 | The Corona Stair | PROPOSED (DRAFT-012) | The last climb, in the corona's light |
 | The Heart | PROPOSED (DRAFT-012) | The Engine's guarded heart; what beating it does is open |

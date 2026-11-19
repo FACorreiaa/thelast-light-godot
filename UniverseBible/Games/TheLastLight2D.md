@@ -155,8 +155,9 @@ pairs; nothing links the Sworn to the Last Oracle or to Seraphine (open question
 The final chapter, for every lead. Fixed already: the Engine is a vast half-built structure rising over a drowned
 city under the eclipse, unfinished, and the chapter climbs it to its guarded heart (DEC-016); six levels, eclipse
 phases as the mechanic, each lead's personal epilogue after the fight (DEC-017). **Everything below is a proposal.**
-The first level is built as a playable placeholder so the mechanic can be felt; its name and the chapter title in
-the game data are proposals too, and no story text is written yet.
+The first level is built as a playable placeholder so the mechanic can be felt. The game data already shows three
+pieces of text, all placeholders and proposals: the chapter title, the level name, and the ending line "The way up
+is open. (Draft chapter: more to come.)". No scenes are written.
 
 ### Route
 
@@ -164,7 +165,7 @@ the game data are proposals too, and no story text is written yet.
 |---|---|---|---|
 | 1 | **The Drowned Approach** (built, placeholder) | Level | Flooded streets of the drowned city; the first light and shadow bridges |
 | 2 | **The Scaffold Ways** | Level | The Engine's half-built frame, climbed; eclipse ledges stacked upward |
-| 3 | **The Still Quarter** | Puzzle | A district the Engine has already "finished": gates that open only in one phase |
+| 3 | **The Still Quarter** | Puzzle | A district where the AI's machines have already replaced the living (WC-010): gates that open only in one phase |
 | 4 | **The Mason's Span** | Mid-boss | A bridge the Engine is still building, kept by the machine building it |
 | 5 | **The Corona Stair** | Level | The last climb, in the corona's light, where the swaps come faster |
 | 6 | **The Heart** | Boss | The Engine's guarded heart |
@@ -195,8 +196,8 @@ the Foundry's AI, and a symptom of the decline (the flood, a district with no on
 The chapter has to end somewhere, and this is the biggest claim in it. Three options:
 
 1. **Halted (recommended).** The Heart breaks. The Engine stands unfinished and silent over the water, and stays
-   that way. The sun is no brighter. Proposed chapter-end line: "The Engine is still. It will stay unfinished. The
-   sun is no brighter." *Consequences:* closes this game's conflict on a clear win without deciding whether the
+   that way in this game. The sun is no brighter. Proposed chapter-end line: "The Engine is still. The sun is no
+   brighter." (Nothing says it can never be finished; later games stay free.) *Consequences:* closes this game's conflict on a clear win without deciding whether the
    decline can be reversed (UNKNOWN) or what became of the AI; later games can find the ruin. Fits the central
    irony: they stopped something meant to save the world.
 2. **Halted, and the AI speaks.** As option 1, but the AI that built it speaks to the lead for the first time, not
@@ -211,8 +212,10 @@ The chapter has to end somewhere, and this is the biggest claim in it. Three opt
 1. The chapter is called **The Eclipse Engine**, and its first level **The Drowned Approach**.
 2. The drowned city was lived in once; its streets are under water now (its name and history stay UNKNOWN, DEC-016).
 3. The Engine's frame is still being built, by machines, as the heroes climb (**Scaffold Crawlers**, **the Mason**).
-4. **The Still Quarter**: a part of the city where the living were replaced by machines that need no light
-   (consistent with WC-010, which is the AI's belief, not the truth).
+4. **The Still Quarter**: a part of the city where the AI's machines have already replaced the living with
+   machines that need no light (consistent with WC-010, which is the AI's belief, not the truth). It shows the AI's
+   plan at work, not what the Engine does when finished. This idea comes from the "a process, not a machine" option
+   that was not chosen for the Engine (DEC-016); it is offered here only as one district.
 5. **Stand-ins**: those machines are shaped like the people they replaced and keep their routines. Nothing says the
    people were killed, moved or lost; that stays open.
 6. **The Mason**, the machine building the span to the Heart, is the mid-boss; it speaks no lines.
