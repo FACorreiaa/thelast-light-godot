@@ -68,3 +68,5 @@ godot --headless --path . -- --sim-ticks=600
   test branch.
 - **Windows run:** GitHub repo for thelast-light-godot + Actions `windows-latest` job running the
   exported exe headless with `--sim-ticks=600`, checking the parity hash.
+
+- 2026-11-19: Xcode 27.2 installed. Build 0.2 (4) archived with the iOS 27.2 SDK and uploaded with no ITMS-90725 warning. The 4.7.2 templates and the arm64 simulator engine built under 26.2 both link and run under Xcode 27.2 (iOS 27.2 simulator checked).
