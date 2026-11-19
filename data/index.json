@@ -104,17 +104,20 @@
         "caelen": [
           "eclipse_approach",
           "scaffold_ways",
-          "still_quarter"
+          "still_quarter",
+          "masons_span"
         ],
         "nimue": [
           "eclipse_approach",
           "scaffold_ways",
-          "still_quarter"
+          "still_quarter",
+          "masons_span"
         ],
         "seraphine": [
           "eclipse_approach",
           "scaffold_ways",
-          "still_quarter"
+          "still_quarter",
+          "masons_span"
         ]
       },
       "title": "The Eclipse Engine"
@@ -188,7 +191,8 @@
     "oracles_terrace",
     "eclipse_approach",
     "scaffold_ways",
-    "still_quarter"
+    "still_quarter",
+    "masons_span"
   ],
   "swiftTag": "swift-final"
 }

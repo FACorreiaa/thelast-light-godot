@@ -193,10 +193,12 @@ func _init() -> void:
 		check(hit != on_ledge, "a floor strike %s a hero %s" % ["misses" if on_ledge else "hits", "on the ledge" if on_ledge else "on the floor"])
 
 	# Fairness: a level where anything can shift the rhythm has solid floor under every piece of eclipse ground.
+	var covered: Array = []
 	for id: String in (JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json")).levels as Array):
 		var lv := Level.load_id(id)
 		if lv.eclipse_period <= 0 or not _shifts(lv, t):
 			continue
+		covered.append(id)
 		var bare: Array = []
 		for p: Level.Platform in lv.platforms:
 			if p.eclipse == 0:
@@ -209,6 +211,31 @@ func _init() -> void:
 			if not under:
 				bare.append("%.0f-%.0f" % [p.box.min_x, p.box.max_x])
 		check(bare.is_empty(), "%s shifts the rhythm, so all its eclipse ground has floor under it: bare %s" % [id, bare])
+	print("fairness covered: ", covered)
+	check(covered.has("masons_span"), "the fairness check covers the Mason's Span (%s)" % [covered])
+
+	# Every boss on an eclipse level shows its whole kit in a fight: it shifts the rhythm, raises floor strikes,
+	# calls help and reaches its second phase, for every lead.
+	for id: String in (JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json")).levels as Array):
+		var lv := Level.load_id(id)
+		if lv.eclipse_period <= 0 or lv.boss == null:
+			continue
+		for lead in ["caelen", "seraphine", "nimue"]:
+			w = World.from_level(lv, lead, t, 1)
+			var pilot := Autopilot.new(true)
+			var seen := {"shift": 0, "spawned": 0, "strike": 0}
+			var phase := 1
+			while w.frame < 12000 and not w.is_over:
+				var before := w.strikes.size()
+				for e: Dictionary in w.step(pilot.input_for(w)):
+					if seen.has(e.case):
+						seen[e.case] += 1
+				if w.strikes.size() > before:
+					seen.strike += 1
+				if w.boss() != null:
+					phase = maxi(phase, w.boss().phase)
+			check(w.is_complete and phase >= 2 and seen.shift > 0 and seen.spawned > 0 and seen.strike > 0,
+				"%s (%s): complete %s, phase %d, seen %s" % [id, lead, w.is_complete, phase, seen])
 
 	# An odd period: the light lasts half (rounded down), and the countdown always reaches the real swap.
 	var odd := room(301)

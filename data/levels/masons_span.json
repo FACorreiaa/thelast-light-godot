@@ -1,0 +1,127 @@
+{
+  "name": "The Mason's Span",
+  "width": 1800.0,
+  "start": {
+    "x": 140.0,
+    "y": 0.0
+  },
+  "platforms": [
+    {
+      "box": {
+        "minX": -200.0,
+        "minY": -460.0,
+        "maxX": 2000.0,
+        "maxY": 0.0
+      },
+      "oneWay": false,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 0
+    },
+    {
+      "box": {
+        "minX": 300.0,
+        "minY": 82.0,
+        "maxX": 420.0,
+        "maxY": 96.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 1
+    },
+    {
+      "box": {
+        "minX": 600.0,
+        "minY": 82.0,
+        "maxX": 720.0,
+        "maxY": 96.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": -1
+    },
+    {
+      "box": {
+        "minX": 900.0,
+        "minY": 82.0,
+        "maxX": 1020.0,
+        "maxY": 96.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 1
+    },
+    {
+      "box": {
+        "minX": 1200.0,
+        "minY": 82.0,
+        "maxX": 1320.0,
+        "maxY": 96.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": -1
+    },
+    {
+      "box": {
+        "minX": 1500.0,
+        "minY": 82.0,
+        "maxX": 1620.0,
+        "maxY": 96.0
+      },
+      "oneWay": true,
+      "travel": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "period": 0,
+      "eclipse": 1
+    }
+  ],
+  "hazards": [],
+  "levers": [],
+  "plates": [],
+  "gates": [],
+  "checkpoints": [],
+  "pickups": [],
+  "enemies": [],
+  "partner": {
+    "kind": "orion",
+    "pos": {
+      "x": 80.0,
+      "y": 0.0
+    }
+  },
+  "boss": {
+    "kind": "mason",
+    "pos": {
+      "x": 1250.0,
+      "y": 0.0
+    }
+  },
+  "twin": null,
+  "scenes": [],
+  "exitX": "inf",
+  "killY": -260.0,
+  "eclipsePeriod": 300,
+  "eclipseWarning": 50
+}
