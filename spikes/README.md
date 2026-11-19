@@ -58,7 +58,9 @@ godot --headless --path . -- --sim-ticks=600
   ```
   scons platform=ios target=template_release arch=arm64 ios_simulator=yes generate_bundle=no
   ```
-  Not yet run (auto mode blocked it; Fernando's call).
+  Built 2026-11-19 (Fernando chose it): `/Volumes/PortableSSD/Work/godot-build/godot/bin/`, about 2 minutes.
+  `tools/ios_sim.sh` exports the full game, swaps the slice in and installs it. Launch arguments work behind
+  `--` (`simctl launch <UDID> <bundle> -- --menu factions`); screenshots with `simctl io <UDID> screenshot`.
 
 ## Deferred until the game is fully ported (Fernando, 2026-11-18)
 - **Steam:** GodotSteam is only on codeberg.org, which doesn't resolve on this network (DNS filter

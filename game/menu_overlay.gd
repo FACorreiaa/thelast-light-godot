@@ -534,12 +534,15 @@ func _faction_pick() -> void:
 
 	var cards := _hbox(12)
 	cards.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	# The portrait takes what height is left, between 56 and 112 points.
-	var portrait_h := clampf(size.y - 24.0 - 48.0 - 12.0 - 230.0, 56.0, 112.0)
+	# The portrait takes what height the card has spare, between 56 and 112 points (SwiftUI: minHeight 56,
+	# idealHeight 112, lowest layout priority). Start at the most and give back whatever overflows.
+	var portraits: Array[Control] = []
 	for i in FACTION_CARDS.size():
 		var card: Dictionary = FACTION_CARDS[i]
 		var choose := app.begin.bind(String(card.lead))
-		cards.add_child(_faction_card(card, choose, portrait_h))
+		var c := _faction_card(card, choose, 112.0)
+		portraits.append(c.find_children("*", "TextureRect", true, false)[0])
+		cards.add_child(c)
 		_keys[KEY_1 + i] = choose
 	v.add_child(cards)
 	var w := minf(940.0, size.x) - 40.0
@@ -552,6 +555,15 @@ func _faction_pick() -> void:
 	v.offset_top = 12
 	v.offset_bottom = -12
 	add_child(v)
+	_fit_portraits.call_deferred(v, portraits)
+
+
+func _fit_portraits(v: Control, portraits: Array[Control]) -> void:
+	var over := v.get_combined_minimum_size().y - v.size.y
+	if over <= 0.0:
+		return
+	for p in portraits:
+		p.custom_minimum_size.y = maxf(56.0, 112.0 - over)
 
 
 func _faction_card(card: Dictionary, choose: Callable, portrait_h: float) -> Control:
