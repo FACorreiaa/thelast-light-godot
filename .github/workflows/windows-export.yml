@@ -1,0 +1,64 @@
+name: windows-export
+
+# Exports the Windows build with the official templates and runs the exported exe headless through a
+# level, the title and a story scene, failing on any script error. Uploads the exe for a hand test.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: windows-export-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+
+jobs:
+  export:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Godot and export templates
+        run: |
+          base=https://github.com/godotengine/godot-builds/releases/download/$GODOT_VERSION
+          zip=Godot_v${GODOT_VERSION}_win64.exe.zip
+          tpz=Godot_v${GODOT_VERSION}_export_templates.tpz
+          curl -fsSL -o "$RUNNER_TEMP/$zip" "$base/$zip"
+          curl -fsSL -o "$RUNNER_TEMP/$tpz" "$base/$tpz"
+          curl -fsSL -o "$RUNNER_TEMP/SHA512-SUMS.txt" "$base/SHA512-SUMS.txt"
+          (cd "$RUNNER_TEMP" && grep -E " ($zip|$tpz)\$" SHA512-SUMS.txt | sha512sum -c -)
+          unzip -q "$RUNNER_TEMP/$zip" -d "$RUNNER_TEMP/godot"
+          dest="$APPDATA/Godot/export_templates/${GODOT_VERSION/-/.}"
+          mkdir -p "$dest"
+          unzip -q -j "$RUNNER_TEMP/$tpz" 'templates/windows_*x86_64*' 'templates/version.txt' -d "$dest"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}_win64_console.exe" >> "$GITHUB_ENV"
+
+      - name: Export
+        run: |
+          "$GODOT" --headless --path . --import >/dev/null 2>&1 || true
+          mkdir -p build/windows
+          "$GODOT" --headless --path . --export-release "Windows" build/windows/TheLastLight.exe
+          ls -la build/windows
+
+      - name: Smoke-run the exported exe
+        run: |
+          fail=0
+          for args in "" "--menu factions" "--demo --level 4" "--level 0 --scene awakening.orion 2"; do
+            out=$(build/windows/TheLastLight.exe --headless --quit-after 600 -- $args --save-dir "$RUNNER_TEMP/save" 2>&1) || { echo "exit $? for [$args]"; fail=1; }
+            if grep -qE "SCRIPT ERROR|Parse Error|Failed to load" <<<"$out"; then echo "$out"; fail=1; fi
+            echo "ok [$args]"
+          done
+          exit $fail
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TheLastLight-windows
+          path: build/windows/TheLastLight.exe
+          retention-days: 14
