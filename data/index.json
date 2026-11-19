@@ -102,13 +102,16 @@
       "number": 4,
       "route": {
         "caelen": [
-          "eclipse_approach"
+          "eclipse_approach",
+          "scaffold_ways"
         ],
         "nimue": [
-          "eclipse_approach"
+          "eclipse_approach",
+          "scaffold_ways"
         ],
         "seraphine": [
-          "eclipse_approach"
+          "eclipse_approach",
+          "scaffold_ways"
         ]
       },
       "title": "The Eclipse Engine"
@@ -180,7 +183,8 @@
     "cloister_gate",
     "choir_stair",
     "oracles_terrace",
-    "eclipse_approach"
+    "eclipse_approach",
+    "scaffold_ways"
   ],
   "swiftTag": "swift-final"
 }
