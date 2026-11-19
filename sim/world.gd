@@ -45,6 +45,9 @@ var lever_timers: Dictionary = {}
 var gate_open: Dictionary = {}
 ## Gate id -> index into `platforms` of its block.
 var gate_platform: Dictionary = {}
+## Port-only: frames the eclipse rhythm has been pulled forward by (a "shift" effect). Read it only through the
+## eclipse_* accessors below.
+var eclipse_offset: int = 0
 
 ## Each wave is an array of [kind: String, x: float] pairs, x a fraction of the arena width.
 var waves: Array = []
@@ -1526,6 +1529,26 @@ func plate_under(f: Fighter) -> Level.Plate:
 	return null
 
 
+## The eclipse clock: the frame the level's rhythm reads, `ahead` frames from now.
+func eclipse_clock(ahead := 0) -> int:
+	return frame + eclipse_offset + ahead
+
+
+## True while the light half of the rhythm lasts, `ahead` frames from now.
+func eclipse_light(ahead := 0) -> bool:
+	return level.eclipse_light(eclipse_clock(ahead))
+
+
+## Frames until the light and shadow next swap; -1 on a level without eclipse phases.
+func eclipse_swap_in() -> int:
+	return level.frames_to_eclipse_swap(eclipse_clock())
+
+
+## Whether platform `p` is solid `ahead` frames from now.
+func eclipse_solid(p: Level.Platform, ahead := 0) -> bool:
+	return level.eclipse_solid(p, eclipse_clock(ahead))
+
+
 ## Port-only (no Swift counterpart): true when eclipse ground starting just ahead of `f`, moving `dir`, is gone
 ## now or will go before `f` has walked across it at its run speed. Always false on a level without eclipse
 ## phases. Assumes eclipse ground of opposite phases never touches (that needs a jump, not a wait).
@@ -1533,7 +1556,7 @@ func eclipse_blocks(f: Fighter, dir: float) -> bool:
 	if level == null or level.eclipse_period <= 0:
 		return false
 	var half := f.spec.width / 2.0
-	var left := level.frames_to_eclipse_swap(frame)
+	var left := eclipse_swap_in()
 	for i in platforms.size():
 		var p: Level.Platform = platforms[i]
 		if p.eclipse == 0:
@@ -1544,7 +1567,7 @@ func eclipse_blocks(f: Fighter, dir: float) -> bool:
 		var behind := f.pos.x > b.max_x if dir > 0.0 else f.pos.x < b.min_x
 		if behind or ahead > 60.0 or absf(b.max_y - f.pos.y) > 40.0:
 			continue
-		if not level.eclipse_solid(p, frame):
+		if not eclipse_solid(p):
 			return true
 		# Already standing over it: getting off in time is eclipse_escape's job.
 		if (f.pos.x >= b.min_x) if dir > 0.0 else (f.pos.x <= b.max_x):
@@ -1558,7 +1581,7 @@ func eclipse_blocks(f: Fighter, dir: float) -> bool:
 ## and that is gone or will go within ECLIPSE_MARGIN frames.
 func _eclipse_edge_unsafe(f: Fighter, x: float) -> bool:
 	var half := f.spec.width / 2.0
-	var soon := float(level.frames_to_eclipse_swap(frame)) < ECLIPSE_MARGIN
+	var soon := float(eclipse_swap_in()) < ECLIPSE_MARGIN
 	for i in platforms.size():
 		var p: Level.Platform = platforms[i]
 		if p.eclipse == 0:
@@ -1600,7 +1623,7 @@ func eclipse_escape(f: Fighter) -> float:
 	if level == null or level.eclipse_period <= 0 or not f.on_ground:
 		return 0.0
 	var half := f.spec.width / 2.0
-	var left := float(level.frames_to_eclipse_swap(frame))
+	var left := float(eclipse_swap_in())
 	for i in platforms.size():
 		if platforms[i].eclipse == 0:
 			continue
@@ -1624,8 +1647,8 @@ static func _eclipsed(p: Level.Platform) -> Box:
 ## Eclipse phases: ground that is solid only in the light or only in shadow comes and goes as they swap. Like a
 ## gate, ground will not form around someone standing in its space; it waits until they are clear.
 func _eclipse_platforms(events: Array) -> void:
-	var light_now := level.eclipse_light(frame)
-	var light_next := level.eclipse_light(frame + 1)
+	var light_now := eclipse_light()
+	var light_next := eclipse_light(1)
 	if light_now != light_next:
 		events.append({"case": "eclipse", "light": light_next})
 	for i in platforms.size():
@@ -1633,7 +1656,7 @@ func _eclipse_platforms(events: Array) -> void:
 		if p.eclipse == 0:
 			continue
 		var there := platform_boxes[i].min_y > -50000.0
-		var want := level.eclipse_solid(p, frame + 1)
+		var want := eclipse_solid(p, 1)
 		if want == there and not p.moves():
 			continue
 		if not want:
@@ -1695,7 +1718,7 @@ func is_warded(id: int) -> bool:
 
 
 func to_canon() -> Dictionary:
-	return {
+	var d := {
 		"fighters": fighters, "controlledID": controlled_id, "frame": frame, "hitStop": hit_stop,
 		"isOver": is_over, "waveNumber": wave_number, "platformBoxes": platform_boxes,
 		"checkpointIndex": checkpoint_index, "collected": Canon.int_set(collected),
@@ -1706,6 +1729,10 @@ func to_canon() -> Dictionary:
 		"leverTimers": lever_timers, "gateOpen": gate_open, "waveLive": wave_live,
 		"waveDelay": wave_delay, "switchCooldown": switch_cooldown, "rng": rng, "nextID": next_id,
 	}
+	# Port-only state, present only once it differs from its start, so Swift's hashes stay as they were.
+	if eclipse_offset != 0:
+		d["eclipseOffset"] = eclipse_offset
+	return d
 
 
 func state_hash() -> String:
