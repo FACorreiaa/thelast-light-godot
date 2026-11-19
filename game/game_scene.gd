@@ -108,6 +108,7 @@ func _ready() -> void:
 	dusk.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dusk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.add_child(dusk)
+	add_child(sound)
 	overlay.add_child(ui_layer)
 	ui_layer.add_child(hud)
 	if show_touch:
@@ -471,6 +472,7 @@ func _process(delta: float) -> void:
 		steps += 1
 	if steps == 4:
 		accumulator = 0.0
+	sound.advance()
 	_draw_frame()
 	_after_frame(delta)
 
