@@ -279,6 +279,11 @@ func _run() -> void:
 			check(leaked.is_empty() and full.has(c.route[lead][-1]), "%s is hidden from %s's run (leaked %s)" % [c.id, lead, leaked])
 		check(list.all(func(e: Dictionary) -> bool: return e.id != c.id), "%s is not in the chapter list" % c.id)
 		check(GameScene.chapters(true).any(func(e: Dictionary) -> bool: return e.id == c.id), "%s comes back with --all-chapters" % c.id)
+	# The same filter on a made-up list, so it stays checked while no real chapter is hidden.
+	var made_up := [{"id": "a"}, {"id": "b", "hidden": true}, {"id": "c", "hidden": false}]
+	var id_list := func(l: Array) -> Array: return l.map(func(e: Dictionary) -> String: return e.id)
+	check(id_list.call(GameScene.reachable(made_up, false)) == ["a", "c"], "a hidden chapter is left out")
+	check(id_list.call(GameScene.reachable(made_up, true)) == ["a", "b", "c"], "--all-chapters keeps a hidden chapter")
 	check(list.size() == chapters and total == app.scene.level_names().size(), "the chapter list covers the run")
 	var last: Dictionary = list[-1]
 	app.play_chapter(total - 1)

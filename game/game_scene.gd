@@ -177,7 +177,12 @@ static func _arg(args: PackedStringArray, flag: String, fallback: String) -> Str
 ## on desktop someone would have to type it).
 static func chapters(all := OS.get_cmdline_user_args().has("--all-chapters")) -> Array:
 	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
-	return (index.chapters as Array).filter(func(c: Dictionary) -> bool: return all or not c.get("hidden", false))
+	return reachable(index.chapters, all)
+
+
+## The chapters in `list` that players can reach: all of them with `all`, otherwise those not marked hidden.
+static func reachable(list: Array, all: bool) -> Array:
+	return list.filter(func(c: Dictionary) -> bool: return all or not c.get("hidden", false))
 
 
 ## The whole run as the lead plays it: every reachable chapter's levels, in order.

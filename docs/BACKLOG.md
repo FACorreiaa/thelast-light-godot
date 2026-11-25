@@ -38,8 +38,8 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
      Span (mid-boss), the Corona Stair and the Heart (boss). Chapter 4 is in `index.json` for every lead and can be
      finished, with a placeholder ending line. Godot goldens cover each level, walking and fighting.
    - Decided 2026-11-25 (DEC-019): the Heart is beaten and the AI speaks (option 2); the ten claims are approved;
-     Chapter 4 is hidden in the game (`"hidden": true` in `index.json`, `--all-chapters` shows it). Keeping it
-     hidden until its lines are in is a reading of the creator's "yes", to confirm.
+     Chapter 4 was hidden until its lines were in (DEC-020) and is open again since 2026-11-25. The mechanism
+     stays: `"hidden": true` on a chapter in `index.json` hides it, `--all-chapters` shows it.
    - Decided 2026-11-25 (DEC-020): voice A, every DRAFT-013 line, the ending line, the level names and the boss
      figures, cards and tips as they stand. The lines go into `data/story/chapter4.json`; then the chapter opens.
    - Next: the three personal epilogue scenes (claim 10's directions are approved; their words are drafts for the
@@ -84,6 +84,8 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
      Light - Chapter Zero" (`com.fernandocorreia.lastlight`). Move the bundle id over before strangers test it.
    - Steam once the game is done: $100 one-time per game, refunded after $1,000 gross.
 8. **Technical leftovers:**
+   - `test_flow` prints about 480 "Lambda capture at index 0 was freed" errors from the start of the run (already
+     there at 89e4962; it still passes). Some lambda outlives the node it captured; find it.
    - A Windows font for the menus (SF Pro falls back to a system font there).
    - A two-object leak at exit after the demo bot plays.
    - Android export, if wanted.

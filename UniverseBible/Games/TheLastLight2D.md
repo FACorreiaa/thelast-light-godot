@@ -158,7 +158,7 @@ phases as the mechanic, each lead's personal epilogue after the fight (DEC-017).
 the Heart is beaten and the AI speaks (option 2 below), and the ten world claims are approved. Then (DEC-020):
 the AI speaks through its machines, the chapter's lines below are approved, the level names stand, and the Mason's
 and the Heart's figures, intro cards and tips are accepted as they are. The gameplay stays gameplay, not canon.
-All six levels are built. The chapter was hidden in the game until its lines were in (DEC-020). The personal
+All six levels are built. The chapter was hidden in the game until its lines were in (DEC-020); it is open again. The personal
 epilogues are not written yet (claim 10's directions are approved). When the Heart dies it breaks apart with the
 standard boss effect, which fits option 2.
 
