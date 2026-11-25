@@ -8,7 +8,8 @@ extends Node2D
 ## world.rng belongs to the simulation.
 ##
 ## Command line (after `--`): --demo  --room  --level N  --lead caelen|seraphine|nimue  --snapshot DIR
-## --frames N (quit after N rendered frames).
+## --frames N (quit after N rendered frames)  --all-chapters (include chapters marked hidden in index.json; --level N
+## counts them too).
 
 enum Mode { LEVEL, ROOM }
 
@@ -115,7 +116,11 @@ func _ready() -> void:
 	var saved_lead := String(saved.get_value("progress", "lead", "caelen"))
 	lead = _arg(args, "--lead", "caelen" if demo else saved_lead)
 	_levels = route(lead)
-	var saved_level := _levels.find(String(saved.get_value("progress", "level", "")))
+	var saved_id := String(saved.get_value("progress", "level", ""))
+	var saved_level := _levels.find(saved_id)
+	# A save made inside a chapter that is now hidden resumes at the last level players can reach.
+	if saved_level < 0 and route(lead, true).has(saved_id):
+		saved_level = _levels.size() - 1
 	var asked := _arg(args, "--level", "")
 	level_index = clampi(int(asked) if asked != "" else (0 if demo else maxi(saved_level, 0)), 0, _levels.size() - 1)
 	world = _make_world(1, -1, {})
@@ -167,11 +172,18 @@ static func _arg(args: PackedStringArray, flag: String, fallback: String) -> Str
 	return args[i + 1] if i >= 0 and i + 1 < args.size() else fallback
 
 
-## The whole run as the lead plays it: every chapter's levels, in order.
-static func route(p_lead: String) -> Array[String]:
+## The chapters players can reach, in order. A chapter marked "hidden" in index.json (built, but its writing not yet
+## approved) is left out unless the command line has --all-chapters, a developer flag (a phone has no command line;
+## on desktop someone would have to type it).
+static func chapters(all := OS.get_cmdline_user_args().has("--all-chapters")) -> Array:
 	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
+	return (index.chapters as Array).filter(func(c: Dictionary) -> bool: return all or not c.get("hidden", false))
+
+
+## The whole run as the lead plays it: every reachable chapter's levels, in order.
+static func route(p_lead: String, all := OS.get_cmdline_user_args().has("--all-chapters")) -> Array[String]:
 	var out: Array[String] = []
-	for c: Dictionary in index.chapters:
+	for c: Dictionary in chapters(all):
 		for id: String in c.route[p_lead]:
 			out.append(id)
 	return out
@@ -939,10 +951,9 @@ func level_names() -> Array[String]:
 ## Each chapter with the run index of its first level and its level names:
 ## [{id, number, title, ending, start, names}], for the chapter list.
 func chapter_list() -> Array:
-	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
 	var out: Array = []
 	var start := 0
-	for c: Dictionary in index.chapters:
+	for c: Dictionary in chapters():
 		var names: Array[String] = []
 		for id: String in c.route[lead]:
 			names.append(Level.load_id(id).name)

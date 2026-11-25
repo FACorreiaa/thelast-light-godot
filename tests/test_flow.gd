@@ -265,7 +265,20 @@ func _run() -> void:
 	for c: Dictionary in list:
 		check(int(c.start) == total, "chapter %s starts where the last ended" % c.id)
 		total += (c.names as Array).size()
-	var chapters: int = (JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json")).chapters as Array).size()
+	var chapters: int = GameScene.chapters().size()
+	# A chapter marked hidden (built, writing not approved) is out of every lead's run and the chapter list, and
+	# comes back only with the developer override.
+	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
+	for c: Dictionary in index.chapters:
+		if not c.get("hidden", false):
+			continue
+		for lead: String in c.route:
+			var run := GameScene.route(lead)
+			var full := GameScene.route(lead, true)
+			var leaked := (c.route[lead] as Array).filter(func(id: String) -> bool: return run.has(id))
+			check(leaked.is_empty() and full.has(c.route[lead][-1]), "%s is hidden from %s's run (leaked %s)" % [c.id, lead, leaked])
+		check(list.all(func(e: Dictionary) -> bool: return e.id != c.id), "%s is not in the chapter list" % c.id)
+		check(GameScene.chapters(true).any(func(e: Dictionary) -> bool: return e.id == c.id), "%s comes back with --all-chapters" % c.id)
 	check(list.size() == chapters and total == app.scene.level_names().size(), "the chapter list covers the run")
 	var last: Dictionary = list[-1]
 	app.play_chapter(total - 1)

@@ -98,6 +98,7 @@
     },
     {
       "ending": "(Draft chapter: the ending awaits a decision.)",
+      "hidden": true,
       "id": "chapter4",
       "number": 4,
       "route": {
