@@ -42,8 +42,8 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
      stays: `"hidden": true` on a chapter in `index.json` hides it, `--all-chapters` shows it.
    - Decided 2026-11-25 (DEC-020): voice A, every DRAFT-013 line, the ending line, the level names and the boss
      figures, cards and tips as they stand. The lines go into `data/story/chapter4.json`; then the chapter opens.
-   - Next: the three personal epilogue scenes (claim 10's directions are approved; their words are drafts for the
-     creator), and showing voice A on screen (machines on the frame speaking; the Heart's arena has none yet, so
+   - Next: the three personal epilogue scenes, drafted as DRAFT-014 for the creator's verdict (they then need an
+     epilogue cue after the ending line), and showing voice A on screen (machines on the frame speaking; the Heart's arena has none yet, so
      adding them is a level change plus a Godot golden re-record).
    - Known, left as is:
      - A boss's leftover summons stay alive during the victory delay and can still kill the lead before the level

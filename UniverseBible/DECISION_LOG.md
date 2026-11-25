@@ -37,6 +37,7 @@ decision are listed separately.
 | DRAFT-009 | 2026-11-16 | The Lock Works, a Chapter 1 puzzle level between the Machine Hall and the Warden's Gate: its name and the lead and Orion lines. | Games/TheLastLight2D, Locations |
 | DRAFT-010 | 2026-11-18 | Chapter 2 additions: the Lamplighter (mid-boss) and the Lamp Row, the Toll Canal puzzle level, and their lead and Orion lines. | Games/TheLastLight2D, Locations, Bestiary/LanternCities |
 | DRAFT-011 | 2026-11-18 | Chapter 3 additions: the Sworn (mid-boss) at the Cloister Gate, the Bell Tower puzzle level, and their lines. | Games/TheLastLight2D, Locations, Bestiary/Dawnfaith |
+| DRAFT-014 | 2026-11-25 | The three personal epilogues (claim 10 of DRAFT-012, approved as directions in DEC-019): one short scene per lead, with Orion's line for trusted and watched. | Games/TheLastLight2D |
 
 ## How to amend
 

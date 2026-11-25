@@ -299,7 +299,38 @@ Speaker label in the dialogue box: **"VOICE"**, so the AI is not given a name.
     the AI speaking changes nothing it says. Rejected alternative: "The Engine is still. Its maker is not." It
     would say the AI survives, which stays UNKNOWN.)
 
-Not drafted yet: the three personal epilogue scenes (claim 10's directions are approved; their words are not).
+The personal epilogues are DRAFT-014, below.
+
+## Draft: the personal epilogues (DRAFT-014, PROPOSED)
+
+Claim 10's directions are approved (DEC-019, ALTERNATE: player continuity). Everything in this section is a
+proposal; nothing here is in the game. Each scene plays after the chapter-end line, for its lead only. Guards: no
+line says what any of them becomes later, whether the decline can be reversed, or what the Foundry or the
+Dawnfaith will do; Orion claims only what he knows (WC-014); the Foundry's people stay distinct from its AI.
+
+### Caelen: back to the Foundry
+
+1. Caelen: "The Foundry measured the light for years. Now they'll hear what was being built while they counted."
+   (Rests on the Sun Gauges, WC-012.)
+2. Orion, trusted: "I will walk beside you, as far as they let me."
+3. Orion, watched: "I will walk where you can see me. That has not changed."
+
+### Seraphine: home to the Dawnfaith, with Orion
+
+4. Seraphine: "Home, with a Foundry machine beside me and the old records in my bag. Let them sing or not."
+   (Echoes her Chapter 3 line, WC-023; the records are WC-011: *when*, not *why*.)
+5. Orion, trusted: "If they do not open the doors, I will wait outside with you."
+6. Orion, watched: "Keep watching me. They will be watching both of us."
+
+### Nimue: telling the runners
+
+7. Nimue: "Pass it down every route: the way is open. Another road nobody charges for." (Echoes the roofs, "the
+   only road no one charges for", WC-016.)
+8. Orion, trusted: "Then someone should walk it first. I can."
+9. Orion, watched: "Send me down it first, if you still want to watch."
+
+Staging (proposed): each epilogue is a scene after the results screen's ending line, with the lead's line, then
+one Orion line by the trust choice. Building it needs an epilogue cue the game does not have yet.
 
 ## Chapter 3, The Dawnfaith (DEC-015, WORKING)
 
