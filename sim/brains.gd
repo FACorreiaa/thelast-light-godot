@@ -33,6 +33,11 @@ const MASON_HAMMER := 0
 const MASON_SHIFT := 1
 const MASON_QUAKE := 2
 const MASON_CALL := 3
+## Port-only: the Heart, Chapter 4's boss (placeholder kit).
+const HEART_PULSE := 0
+const HEART_SHIFT := 1
+const HEART_BEAT := 2
+const HEART_CALL := 3
 const SWORN_SHIELD_BASH := 0
 const SWORN_SHIELD_LIGHT := 2
 const SWORN_SPEAR_THRUST := 0
@@ -93,6 +98,8 @@ static func think(brain: String, me: Fighter, foes: Array[Fighter], allies: Arra
 			return lamplighter(me, foes, allies, tuning, rng)
 		"MasonBrain":
 			return mason(me, foes, allies, tuning, rng)
+		"HeartBrain":
+			return heart(me, foes, allies, tuning, rng)
 		"SwornShieldBrain":
 			return sworn_shield(me, foes, allies, tuning, rng)
 		"SwornSpearBrain":
@@ -624,6 +631,59 @@ static func mason(me: Fighter, foes: Array[Fighter], allies: Array[Fighter], tun
 	else:
 		me.ai_aux -= 1
 		return _mv(dir)
+	return _mv(dir * FACING_NUDGE, true)
+
+
+## Port-only: the Heart never moves; it only turns to face. (1) A steady beat: a fixed pause between attacks, a pulse
+## around it up close and floor strikes below the ledges' tops further off. (2) It shifts the rhythm every few
+## attacks, a beat following each shift, and calls help when alone. (3) No more help; shifts come more often, so
+## the swaps come faster and out of step.
+static func heart(me: Fighter, foes: Array[Fighter], allies: Array[Fighter], tuning: Tuning,
+		rng: SeededRandom) -> InputFrame:
+	var target := _nearest(foes, me)
+	if target == null:
+		return InputFrame.neutral()
+	if me.ai_cooldown > 0:
+		me.ai_cooldown -= 1
+	if not me.is_actionable():
+		return InputFrame.neutral()
+	var dx := target.pos.x - me.pos.x
+	var dir: float = 1.0 if dx >= 0.0 else -1.0
+	var gap := absf(dx) - me.spec.width / 2.0 - target.spec.width / 2.0
+	if me.ai_cooldown != 0:
+		return _mv(dir * FACING_NUDGE)
+	if me.phase <= 1:
+		me.ai_cooldown = tuning.heart_beat_gap
+	else:
+		me.ai_cooldown = rng.int_closed(tuning.heart_attack_gap.lower, tuning.heart_attack_gap.upper)
+
+	# The beat that follows a shift.
+	if me.ai_aux2 > 0:
+		me.ai_aux2 = 0
+		me.next_attack = HEART_BEAT
+		return _mv(dir * FACING_NUDGE, true)
+	if me.phase == 2:
+		var alone := true
+		for a: Fighter in allies:
+			if a.id != me.id and a.is_alive():
+				alone = false
+				break
+		if alone and me.ai_aux3 == 0:
+			me.ai_aux3 = 5
+			me.next_attack = HEART_CALL
+			return _mv(dir * FACING_NUDGE, true)
+		if me.ai_aux3 > 0:
+			me.ai_aux3 -= 1
+	if me.phase >= 2:
+		me.ai_aux += 1
+		var every := tuning.heart_final_shift_every if me.phase >= 3 else tuning.heart_shift_every
+		if me.ai_aux >= every:
+			me.ai_aux = 0
+			me.ai_aux2 = 1
+			me.next_attack = HEART_SHIFT
+			return _mv(dir * FACING_NUDGE, true)
+	var close: bool = gap < me.spec.attacks[HEART_PULSE].reach - 10.0 and absf(target.pos.y - me.pos.y) < 120.0
+	me.next_attack = HEART_PULSE if close else HEART_BEAT
 	return _mv(dir * FACING_NUDGE, true)
 
 

@@ -269,6 +269,19 @@ func _build_mason() -> void:
 	weapon_pivot.add_child(head)
 
 
+## Port-only placeholder (DRAFT-012): the Heart, rooted in the Engine's frame. No face: a tapering column braced
+## by struts, a lit core in a cage of ribs, and an arm that sweeps around it.
+func _build_heart() -> void:
+	part(SkPath.polygon([Vector2(-48, 0), Vector2(48, 0), Vector2(30, 40), Vector2(-30, 40)]), -1)
+	part(SkPath.polygon([Vector2(-30, 38), Vector2(30, 38), Vector2(22, 168), Vector2(-22, 168)]))
+	part(SkPath.polygon([Vector2(-40, 20), Vector2(-34, 20), Vector2(-14, 120), Vector2(-20, 120)]), 1)
+	part(SkPath.polygon([Vector2(40, 20), Vector2(34, 20), Vector2(14, 120), Vector2(20, 120)]), 1)
+	part(SkPath.rounded_rect(-26, 70, 52, 8, 3), 1)
+	part(SkPath.rounded_rect(-26, 116, 52, 8, 3), 1)
+	eye = lit(SkPath.circle(11), Palette.EMBER, 6, Vector2(0, 96))
+	blade(90, Palette.STEEL, Vector2(0, 140))
+
+
 ## A small gold sun on the chest: the Dawnfaith's mark.
 func _sun_mark(point: Vector2, radius: float = 4.0) -> void:
 	lit(SkPath.circle(radius), Palette.GOLD, 3, point)
@@ -910,6 +923,7 @@ func _weapon_length() -> float:
 		"lineWarden": return 96
 		"lamplighter": return 100
 		"mason": return 110
+		"heart": return 90
 		"swornShield": return 60
 		"swornSpear": return 140
 		"zealot": return 50

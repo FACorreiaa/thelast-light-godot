@@ -1052,6 +1052,9 @@ static func boss_title(kind: String) -> Array:
 		# Port-only placeholder (DRAFT-012): name, phase and tip await the creator's verdict.
 		"mason":
 			return ["THE MASON", ["THE KEYSTONE"], "When he strikes the floor, get onto a ledge.  His hammer still reaches you there."]
+		# Port-only placeholder (DRAFT-012): name, phase names and tip await the creator's verdict.
+		"heart":
+			return ["THE HEART", ["OUT OF STEP", "THE LAST BEAT"], "When the floor erupts, get onto a ledge.  Up close it strikes all around."]
 		"lastOracle":
 			return ["THE LAST ORACLE", ["THE DUSK", "THE ENDING"], "Gold light: look away.  Dark light: face her."]
 	return ["THE PROTOCOL", ["ASCENSION", "EXECUTION"], "Strike only when the core opens.  Jump the surge.  Dodge the charge."]
