@@ -33,13 +33,23 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
    boss ("a world without life"; mechanics: multi-stage, reality shifts).
    - Decided (DEC-016, DEC-017): a half-built structure over a drowned city, six levels, eclipse phases, personal
      epilogues.
-   - Built: the eclipse-phase mechanic in the sim (`tests/test_eclipse.gd`), its placeholder drawing, and the first
-     level, the Drowned Approach. Chapter 4 is in `index.json`, so every lead reaches it after Chapter 3, with a
-     placeholder ending line.
+   - Built (2026-11-25): the eclipse-phase mechanic in the sim (`tests/test_eclipse.gd`), its placeholder drawing,
+     and all six levels as placeholders: the Drowned Approach, the Scaffold Ways, the Still Quarter, the Mason's
+     Span (mid-boss), the Corona Stair and the Heart (boss). Chapter 4 is in `index.json` for every lead and can be
+     finished, with a placeholder ending line. Godot goldens cover each level, walking and fighting.
    - Waiting on the creator: DRAFT-012 in `UniverseBible/Games/TheLastLight2D.md` (route, enemies, the Mason, the
-     Heart, what beating it does, ten claims).
-   - Next in code, before the levels that need them: jumps planned around the rhythm, eclipse ground in boss
-     arenas, phase gates, moving eclipse ground.
+     Heart, what beating it does, ten claims), whether to hide Chapter 4 until then, and verdicts on the Mason's and
+     the Heart's figures, intro cards and tips.
+   - Known, left as is:
+     - A boss's leftover summons stay alive during the victory delay and can still kill the lead before the level
+       completes. That is the Swift rule; changing it is a design call and needs a Swift golden check plus a
+       re-record.
+     - Walk-mode autopilot cannot shake a chaser while it waits for the rhythm. The Corona Stair drone at x 1100
+       sits on a waiting landing; seeds 1-9 pass, but a level edit can expose it.
+     - The Heart's balance is thin for Nimue: over seeds 1-30 every lead wins, but Nimue's closest win ends at 5 HP
+       (Caelen 44, Seraphine 46). The Heart spends about 8% of a fight staggered (the Mason 5-7%).
+     - The autopilot wins both boss fights without using the arena ledges as shelter, so ledge play is untested.
+     - A player's own lunge or jump can carry them over gone ground, like any pit.
 2. **The other four heroes as playable kits:** Elyra (Engineer, Foundry: control and debuff), Valen (Paladin,
    Dawnfaith: tank and protect), Lira (Scholar, Dawnfaith: buff and strike) and Jax (Broker, Lantern Cities: steal
    and burst). The owner brief says all eight become playable. The cast sheet says Jax needs a new name, because a

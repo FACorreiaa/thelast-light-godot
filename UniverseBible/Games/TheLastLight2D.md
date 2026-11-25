@@ -155,20 +155,22 @@ pairs; nothing links the Sworn to the Last Oracle or to Seraphine (open question
 The final chapter, for every lead. Fixed already: the Engine is a vast half-built structure rising over a drowned
 city under the eclipse, unfinished, and the chapter climbs it to its guarded heart (DEC-016); six levels, eclipse
 phases as the mechanic, each lead's personal epilogue after the fight (DEC-017). **Everything below is a proposal.**
-The first level is built as a playable placeholder so the mechanic can be felt. The game data already shows three
-pieces of text, all placeholders and proposals: the chapter title, the level name, and the ending line "The way up
-is open. (Draft chapter: more to come.)". No scenes are written.
+All six levels are built as playable placeholders, so the chapter can be played to its end for every lead. The
+game data shows text that is all placeholder or proposal: the chapter title, the six level names, the Mason's and
+the Heart's intro cards (names, phase names, tips), and the ending line "(Draft chapter: the ending awaits a
+decision.)". No scenes and no epilogues are written. When the Heart dies it breaks apart with the standard boss
+effect, which reads like option 1 below; that is not a decision.
 
 ### Route
 
 | # | Level (proposed name) | Kind | What it shows |
 |---|---|---|---|
 | 1 | **The Drowned Approach** (built, placeholder) | Level | Flooded streets of the drowned city; the first light and shadow bridges |
-| 2 | **The Scaffold Ways** | Level | The Engine's half-built frame, climbed; eclipse ledges stacked upward |
-| 3 | **The Still Quarter** | Puzzle | A district where the AI's machines have already replaced the living (WC-010): gates that open only in one phase |
-| 4 | **The Mason's Span** | Mid-boss | A bridge the Engine is still building, kept by the machine building it |
-| 5 | **The Corona Stair** | Level | The last climb, in the corona's light, where the swaps come faster |
-| 6 | **The Heart** | Boss | The Engine's guarded heart |
+| 2 | **The Scaffold Ways** (built, placeholder) | Level | The Engine's half-built frame, climbed; eclipse steps between solid ones |
+| 3 | **The Still Quarter** (built, placeholder) | Puzzle | A district where the AI's machines have already replaced the living (WC-010): walls that stand only in one phase, two paired as airlocks |
+| 4 | **The Mason's Span** (built, placeholder) | Mid-boss | A bridge the Engine is still building, kept by the machine building it |
+| 5 | **The Corona Stair** (built, placeholder) | Level | The last climb, in the corona's light, where the swaps come faster; moving eclipse ferries |
+| 6 | **The Heart** (built, placeholder) | Boss | The Engine's guarded heart |
 
 The scenario principle holds for every stop: a playable place with its own mechanic, something it reveals about
 the Foundry's AI, and a symptom of the decline (the flood, a district with no one left in it, a sun that dims).
@@ -177,19 +179,29 @@ the Foundry's AI, and a symptom of the decline (the flood, a district with no on
 
 - **Eclipse phases.** Ground is solid only in the light or only in shadow and swaps on the level's rhythm; ground
   about to go flickers first, and ground will not form inside someone. Built and tested (`tests/test_eclipse.gd`).
-- **The Still Quarter** adds gates tied to a phase. **The Mason** lays and removes eclipse ground during the fight.
-  **The Heart** fights through the rhythm: (1) a steady beat; (2) floor sections unmade and rebuilt, with Stand-ins;
-  (3) swaps that come faster and out of step, ending on its last beat.
+- **The Still Quarter** has walls that stand only in the light or only in shadow, so they work as gates.
+- **The Mason** (as built) pulls the next swap early and then raises floor strikes lower than the ledges, so the
+  ledges standing after the swap are the shelter; in its second phase it calls help (Scrap Drones standing in for
+  the proposed Stand-ins).
+- **The Heart** (as built) never moves, only turns. (1) A steady beat with no swaps pulled early: a strike all
+  round it up close, floor eruptions further off, lower than the ledges. (2) Every third attack pulls the next swap
+  early; when alone it calls one Scrap Drone. (3) No more help; every second attack pulls the swap early. Not
+  built from the earlier proposal: floor sections unmade and rebuilt, Stand-ins, and a closing "last beat".
 - **Enemies.** Placeholders from the Foundry until these are agreed: the **Stand-in** (a machine in the shape of
   someone who lived in the district, keeping their routine) and the **Scaffold Crawler** (a builder that climbs
   the frame and drops loose parts).
-- **Current limits of the mechanic**, to clear before the levels that need them:
-  - A swing's lunge or a jump can carry a fighter over ground that has gone, as over any pit; the autopilot and
-    Orion wait and step off, but do not plan jumps around the rhythm. Ledges reached only by jumping (level 2),
-    eclipse ground in a mid-boss or boss arena (levels 4 and 6), moving eclipse ground and phase gates (level 3)
-    each need sim and autopilot work and tests first.
+- **Handled for the built levels** (sim, autopilot and Orion; tested over seeds 1-9 for every lead): swings and
+  dodges stop at the edge of a gap; jumps and steps up account for the rhythm; no one steers from above floor to
+  above none in the air; whoever stands where ground is forming steps out; a walker waits at ground someone else
+  is holding off; only heroes hold off forming ground; no stepping or dodging down onto lower ground that will be
+  gone first.
+- **Current limits of the mechanic:**
+  - A player's own swing lunge or jump can still carry them over ground that has gone, as over any pit. That is
+    the player's call, like any jump.
   - Eclipse ground of opposite phases must not touch; crossing from one to the other would need a jump.
   - An enemy standing on eclipse ground when it goes falls and is lost; levels place enemies on solid ground.
+  - The autopilot's ledge play in the boss arenas is not proven: it wins both fights, but not by using the ledges
+    as shelter.
 
 ### The open question: what beating the Heart does
 
