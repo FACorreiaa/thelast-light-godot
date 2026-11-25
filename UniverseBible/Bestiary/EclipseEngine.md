@@ -13,7 +13,7 @@ reality shifts and a catastrophic finale.
   boss guards its heart.
 - **WORKING (DEC-019, 2026-11-25):** in this game the Heart is beaten; the Engine stands unfinished and silent over
   the water, and the sun is no brighter. The AI that built it then speaks to the lead for the first time, not
-  through the Protocol (its lines: DRAFT-013, PROPOSED). Whether the decline can be reversed, whether the Engine can
+  through the Protocol, through every machine left on the frame at once (DEC-020, WC-028). Whether the decline can be reversed, whether the Engine can
   still be finished, and whether the AI survives stay UNKNOWN.
 - **UNKNOWN:** the drowned city's name and history, what the Engine does when finished, and who designed it beyond the AI.
 
@@ -25,4 +25,4 @@ reality shifts and a catastrophic finale.
 - **The Mason** (mid-boss): the machine building the span to the Heart; speaks no lines. How it fights is gameplay
   (see `../Games/TheLastLight2D.md`).
 - **The Heart** (boss): has no face; fights through the eclipse's rhythm in three phases (gameplay). The voice that
-  speaks after it is beaten is the AI's (DEC-019); how that voice reaches the lead is part of DRAFT-013.
+  speaks after it is beaten is the AI's, through its machines (DEC-019, DEC-020).

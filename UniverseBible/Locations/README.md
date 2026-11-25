@@ -57,8 +57,8 @@ are **UNKNOWN**.
 | Place | Status | Notes |
 |---|---|---|
 | The Drowned Approach | WORKING (DEC-019, WC-024) | Flooded streets below the Engine; the first level is built as a placeholder |
-| The Scaffold Ways | PROPOSED (name; place is built) | The Engine's half-built frame, still being built as it is climbed |
+| The Scaffold Ways | WORKING (DEC-020) | The Engine's half-built frame, still being built as it is climbed |
 | The Still Quarter | WORKING (DEC-019, WC-025) | A district where the AI's machines have replaced the living (WC-010); machines shaped like its people keep their routines |
-| The Mason's Span | PROPOSED (name; place is built) | A bridge to the Heart, kept by the machine building it |
-| The Corona Stair | PROPOSED (name; place is built) | The last climb, in the corona's light |
+| The Mason's Span | WORKING (DEC-020) | A bridge to the Heart, kept by the machine building it |
+| The Corona Stair | WORKING (DEC-020) | The last climb, in the corona's light |
 | The Heart | WORKING (DEC-019, WC-026, WC-027) | The Engine's guarded heart; beaten in this game, and the AI speaks after it |

@@ -150,18 +150,17 @@ Solar Guard among them. The Cloister Gate is a mid-boss fight against the Sworn 
 Guards kept: nothing says how the Dawnfaith is organised (open question 6) or whether wardens always swear in
 pairs; nothing links the Sworn to the Last Oracle or to Seraphine (open question 9).
 
-## Chapter 4, The Eclipse Engine (DEC-019, WORKING; its lines are DRAFT-013, PROPOSED)
+## Chapter 4, The Eclipse Engine (DEC-019, DEC-020, WORKING)
 
 The final chapter, for every lead. Fixed already: the Engine is a vast half-built structure rising over a drowned
 city under the eclipse, unfinished, and the chapter climbs it to its guarded heart (DEC-016); six levels, eclipse
 phases as the mechanic, each lead's personal epilogue after the fight (DEC-017). Decided on 2026-11-25 (DEC-019):
-the Heart is beaten and the AI speaks (option 2 below), and the ten world claims are approved. The other level
-names, the gameplay and all the chapter's lines are still proposals.
-All six levels are built as playable placeholders, and **the chapter is hidden in the game** (DEC-019; keeping it
-hidden until its lines are in is a reading to confirm). The game data still shows placeholder text: three level
-names (the Scaffold Ways, the Mason's Span, the Corona Stair; still PROPOSED), the Mason's and the Heart's intro
-cards (names, phase names, tips) and the ending line "(Draft chapter: the ending awaits a decision.)". No scenes and no epilogues are in the
-game yet. When the Heart dies it breaks apart with the standard boss effect, which fits option 2.
+the Heart is beaten and the AI speaks (option 2 below), and the ten world claims are approved. Then (DEC-020):
+the AI speaks through its machines, the chapter's lines below are approved, the level names stand, and the Mason's
+and the Heart's figures, intro cards and tips are accepted as they are. The gameplay stays gameplay, not canon.
+All six levels are built. The chapter was hidden in the game until its lines were in (DEC-020). The personal
+epilogues are not written yet (claim 10's directions are approved). When the Heart dies it breaks apart with the
+standard boss effect, which fits option 2.
 
 ### Route
 
@@ -246,25 +245,27 @@ Guards kept: nothing says what the Engine does when finished, who designed it be
 survives; nothing links Orion to the AI beyond the Foundry (open questions stay open); no line says why the sun
 weakens (LC-002, LC-005); the Foundry's people stay distinct from its AI, and no faction becomes purely evil.
 
-## Draft: Chapter 4's lines (DRAFT-013, PROPOSED)
+## Chapter 4's lines (DRAFT-013, approved as DEC-020; WC-019, WC-028)
 
-Everything in this section is a proposal; nothing here is in the game. Each numbered line needs its own verdict.
-Guards for the AI's words: they voice only its belief (WC-010), never as truth (WC-007). They give it no name, no
+Creator, 2026-11-25: "1. A, yes 2. yes 3. yes 4. yes": voice A, every line as listed (line 7 in its listed
+form), the chapter-end line kept. In the game: `data/story/chapter4.json`, scenes `approach.arrive` (start of the
+Drowned Approach) and `heart.end` (after the Heart). Guards kept for the AI's words: they voice only its belief (WC-010), never as truth (WC-007). They give it no name, no
 mandate or history, no cause for the sun's weakening (LC-002, LC-005), no hint that it survives or ends, no link to
 Orion, and say nothing about what the finished Engine would do.
 
-### How the AI's voice reaches the lead (pick one)
+### How the AI's voice reaches the lead (A chosen)
 
-- **A. Through its machines (recommended).** After the Heart breaks, every machine left on the frame (Crawlers,
+- **A. Through its machines (CHOSEN).** After the Heart breaks, every machine left on the frame (Crawlers,
   Stand-ins below) stops and speaks the same words at once. *Consequences:* shows how far the AI reaches without
   placing it anywhere; echoes the Protocol being "only a voice" (WC-019) but is the AI itself this time. New claim:
   the AI can speak through any of its machines. Tension to weigh: WC-027 says the Engine then stands "silent";
-  machines on its frame speaking strains that (the frame could fall silent once the AI has spoken).
+  machines on its frame speaking strains that. Left open by DEC-020. In the game so far, voice A shows only as the
+  "VOICE" label: the Heart's arena has no Crawlers or Stand-ins in it to speak.
 - **B. From the Heart's broken core.** The words come from the ruin. *Consequences:* simpler to stage, but it hints
   the AI lives in the Heart, which edges toward "does it survive?" (UNKNOWN).
 - **C. No source shown.** Text on screen, no figure. *Consequences:* safest for canon, weakest scene.
 
-Speaker label in the dialogue box for A, B or C: **"VOICE"** (proposed), so the AI is not given a name.
+Speaker label in the dialogue box: **"VOICE"**, so the AI is not given a name.
 
 ### The AI's words, after the Heart (each line rests only on WC-010 and LC-005)
 

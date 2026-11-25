@@ -13,7 +13,8 @@ fragility, environmental cost, imperfect information, and flawed human or AI goa
 - The Protocol is its first direct voice in physical form (ART). The Eclipse Engine is described in the art as
   its final solution: a world without life.
 - **WORKING (DEC-019):** in the 2D game the Engine's Heart is beaten and the Engine stands unfinished; the AI then
-  speaks to the lead for the first time, not through the Protocol. Its words are proposals (DRAFT-013) and must not
+  speaks to the lead for the first time, not through the Protocol but through its machines (DEC-020, WC-028). It can
+  speak through any of its machines (WORKING). Its words state its belief only (WC-010) and must not
   settle its mandate or history (open question 5).
 - **WORKING (WC-010):** it believes organic life burns too much of the remaining light, and is replacing living
   things with machines that need none. That is its belief, not the truth.
