@@ -32,5 +32,57 @@ func _init() -> void:
 			if bad < 5:
 				print("MISMATCH %s start %d policy %d" % [run.scene, run.start, run.policy])
 			bad += 1
+	bad += _port_scenes(lib, index)
 	print("story: %d runs, %d mismatched" % [golden.runs.size(), bad])
 	quit(1 if bad > 0 else 0)
+
+
+## The port's own scenes (Chapter 4, DEC-020), which have no Swift golden: every scene a level triggers exists, and
+## each lead and Orion choice sees exactly its approved lines, in order, and nothing meant for another lead.
+func _port_scenes(lib: Story.Library, index: Dictionary) -> int:
+	var bad := 0
+	for c: Dictionary in index.chapters:
+		for lead: String in c.route:
+			for id: String in c.route[lead]:
+				for t: Level.SceneTrigger in Level.load_id(id).scenes:
+					if not lib.scenes.has(t.scene):
+						print("MISSING scene %s, triggered by %s" % [t.scene, id])
+						bad += 1
+	var first := {
+		"caelen": "CAELEN|They never finished it. Something is still building.",
+		"seraphine": "SERAPHINE|The sky is darker over it. Even the corona looks tired.",
+		"nimue": "NIMUE|A whole city under the water, and they built on top of it.",
+	}
+	var answer := {
+		"caelen": "CAELEN|Maybe the light is going. That was never yours to decide for us.",
+		"seraphine": "SERAPHINE|The Oracle wanted everyone still. So do you. Neither of you asked.",
+		"nimue": "NIMUE|You put a price on everyone and never asked if they'd sell.",
+	}
+	var orion := {
+		"trusted": "ORION|I cannot tell you it is wrong. I can tell you it never asked.",
+		"watched": "ORION|It is certain. I told you to watch the certain ones.",
+	}
+	var voice := [
+		"VOICE|You have stopped the work. You have not stopped the reason for it.",
+		"VOICE|Every living thing burns a little of the light that is left. Mine do not.",
+		"VOICE|Look at the sun. Then tell me I am wrong.",
+	]
+	for lead: String in first:
+		for choice: String in orion:
+			var flags := {"lead": lead, "orion": choice}
+			var want := {"approach.arrive": [first[lead]], "heart.end": voice + [answer[lead], orion[choice]]}
+			for scene: String in want:
+				var got := _lines(lib, scene, flags)
+				if got != want[scene]:
+					print("MISMATCH %s for %s: %s" % [scene, flags, got])
+					bad += 1
+	return bad
+
+
+func _lines(lib: Story.Library, scene: String, flags: Dictionary) -> Array:
+	var r := Story.Runner.start(scene, lib, Story.State.from_json({"flags": flags}))
+	var out: Array = []
+	while r != null and not r.is_finished() and out.size() < 50:
+		out.append("%s|%s" % [r.line.speaker, r.line.text])
+		r.advance()
+	return out

@@ -1,3 +1,84 @@
 {
-  "scenes": {}
+  "scenes": {
+    "approach.arrive": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "They never finished it. Something is still building.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "The sky is darker over it. Even the corona looks tired.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "A whole city under the water, and they built on top of it."
+        }
+      }
+    },
+    "heart.end": {
+      "start": "voice",
+      "lines": {
+        "voice": {
+          "speaker": "VOICE",
+          "text": "You have stopped the work. You have not stopped the reason for it.",
+          "next": "voice2"
+        },
+        "voice2": {
+          "speaker": "VOICE",
+          "text": "Every living thing burns a little of the light that is left. Mine do not.",
+          "next": "voice3"
+        },
+        "voice3": {
+          "speaker": "VOICE",
+          "text": "Look at the sun. Then tell me I am wrong.",
+          "next": "caelen"
+        },
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "Maybe the light is going. That was never yours to decide for us.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "orion"
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "The Oracle wanted everyone still. So do you. Neither of you asked.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "orion"
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "You put a price on everyone and never asked if they'd sell.",
+          "next": "orion"
+        },
+        "orion": {
+          "speaker": "ORION",
+          "text": "I cannot tell you it is wrong. I can tell you it never asked.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "orion2"
+        },
+        "orion2": {
+          "speaker": "ORION",
+          "text": "It is certain. I told you to watch the certain ones."
+        }
+      }
+    }
+  }
 }

@@ -119,7 +119,12 @@
     }
   },
   "twin": null,
-  "scenes": [],
+  "scenes": [
+    {
+      "scene": "heart.end",
+      "cue": "complete"
+    }
+  ],
   "exitX": "inf",
   "killY": -260.0,
   "eclipsePeriod": 300,

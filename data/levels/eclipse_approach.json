@@ -335,7 +335,12 @@
   },
   "boss": null,
   "twin": null,
-  "scenes": [],
+  "scenes": [
+    {
+      "scene": "approach.arrive",
+      "cue": "start"
+    }
+  ],
   "exitX": 5500.0,
   "killY": -260.0,
   "eclipsePeriod": 300,

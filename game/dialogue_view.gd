@@ -44,6 +44,9 @@ static func colour_for(speaker: String) -> Color:
 			return Color(0.98, 0.82, 0.42)
 		"LAST ORACLE":
 			return Color(0.93, 0.89, 0.8)
+		"VOICE":
+			# The AI, speaking through its machines: hostile machines glow red (WC-008).
+			return Palette.RED
 	return UI.CYAN
 
 
