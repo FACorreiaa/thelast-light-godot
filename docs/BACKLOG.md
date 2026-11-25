@@ -37,9 +37,15 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
      and all six levels as placeholders: the Drowned Approach, the Scaffold Ways, the Still Quarter, the Mason's
      Span (mid-boss), the Corona Stair and the Heart (boss). Chapter 4 is in `index.json` for every lead and can be
      finished, with a placeholder ending line. Godot goldens cover each level, walking and fighting.
-   - Waiting on the creator: DRAFT-012 in `UniverseBible/Games/TheLastLight2D.md` (route, enemies, the Mason, the
-     Heart, what beating it does, ten claims), whether to hide Chapter 4 until then, and verdicts on the Mason's and
-     the Heart's figures, intro cards and tips.
+   - Decided 2026-11-25 (DEC-019): the Heart is beaten and the AI speaks (option 2); the ten claims are approved;
+     Chapter 4 is hidden in the game (`"hidden": true` in `index.json`, `--all-chapters` shows it) until its lines
+     are approved.
+   - Waiting on the creator: DRAFT-013 in `UniverseBible/Games/TheLastLight2D.md` (how the AI's voice reaches the
+     lead, its three lines, the lead and Orion answers, the first-sight lines, the chapter-end line), the other
+     level names, and the Mason's and the Heart's figures, intro cards and tips.
+   - Next in code once DRAFT-013 is approved: the post-Heart scene and first-sight lines in
+     `data/story/chapter4.json`, the ending line, then the three personal epilogue scenes (claim 10's directions
+     are approved; their words are not written), then unhide the chapter.
    - Known, left as is:
      - A boss's leftover summons stay alive during the victory delay and can still kill the lead before the level
        completes. That is the Swift rule; changing it is a design call and needs a Swift golden check plus a

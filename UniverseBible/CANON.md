@@ -41,6 +41,10 @@ register, the register wins until the conflict is resolved.
 | WC-022 | The Last Oracle | Believes she has seen how it ends: "The light goes out, and everyone is finally still." She names no cause (LC-002), and whether she truly sees the future is UNKNOWN. She will not stop that ending, only "make it gentle". Asked what was bought with the Dawnfaith's seal, she doesn't answer. Her link to Seraphine stays UNKNOWN (open question 9). | DEC-015 |
 | WC-023 | Why each lead comes | Caelen: the Dawnfaith's seal was in the Cinder King's ledger, "I want to know what they bought". Seraphine comes home with a Foundry machine at her side. Nimue: the sanctuaries sold their bread to the Cinder King, "let's see who else they deal with". Orion after the Oracle: "Being sure is not the same as being right" (trusted) or "Watch the certain ones too" (watched). | DEC-015 |
 | WC-020 | The Line Warden | A machine that keeps the Warden's Gate before the Protocol. Orion knows its name and how it fights. Nimue's runners once went round the gate; that way is gone. Whether it is one of many is UNKNOWN. | DEC-014 |
+| WC-024 | The final chapter | Chapter 4 is called **The Eclipse Engine**; its first level is **The Drowned Approach**. The drowned city was lived in once and its streets are under water now (name and history UNKNOWN). The Engine's frame is still being built, by machines, as the heroes climb (Scaffold Crawlers, the Mason). The eclipse is darker over the Engine than anywhere else in the game: a sight, not a cause (LC-002, LC-005). | DEC-016, DEC-019 |
+| WC-025 | The Still Quarter | A part of the drowned city where the AI's machines have already replaced the living with machines that need no light. It shows the AI's plan at work (WC-010, its belief, not the truth), not what the Engine does when finished. **Stand-ins** there are shaped like the people they replaced and keep their routines; what became of the people stays UNKNOWN. | DEC-019 |
+| WC-026 | The Mason and the Heart | The Mason, the machine building the span to the Heart, is Chapter 4's mid-boss and speaks no lines. The Heart, the Engine's guarded heart, has no face. | DEC-019 |
+| WC-027 | What beating the Heart does | In this game the Heart is beaten and the Engine stands unfinished and silent over the water; the sun is no brighter. The AI that built it then speaks to the lead for the first time, not through the Protocol; each of its lines needs its own verdict (DRAFT-013). Nothing says the Engine can never be finished, whether the AI survives, or whether the decline can be reversed. The leads' epilogues are ALTERNATE (player continuity). | DEC-019 |
 
 ## SHIPPED: in a build players have played
 
@@ -81,7 +85,8 @@ All six conflicts from the v0.1 audit were decided on 2026-11-16 (DEC-006 to DEC
 - Which endings, if any, later become history.
 - Who the Last Oracle is relative to Seraphine.
 - What the Eclipse Engine physically is and where it is, beyond DEC-016: in the 2D game it is a half-built structure over a
-  drowned city, unfinished (WORKING). The city's name and history, and what the Engine does when finished, stay open.
+  drowned city, unfinished, and its Heart is beaten (WORKING, WC-024, WC-027). The city's name and history, what the
+  Engine does when finished, whether it can still be finished, and whether the AI survives stay open.
 
 ## RETIRED
 

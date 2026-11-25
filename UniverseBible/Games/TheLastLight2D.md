@@ -12,7 +12,7 @@ the Godot port (`sim/`, `game/`, `data/` in `thelast-light-godot`); the Swift ga
 | Caelen, Orion | WORKING (ART); backstory PROPOSED | Lead and companion |
 | Seraphine, Nimue as other leads | WORKING (ART); arcs PROPOSED | Chosen at New Game by faction. Each has her own opening (DEC-012). Kits are gameplay, not canon: Seraphine's **Light Listens** heals, Nimue's **Lantern Trick** leaves a decoy |
 | The AI's goal | WORKING (WC-010) | Implied: a line where the others never woke |
-| The Eclipse Engine | WORKING (ART, DEC-016); most details UNKNOWN | Hook at the end of Chapter 1 (DEC-011); the final chapter climbs it (DEC-016, DEC-017, DRAFT-012) |
+| The Eclipse Engine | WORKING (ART, DEC-016); most details UNKNOWN | Hook at the end of Chapter 1 (DEC-011); the final chapter climbs it and beats its Heart; the AI then speaks (DEC-016, DEC-017, DEC-019) |
 | The Lantern Cities, their enemies, The Cinder King | WORKING (ART) | Chapter 2 region; the Cinder King's fight is next |
 
 ## Local canon this game has shipped
@@ -150,16 +150,17 @@ Solar Guard among them. The Cloister Gate is a mid-boss fight against the Sworn 
 Guards kept: nothing says how the Dawnfaith is organised (open question 6) or whether wardens always swear in
 pairs; nothing links the Sworn to the Last Oracle or to Seraphine (open question 9).
 
-## Draft: Chapter 4, The Eclipse Engine (DRAFT-012, PROPOSED)
+## Chapter 4, The Eclipse Engine (DEC-019, WORKING; its lines are DRAFT-013, PROPOSED)
 
 The final chapter, for every lead. Fixed already: the Engine is a vast half-built structure rising over a drowned
 city under the eclipse, unfinished, and the chapter climbs it to its guarded heart (DEC-016); six levels, eclipse
-phases as the mechanic, each lead's personal epilogue after the fight (DEC-017). **Everything below is a proposal.**
-All six levels are built as playable placeholders, so the chapter can be played to its end for every lead. The
-game data shows text that is all placeholder or proposal: the chapter title, the six level names, the Mason's and
-the Heart's intro cards (names, phase names, tips), and the ending line "(Draft chapter: the ending awaits a
-decision.)". No scenes and no epilogues are written. When the Heart dies it breaks apart with the standard boss
-effect, which reads like option 1 below; that is not a decision.
+phases as the mechanic, each lead's personal epilogue after the fight (DEC-017). Decided on 2026-11-25 (DEC-019):
+the Heart is beaten and the AI speaks (option 2 below), and the ten world claims are approved. The other level
+names, the gameplay and all the chapter's lines are still proposals.
+All six levels are built as playable placeholders, and **the chapter is hidden in the game** until its lines are
+approved. The game data still shows placeholder text: the Mason's and the Heart's intro cards (names, phase names,
+tips) and the ending line "(Draft chapter: the ending awaits a decision.)". No scenes and no epilogues are in the
+game yet. When the Heart dies it breaks apart with the standard boss effect, which fits option 2.
 
 ### Route
 
@@ -204,23 +205,25 @@ the Foundry's AI, and a symptom of the decline (the flood, a district with no on
   - Ledge play in the boss arenas is unproven: the autopilot wins both fights, but nothing checks that it uses
     the ledges as shelter.
 
-### The open question: what beating the Heart does
+### What beating the Heart does (decided: option 2, DEC-019)
 
-The chapter has to end somewhere, and this is the biggest claim in it. Three options:
+The three options as they were put to the creator. **Option 2 was chosen.**
 
-1. **Halted (recommended).** The Heart breaks. The Engine stands unfinished and silent over the water, and stays
+1. **Halted (recommended at the time).** The Heart breaks. The Engine stands unfinished and silent over the water, and stays
    that way in this game. The sun is no brighter. Proposed chapter-end line: "The Engine is still. The sun is no
    brighter." (Nothing says it can never be finished; later games stay free.) *Consequences:* closes this game's conflict on a clear win without deciding whether the
    decline can be reversed (UNKNOWN) or what became of the AI; later games can find the ruin. Fits the central
    irony: they stopped something meant to save the world.
-2. **Halted, and the AI speaks.** As option 1, but the AI that built it speaks to the lead for the first time, not
+2. **Halted, and the AI speaks (CHOSEN).** As option 1, but the AI that built it speaks to the lead for the first time, not
    through the Protocol. *Consequences:* a stronger finale, but the AI's own words would start to define its
    mandate and history (UNKNOWN); every line would need its own verdict.
 3. **The lead chooses.** Break the Heart, or leave the Engine standing, unfinished, for others to study. *Consequences:*
    the epilogues diverge and become player continuity (ALTERNATE), so no later game can assume either; twice the
    ending writing for each lead.
 
-### New world claims in this draft, each needing a verdict
+### World claims, approved (DEC-019; WC-024 to WC-027)
+
+Creator, 2026-11-25: "Accept" (all ten). Claim 7's "no voice" gave way to option 2; claim 9's lines are DRAFT-013.
 
 1. The chapter is called **The Eclipse Engine**, and its first level **The Drowned Approach**.
 2. The drowned city was lived in once; its streets are under water now (its name and history stay UNKNOWN, DEC-016).
@@ -242,6 +245,57 @@ The chapter has to end somewhere, and this is the biggest claim in it. Three opt
 Guards kept: nothing says what the Engine does when finished, who designed it beyond the AI, or whether the AI
 survives; nothing links Orion to the AI beyond the Foundry (open questions stay open); no line says why the sun
 weakens (LC-002, LC-005); the Foundry's people stay distinct from its AI, and no faction becomes purely evil.
+
+## Draft: Chapter 4's lines (DRAFT-013, PROPOSED)
+
+Everything in this section is a proposal; nothing here is in the game. Each numbered line needs its own verdict.
+Guards for the AI's words: they voice only its belief (WC-010), never as truth (WC-007). They give it no name, no
+mandate or history, no cause for the sun's weakening (LC-002, LC-005), no hint that it survives or ends, no link to
+Orion, and say nothing about what the finished Engine would do.
+
+### How the AI's voice reaches the lead (pick one)
+
+- **A. Through its machines (recommended).** After the Heart breaks, every machine left on the frame (Crawlers,
+  Stand-ins below) stops and speaks the same words at once. *Consequences:* shows how far the AI reaches without
+  placing it anywhere; echoes the Protocol being "only a voice" (WC-019) but is the AI itself this time. New claim:
+  the AI can speak through any of its machines.
+- **B. From the Heart's broken core.** The words come from the ruin. *Consequences:* simpler to stage, but it hints
+  the AI lives in the Heart, which edges toward "does it survive?" (UNKNOWN).
+- **C. No source shown.** Text on screen, no figure. *Consequences:* safest for canon, weakest scene.
+
+Speaker label in the dialogue box for A, B or C: **"VOICE"** (proposed), so the AI is not given a name.
+
+### The AI's words, after the Heart (each line rests only on WC-010 and LC-005)
+
+1. "You have stopped the work. You have not stopped the reason for it."
+2. "Every living thing burns a little of the light that is left. Mine do not."
+3. "Look at the sun. Then tell me I am wrong."
+
+### Each lead's answer (one shown, by lead)
+
+4. Caelen: "Maybe the light is going. That was never yours to decide for us."
+5. Seraphine: "The Oracle wanted everyone still. So do you. Neither of you asked." (Links WC-022; says nothing
+   about who the Oracle is to her.)
+6. Nimue: "You put a price on everyone and never asked if they'd sell." (Lantern Cities voice, WC-016.)
+
+### Orion, last (respects WC-014: he cannot lie, so he claims only what he knows)
+
+7. Trusted: "I cannot tell you it is wrong. I can tell you it never asked."
+8. Watched: "It is certain. I told you to watch the certain ones." (Echoes his own Chapter 3 line, WC-023.)
+
+### First sight of the Engine (claim 9; shown at the start of the Drowned Approach)
+
+9. Caelen: "They never finished it. Something is still building."
+10. Seraphine: "The sky is darker over it. Even the corona looks tired." (Claim 8: a sight, not a cause.)
+11. Nimue: "A whole city under the water, and they built on top of it."
+
+### Chapter-end line
+
+12. "The Engine is still. The sun is no brighter." (Written for option 1; it still holds under option 2, since
+    the AI speaking changes nothing it says. Rejected alternative: "The Engine is still. Its maker is not." It
+    would say the AI survives, which stays UNKNOWN.)
+
+Not drafted yet: the three personal epilogue scenes (claim 10's directions are approved; their words are not).
 
 ## Chapter 3, The Dawnfaith (DEC-015, WORKING)
 
