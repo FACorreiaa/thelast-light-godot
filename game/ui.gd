@@ -60,9 +60,9 @@ static func focusable(c: Control, action: Callable) -> void:
 			c.draw_style_box(ring, Rect2(Vector2.ZERO, c.size)))
 	c.focus_entered.connect(c.queue_redraw)
 	c.focus_exited.connect(c.queue_redraw)
-	relay.navigating_changed.connect(func() -> void:
-		if is_instance_valid(c) and c.has_focus():
-			c.queue_redraw())
+	# A bound method, not a lambda: Godot drops the connection when `c` is freed, while a lambda capturing `c`
+	# stayed connected to the long-lived relay and reported the freed capture on every emit.
+	relay.navigating_changed.connect(c.queue_redraw)
 	c.gui_input.connect(func(e: InputEvent) -> void:
 		if e.is_action_pressed("ui_accept") and not e.is_echo():
 			c.accept_event()

@@ -84,8 +84,6 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
      Light - Chapter Zero" (`com.fernandocorreia.lastlight`). Move the bundle id over before strangers test it.
    - Steam once the game is done: $100 one-time per game, refunded after $1,000 gross.
 8. **Technical leftovers:**
-   - `test_flow` prints about 480 "Lambda capture at index 0 was freed" errors from the start of the run (already
-     there at 89e4962; it still passes). Some lambda outlives the node it captured; find it.
    - A Windows font for the menus (SF Pro falls back to a system font there).
    - A two-object leak at exit after the demo bot plays.
    - Android export, if wanted.
