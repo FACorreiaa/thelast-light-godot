@@ -252,7 +252,7 @@ func _build_lamplighter() -> void:
 	blade(100, Palette.EMBER, Vector2(8, 80))
 
 
-## Port-only placeholder (DRAFT-012, PROPOSED): the Mason. Broad and stooped under a stone-grey cowl, a
+## Port-only figure (accepted as it stands, DEC-020): the Mason. Broad and stooped under a stone-grey cowl, a
 ## mason's apron, and a long hammer whose head is a block of the Engine's own stone. Pixel verdict pending.
 func _build_mason() -> void:
 	leg(-13, 50, 50, 15)
@@ -269,7 +269,7 @@ func _build_mason() -> void:
 	weapon_pivot.add_child(head)
 
 
-## Port-only placeholder (DRAFT-012): the Heart, rooted in the Engine's frame. No face: a tapering column braced
+## Port-only figure (accepted as it stands, DEC-020): the Heart, rooted in the Engine's frame. No face: a tapering column braced
 ## by struts, a lit core in a cage of ribs, and an arm that sweeps around it.
 func _build_heart() -> void:
 	part(SkPath.polygon([Vector2(-48, 0), Vector2(48, 0), Vector2(30, 40), Vector2(-30, 40)]), -1)

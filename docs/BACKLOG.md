@@ -34,7 +34,7 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
    - Decided (DEC-016, DEC-017): a half-built structure over a drowned city, six levels, eclipse phases, personal
      epilogues.
    - Built (2026-11-25): the eclipse-phase mechanic in the sim (`tests/test_eclipse.gd`), its placeholder drawing,
-     and all six levels as placeholders: the Drowned Approach, the Scaffold Ways, the Still Quarter, the Mason's
+     and all six levels (names, boss figures, cards and tips accepted as they stand, DEC-020): the Drowned Approach, the Scaffold Ways, the Still Quarter, the Mason's
      Span (mid-boss), the Corona Stair and the Heart (boss). Chapter 4 is in `index.json` for every lead and can be
      finished, with a placeholder ending line. Godot goldens cover each level, walking and fighting.
    - Decided 2026-11-25 (DEC-019): the Heart is beaten and the AI speaks (option 2); the ten claims are approved;

@@ -164,14 +164,14 @@ standard boss effect, which fits option 2.
 
 ### Route
 
-| # | Level (proposed name) | Kind | What it shows |
+| # | Level | Kind | What it shows |
 |---|---|---|---|
-| 1 | **The Drowned Approach** (built, placeholder) | Level | Flooded streets of the drowned city; the first light and shadow bridges |
-| 2 | **The Scaffold Ways** (built, placeholder) | Level | The Engine's half-built frame, climbed; eclipse steps between solid ones |
-| 3 | **The Still Quarter** (built, placeholder) | Puzzle | A district where the AI's machines have already replaced the living (WC-010): walls that stand only in one phase, two paired as airlocks |
-| 4 | **The Mason's Span** (built, placeholder) | Mid-boss | A bridge the Engine is still building, kept by the machine building it |
-| 5 | **The Corona Stair** (built, placeholder) | Level | The last climb, in the corona's light, where the swaps come faster; moving eclipse ferries |
-| 6 | **The Heart** (built, placeholder) | Boss | The Engine's guarded heart |
+| 1 | **The Drowned Approach** | Level | Flooded streets of the drowned city; the first light and shadow bridges |
+| 2 | **The Scaffold Ways** | Level | The Engine's half-built frame, climbed; eclipse steps between solid ones |
+| 3 | **The Still Quarter** | Puzzle | A district where the AI's machines have already replaced the living (WC-010): walls that stand only in one phase, two paired as airlocks |
+| 4 | **The Mason's Span** | Mid-boss | A bridge the Engine is still building, kept by the machine building it |
+| 5 | **The Corona Stair** | Level | The last climb, in the corona's light, where the swaps come faster; moving eclipse ferries |
+| 6 | **The Heart** | Boss | The Engine's guarded heart |
 
 The scenario principle holds for every stop: a playable place with its own mechanic, something it reveals about
 the Foundry's AI, and a symptom of the decline (the flood, a district with no one left in it, a sun that dims).
@@ -311,14 +311,17 @@ Dawnfaith will do; Orion claims only what he knows (WC-014); the Foundry's peopl
 ### Caelen: back to the Foundry
 
 1. Caelen: "The Foundry measured the light for years. Now they'll hear what was being built while they counted."
-   (Rests on the Sun Gauges, WC-012.)
+   (Rests on the Sun Gauges, WC-012. Flag: implies the Foundry's people did not know what the Engine was, a new
+   claim. Safer variant: "The Foundry measured the light for years. Now I'll tell them what I saw.")
 2. Orion, trusted: "I will walk beside you, as far as they let me."
 3. Orion, watched: "I will walk where you can see me. That has not changed."
 
 ### Seraphine: home to the Dawnfaith, with Orion
 
 4. Seraphine: "Home, with a Foundry machine beside me and the old records in my bag. Let them sing or not."
-   (Echoes her Chapter 3 line, WC-023; the records are WC-011: *when*, not *why*.)
+   (Echoes her Chapter 3 line, WC-023; the records are WC-011: *when*, not *why*. Flag: that she carries the buried
+   records with her is new; in Chapter 1 she carries the Foundry's count home. Variant: "Home, with a Foundry machine
+   beside me and the Foundry's count in my head. Let them sing or not.")
 5. Orion, trusted: "If they do not open the doors, I will wait outside with you."
 6. Orion, watched: "Keep watching me. They will be watching both of us."
 
@@ -328,6 +331,10 @@ Dawnfaith will do; Orion claims only what he knows (WC-014); the Foundry's peopl
    only road no one charges for", WC-016.)
 8. Orion, trusted: "Then someone should walk it first. I can."
 9. Orion, watched: "Send me down it first, if you still want to watch."
+
+Flag for lines 2-3 and 8-9: claim 10 names Orion only in Seraphine's epilogue. Orion going to the Foundry with
+Caelen, or down the runners' road with Nimue, is new; the alternative is an epilogue with no Orion line for those
+two leads.
 
 Staging (proposed): each epilogue is a scene after the results screen's ending line, with the lead's line, then
 one Orion line by the trust choice. Building it needs an epilogue cue the game does not have yet.

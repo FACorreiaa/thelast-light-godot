@@ -17,6 +17,8 @@ Planned lead for the Dawnfaith opening (plan, stage 4). **LOCKED:** keeps her na
   match her buried records (WC-012, DEC-012).
 - Her order calls the Lantern Cities godless; on the docks she finds sanctuary bread resold at three times its cost,
   and the Cinder King's ledgers carry the Dawnfaith's seal (WC-016, WC-018, DEC-013).
+- At the Eclipse Engine: "The sky is darker over it. Even the corona looks tired." To the AI's voice: "The Oracle
+  wanted everyone still. So do you. Neither of you asked." (WC-028, DEC-020; says nothing of who the Oracle is to her)
 
 ## Personality (PROPOSED)
 

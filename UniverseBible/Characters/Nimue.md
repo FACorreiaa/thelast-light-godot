@@ -17,6 +17,8 @@ Planned lead for the Lantern Cities opening (plan, stage 4).
   Cinder King says they went "where every debt goes. Paid." Their fate is UNKNOWN (WC-016, WC-018, DEC-012, DEC-013).
 - She comes into the Foundry by the Undercroft, her route under it (DEC-012).
 - The Cinder King calls her routes his roads and says she never pays the toll (WC-017, DEC-013).
+- At the Eclipse Engine: "A whole city under the water, and they built on top of it." To the AI's voice: "You put a
+  price on everyone and never asked if they'd sell." (WC-028, DEC-020)
 
 ## Personality (PROPOSED)
 

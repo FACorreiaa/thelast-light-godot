@@ -16,6 +16,8 @@
 - **He cannot lie, not even to be kind** (WC-014, DEC-012). This was already in the cast sheet's Seraphine pairing; the
   game now says it. He may be silent or wrong, never lying.
 - He meets each lead differently in their opening, and always asks the same thing: walk beside, or ahead (DEC-012).
+- After the AI speaks at the Engine: "I cannot tell you it is wrong. I can tell you it never asked." (beside) or "It
+  is certain. I told you to watch the certain ones." (ahead) (WC-028, DEC-020)
 
 ## Personality (PROPOSED)
 

@@ -16,6 +16,8 @@
 - He knows the Machine Hall floor "and doesn't know why"; his faction card reads "Find out what you built" (WC-015,
   DEC-012). Why stays UNKNOWN, and his backstory stays PROPOSED below.
 - In the Cinder King's ledgers he finds Foundry seals beside everyone else's (WC-018, DEC-013).
+- At the Eclipse Engine: "They never finished it. Something is still building." To the AI's voice: "Maybe the light
+  is going. That was never yours to decide for us." (WC-028, DEC-020)
 
 ## Personality (PROPOSED)
 
