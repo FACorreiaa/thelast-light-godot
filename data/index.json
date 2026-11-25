@@ -97,7 +97,7 @@
       "title": "The Dawnfaith"
     },
     {
-      "ending": "The way up is open. (Draft chapter: more to come.)",
+      "ending": "(Draft chapter: the ending awaits a decision.)",
       "id": "chapter4",
       "number": 4,
       "route": {
@@ -106,21 +106,24 @@
           "scaffold_ways",
           "still_quarter",
           "masons_span",
-          "corona_stair"
+          "corona_stair",
+          "heart"
         ],
         "nimue": [
           "eclipse_approach",
           "scaffold_ways",
           "still_quarter",
           "masons_span",
-          "corona_stair"
+          "corona_stair",
+          "heart"
         ],
         "seraphine": [
           "eclipse_approach",
           "scaffold_ways",
           "still_quarter",
           "masons_span",
-          "corona_stair"
+          "corona_stair",
+          "heart"
         ]
       },
       "title": "The Eclipse Engine"
@@ -196,7 +199,8 @@
     "scaffold_ways",
     "still_quarter",
     "masons_span",
-    "corona_stair"
+    "corona_stair",
+    "heart"
   ],
   "swiftTag": "swift-final"
 }

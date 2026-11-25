@@ -215,27 +215,79 @@ func _init() -> void:
 	check(covered.has("masons_span"), "the fairness check covers the Mason's Span (%s)" % [covered])
 
 	# Every boss on an eclipse level shows its whole kit in a fight: it shifts the rhythm, raises floor strikes,
-	# calls help and reaches its second phase, for every lead.
+	# calls help and reaches its last phase, for every lead. The Heart also keeps each phase's signature: no shifts
+	# in its steady first phase, help called only in the second, and shifts coming faster in the third than the second.
 	for id: String in (JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json")).levels as Array):
 		var lv := Level.load_id(id)
 		if lv.eclipse_period <= 0 or lv.boss == null:
 			continue
+		var last_phase := t.spec(lv.boss.kind).phase_thresholds.size() + 1
 		for lead in ["caelen", "seraphine", "nimue"]:
-			w = World.from_level(lv, lead, t, 1)
-			var pilot := Autopilot.new(true)
-			var seen := {"shift": 0, "spawned": 0, "strike": 0}
-			var phase := 1
-			while w.frame < 12000 and not w.is_over:
-				var before := w.strikes.size()
-				for e: Dictionary in w.step(pilot.input_for(w)):
-					if seen.has(e.case):
-						seen[e.case] += 1
-				if w.strikes.size() > before:
-					seen.strike += 1
-				if w.boss() != null:
-					phase = maxi(phase, w.boss().phase)
-			check(w.is_complete and phase >= 2 and seen.shift > 0 and seen.spawned > 0 and seen.strike > 0,
-				"%s (%s): complete %s, phase %d, seen %s" % [id, lead, w.is_complete, phase, seen])
+			for seed in [1, 2, 3]:
+				w = World.from_level(lv, lead, t, seed)
+				var pilot := Autopilot.new(true)
+				var seen := {"shift": 0, "spawned": 0, "strike": 0}
+				var shifts := [0, 0, 0, 0]
+				var calls := [0, 0, 0, 0]
+				var frames := [0, 0, 0, 0]
+				var phase := 1
+				while w.frame < 12000 and not w.is_over:
+					var before := w.strikes.size()
+					var now := w.boss().phase if w.boss() != null and w.boss().awake and w.boss().is_alive() else 0
+					frames[mini(now, 3)] += 1
+					for e: Dictionary in w.step(pilot.input_for(w)):
+						if seen.has(e.case):
+							seen[e.case] += 1
+						if e.case == "shift":
+							shifts[mini(now, 3)] += 1
+						elif e.case == "spawned":
+							calls[mini(now, 3)] += 1
+					if w.strikes.size() > before:
+						seen.strike += 1
+					if w.boss() != null:
+						phase = maxi(phase, w.boss().phase)
+				var ok: bool = w.is_complete and phase >= last_phase and seen.shift > 0 and seen.spawned > 0 and seen.strike > 0
+				if lv.boss.kind == "heart":
+					# Rate per 1000 frames awake in each phase.
+					var rate2: float = 1000.0 * shifts[2] / maxf(frames[2], 1.0)
+					var rate3: float = 1000.0 * shifts[3] / maxf(frames[3], 1.0)
+					ok = ok and shifts[1] == 0 and calls[2] > 0 and calls[3] == 0 and frames[3] > 0 and rate3 > rate2
+				check(ok, "%s (%s, seed %d): complete %s, phase %d/%d, seen %s, shifts by phase %s, calls %s, frames %s"
+					% [id, lead, seed, w.is_complete, phase, last_phase, seen, shifts, calls, frames])
+	check(covered.has("heart"), "the fairness check covers the Heart (%s)" % [covered])
+
+	# The Heart's third phase shifts the rhythm more often than its second: more of its attacks are shifts (calls
+	# for help, which only the second phase makes, left out of the count). The hero is kept out of harm's way.
+	var heart_rate := {}
+	for ph in [2, 3]:
+		w = World.from_level(Level.load_id("heart"), "caelen", t, 1)
+		var hid := w.boss().id
+		var n_shift := 0
+		var n_attack := 0
+		for i in 3000:
+			var h := w.controlled()
+			h.invulnerable = 10
+			h.pos = Vec2.new(700.0, 0.0)
+			var b := w.fighter(hid)
+			b.awake = true
+			b.phase = ph
+			b.hp = b.spec.max_hp * (0.5 if ph == 2 else 0.2)
+			var was := b.state
+			w.step(InputFrame.neutral())
+			b = w.fighter(hid)
+			if b.state == Fighter.St.ATTACK and was != Fighter.St.ATTACK:
+				var effect: Variant = b.current_attack().effect
+				var kind := String(effect.get("case", "")) if effect is Dictionary else String(effect)
+				if kind == "shift":
+					n_shift += 1
+				if kind != "summon":
+					n_attack += 1
+		heart_rate[ph] = [n_shift, n_attack]
+	var r2: float = float(heart_rate[2][0]) / maxf(float(heart_rate[2][1]), 1.0)
+	var r3: float = float(heart_rate[3][0]) / maxf(float(heart_rate[3][1]), 1.0)
+	check(heart_rate[2][0] > 0 and r3 > r2 + 0.05,
+		"the Heart shifts more often in its third phase than its second (shifts/attacks %s)" % [heart_rate])
+	print("heart shifts/attacks: ", heart_rate)
 
 	# An odd period: the light lasts half (rounded down), and the countdown always reaches the real swap.
 	var odd := room(301)
