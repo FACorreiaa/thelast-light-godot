@@ -38,8 +38,8 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
      Span (mid-boss), the Corona Stair and the Heart (boss). Chapter 4 is in `index.json` for every lead and can be
      finished, with a placeholder ending line. Godot goldens cover each level, walking and fighting.
    - Decided 2026-11-25 (DEC-019): the Heart is beaten and the AI speaks (option 2); the ten claims are approved;
-     Chapter 4 is hidden in the game (`"hidden": true` in `index.json`, `--all-chapters` shows it) until its lines
-     are approved.
+     Chapter 4 is hidden in the game (`"hidden": true` in `index.json`, `--all-chapters` shows it). Keeping it
+     hidden until its lines are in is a reading of the creator's "yes", to confirm.
    - Waiting on the creator: DRAFT-013 in `UniverseBible/Games/TheLastLight2D.md` (how the AI's voice reaches the
      lead, its three lines, the lead and Orion answers, the first-sight lines, the chapter-end line), the other
      level names, and the Mason's and the Heart's figures, intro cards and tips.

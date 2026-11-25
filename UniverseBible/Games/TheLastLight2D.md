@@ -157,9 +157,10 @@ city under the eclipse, unfinished, and the chapter climbs it to its guarded hea
 phases as the mechanic, each lead's personal epilogue after the fight (DEC-017). Decided on 2026-11-25 (DEC-019):
 the Heart is beaten and the AI speaks (option 2 below), and the ten world claims are approved. The other level
 names, the gameplay and all the chapter's lines are still proposals.
-All six levels are built as playable placeholders, and **the chapter is hidden in the game** until its lines are
-approved. The game data still shows placeholder text: the Mason's and the Heart's intro cards (names, phase names,
-tips) and the ending line "(Draft chapter: the ending awaits a decision.)". No scenes and no epilogues are in the
+All six levels are built as playable placeholders, and **the chapter is hidden in the game** (DEC-019; keeping it
+hidden until its lines are in is a reading to confirm). The game data still shows placeholder text: three level
+names (the Scaffold Ways, the Mason's Span, the Corona Stair; still PROPOSED), the Mason's and the Heart's intro
+cards (names, phase names, tips) and the ending line "(Draft chapter: the ending awaits a decision.)". No scenes and no epilogues are in the
 game yet. When the Heart dies it breaks apart with the standard boss effect, which fits option 2.
 
 ### Route
@@ -189,9 +190,8 @@ the Foundry's AI, and a symptom of the decline (the flood, a district with no on
   round it up close, floor eruptions further off, lower than the ledges. (2) Every third attack pulls the next swap
   early; when alone it calls one Scrap Drone. (3) No more help; every second attack pulls the swap early. Not
   built from the earlier proposal: floor sections unmade and rebuilt, Stand-ins, and a closing "last beat".
-- **Enemies.** Placeholders from the Foundry until these are agreed: the **Stand-in** (a machine in the shape of
-  someone who lived in the district, keeping their routine) and the **Scaffold Crawler** (a builder that climbs
-  the frame and drops loose parts).
+- **Enemies.** The **Stand-in** and the **Scaffold Crawler** are approved (DEC-019, WC-024, WC-025) but not built;
+  Foundry enemies stand in for them. That a Crawler drops loose parts is still a gameplay proposal.
 - **Handled for the built levels** (sim, autopilot and Orion; tested over seeds 1-9 for every lead): a hero's
   swing lunge or dodge, the player's included, stops at the edge of eclipse ground that is gone or about to go; jumps and steps up account for the rhythm; no one steers from above floor to
   above none in the air; whoever stands where ground is forming steps out; a walker waits at ground someone else
@@ -258,7 +258,8 @@ Orion, and say nothing about what the finished Engine would do.
 - **A. Through its machines (recommended).** After the Heart breaks, every machine left on the frame (Crawlers,
   Stand-ins below) stops and speaks the same words at once. *Consequences:* shows how far the AI reaches without
   placing it anywhere; echoes the Protocol being "only a voice" (WC-019) but is the AI itself this time. New claim:
-  the AI can speak through any of its machines.
+  the AI can speak through any of its machines. Tension to weigh: WC-027 says the Engine then stands "silent";
+  machines on its frame speaking strains that (the frame could fall silent once the AI has spoken).
 - **B. From the Heart's broken core.** The words come from the ruin. *Consequences:* simpler to stage, but it hints
   the AI lives in the Heart, which edges toward "does it survive?" (UNKNOWN).
 - **C. No source shown.** Text on screen, no figure. *Consequences:* safest for canon, weakest scene.
@@ -275,12 +276,14 @@ Speaker label in the dialogue box for A, B or C: **"VOICE"** (proposed), so the 
 
 4. Caelen: "Maybe the light is going. That was never yours to decide for us."
 5. Seraphine: "The Oracle wanted everyone still. So do you. Neither of you asked." (Links WC-022; says nothing
-   about who the Oracle is to her.)
+   about who the Oracle is to her. "So do you" is her reading of the AI's aim, not WC-010 itself.)
 6. Nimue: "You put a price on everyone and never asked if they'd sell." (Lantern Cities voice, WC-016.)
 
 ### Orion, last (respects WC-014: he cannot lie, so he claims only what he knows)
 
-7. Trusted: "I cannot tell you it is wrong. I can tell you it never asked."
+7. Trusted: "I cannot tell you it is wrong. I can tell you it never asked." (Flag: Orion cannot lie (WC-014), so
+   "it never asked" becomes a fact about the AI's past conduct, which touches its UNKNOWN history. A safer
+   variant: "I cannot tell you it is wrong. I can tell you it did not ask you.")
 8. Watched: "It is certain. I told you to watch the certain ones." (Echoes his own Chapter 3 line, WC-023.)
 
 ### First sight of the Engine (claim 9; shown at the start of the Drowned Approach)
