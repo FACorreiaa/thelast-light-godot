@@ -248,10 +248,9 @@ func _init() -> void:
 						phase = maxi(phase, w.boss().phase)
 				var ok: bool = w.is_complete and phase >= last_phase and seen.shift > 0 and seen.spawned > 0 and seen.strike > 0
 				if lv.boss.kind == "heart":
-					# Rate per 1000 frames awake in each phase.
-					var rate2: float = 1000.0 * shifts[2] / maxf(frames[2], 1.0)
-					var rate3: float = 1000.0 * shifts[3] / maxf(frames[3], 1.0)
-					ok = ok and shifts[1] == 0 and calls[2] > 0 and calls[3] == 0 and frames[3] > 0 and rate3 > rate2
+					# The phase pattern. That phase 3 shifts more often is checked directly below: one fight's
+					# counts are too few to compare rates.
+					ok = ok and shifts[1] == 0 and calls[2] > 0 and calls[3] == 0 and frames[3] > 0
 				check(ok, "%s (%s, seed %d): complete %s, phase %d/%d, seen %s, shifts by phase %s, calls %s, frames %s"
 					% [id, lead, seed, w.is_complete, phase, last_phase, seen, shifts, calls, frames])
 	check(covered.has("heart"), "the fairness check covers the Heart (%s)" % [covered])
