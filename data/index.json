@@ -105,19 +105,22 @@
           "eclipse_approach",
           "scaffold_ways",
           "still_quarter",
-          "masons_span"
+          "masons_span",
+          "corona_stair"
         ],
         "nimue": [
           "eclipse_approach",
           "scaffold_ways",
           "still_quarter",
-          "masons_span"
+          "masons_span",
+          "corona_stair"
         ],
         "seraphine": [
           "eclipse_approach",
           "scaffold_ways",
           "still_quarter",
-          "masons_span"
+          "masons_span",
+          "corona_stair"
         ]
       },
       "title": "The Eclipse Engine"
@@ -192,7 +195,8 @@
     "eclipse_approach",
     "scaffold_ways",
     "still_quarter",
-    "masons_span"
+    "masons_span",
+    "corona_stair"
   ],
   "swiftTag": "swift-final"
 }
