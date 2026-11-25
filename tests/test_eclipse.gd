@@ -266,6 +266,39 @@ func _init() -> void:
 				check(w.is_complete and fell.is_empty(), "autopilot (crowd %s, fights %s, period %d) crosses: complete %s, fell %s, x %.0f"
 					% [crowd, fights, period, w.is_complete, fell, w.controlled().pos.x])
 
+	# Moving eclipse ground: while there it moves on its path and carries whoever stands on it; when gone it is
+	# parked; it comes back where its path has reached by then, not where it left.
+	var ferry := Level.from_data({
+		"name": "Eclipse ferry", "width": 2000.0, "start": {"x": 120.0, "y": 0.0},
+		"platforms": [_plat(-200, 2000, 0), {"box": {"minX": 300.0, "minY": 82.0, "maxX": 420.0, "maxY": 96.0},
+			"oneWay": true, "travel": {"x": 300.0, "y": 0.0}, "period": 200, "eclipse": 1}],
+		"hazards": [], "levers": [], "plates": [], "gates": [], "checkpoints": [], "pickups": [], "enemies": [],
+		"partner": null, "boss": null, "twin": null, "scenes": [], "exitX": 1900.0, "killY": -260.0,
+		"eclipsePeriod": 300, "eclipseWarning": 40})
+	w = World.from_level(ferry, "caelen", t, 1)
+	w.controlled().pos = Vec2.new(360.0, 96.0)
+	for i in 5:
+		w.step(InputFrame.neutral())
+	var rider_start := w.controlled().pos.x
+	var box_start := w.platform_boxes[1].min_x
+	for i in 60:
+		w.step(InputFrame.neutral())
+	hero = w.controlled()
+	var moved := w.platform_boxes[1].min_x - box_start
+	check(hero.on_ground and hero.pos.y == 96.0 and moved > 50.0 and absf((hero.pos.x - rider_start) - moved) < 0.01,
+		"moving eclipse ground carries its rider (box %.1f, rider %.1f, y %.0f)" % [moved, hero.pos.x - rider_start, hero.pos.y])
+	while w.eclipse_light():
+		w.step(InputFrame.neutral())
+	w.step(InputFrame.neutral())
+	hero = w.controlled()
+	check(not _there(w, 1) and hero.pos.y < 96.0, "when the shadow comes it goes, and the rider drops (y %.0f)" % hero.pos.y)
+	while not w.eclipse_light():
+		w.step(InputFrame.neutral())
+	w.step(InputFrame.neutral())
+	var want := ferry.platforms[1].box_at(w.frame)
+	check(_there(w, 1) and absf(w.platform_boxes[1].min_x - want.min_x) < 0.01,
+		"and comes back where its path has reached (%.1f, path %.1f)" % [w.platform_boxes[1].min_x, want.min_x])
+
 	# A tall eclipse wall is a phase gate: shut in its phase, open in the other, with no gate code. Ground that
 	# should be there but is held off by someone standing in its space sends them out; ground gone by the rhythm
 	# does not, so its space can be walked through.
@@ -305,6 +338,62 @@ func _init() -> void:
 	check(_there(w, 1) and (hero.pos.x < 600.0 or hero.pos.x > 640.0),
 		"and forms once they are out (%d frames, x %.0f)" % [waited, hero.pos.x])
 
+	# Ground waits only for heroes: an enemy loitering in a gone wall's space does not hold it off, and is shoved out.
+	w = World.from_level(gated, "caelen", t, 1)
+	for i in 160:
+		w.step(InputFrame.neutral())
+	var drone := w.spawn("scrapDrone", 620.0, 0.0, 1.0)
+	# Pinned in the wall's space through the swap back to light (frame 300), so it cannot simply wander out first.
+	while w.frame < 302:
+		w.fighter(drone).pos.x = 620.0
+		w.step(InputFrame.neutral())
+	check(_there(w, 1), "an enemy pinned in a wall's space at the swap does not hold it off")
+	for i in 30:
+		w.step(InputFrame.neutral())
+	var d := w.fighter(drone)
+	check(_there(w, 1) and d != null and (d.pos.x < 600.0 or d.pos.x > 640.0),
+		"an enemy in a wall's space does not hold it off (there %s, x %.0f)" % [_there(w, 1), d.pos.x if d else 0.0])
+
+	# Walkers wait at the edge of ground held off by someone else, so two cannot take turns keeping it away.
+	var paired := Level.from_data({
+		"name": "Eclipse gate pair", "width": 2000.0, "start": {"x": 400.0, "y": 0.0},
+		"platforms": [_plat(-200, 2000, 0), {"box": {"minX": 600.0, "minY": 0.0, "maxX": 640.0, "maxY": 200.0},
+			"oneWay": false, "travel": {"x": 0.0, "y": 0.0}, "period": 0, "eclipse": 1}],
+		"hazards": [], "levers": [], "plates": [], "gates": [], "checkpoints": [], "pickups": [], "enemies": [],
+		"partner": {"kind": "orion", "pos": {"x": 300.0, "y": 0.0}}, "boss": null, "twin": null, "scenes": [],
+		"exitX": 1900.0, "killY": -260.0, "eclipsePeriod": 300, "eclipseWarning": 40})
+	w = World.from_level(paired, "caelen", t, 1)
+	for i in 299:
+		w.step(InputFrame.neutral())
+	w.fighter(2).pos.x = 620.0
+	w.controlled().pos.x = 600.0 - w.controlled().hurtbox().width() / 2.0 - 4.0 - (w.controlled().hurtbox().center().x - w.controlled().pos.x)
+	for i in 2:
+		w.step(InputFrame.neutral())
+	check(not _there(w, 1) and w.eclipse_held(w.controlled(), 1.0) and not w.eclipse_held(w.controlled(), -1.0),
+		"a walker at the edge of ground someone else holds off waits for it (there %s)" % _there(w, 1))
+
+	# Lower eclipse ground: no walking or dodging off a ledge onto ground that will go before the drop and the
+	# crossing are done.
+	var drop := Level.from_data({
+		"name": "Eclipse drop", "width": 2000.0, "start": {"x": 470.0, "y": 300.0},
+		"platforms": [_plat(-200, 500, 300), _plat(500, 600, 230, 1), _plat(600, 2000, 230)],
+		"hazards": [], "levers": [], "plates": [], "gates": [], "checkpoints": [], "pickups": [], "enemies": [],
+		"partner": null, "boss": null, "twin": null, "scenes": [], "exitX": 1900.0, "killY": -260.0,
+		"eclipsePeriod": 300, "eclipseWarning": 40})
+	w = World.from_level(drop, "caelen", t, 1)
+	for i in 10:
+		w.step(InputFrame.neutral())
+	check(not w.eclipse_blocks(w.controlled(), 1.0), "early in the light a drop onto light ground is open")
+	for i in 100:
+		w.step(InputFrame.neutral())
+	check(w.eclipse_blocks(w.controlled(), 1.0), "late in the light it is shut (%d to the swap)" % w.eclipse_swap_in())
+	w.controlled().facing = 1.0
+	for i in 30:
+		w.step(InputFrame.make(0.0, false, false, false, i == 0))
+	hero = w.controlled()
+	check(hero.pos.y == 300.0 and hero.pos.x < 500.0 + hero.spec.width,
+		"and a dodge stops at the ledge's edge (x %.0f, y %.0f)" % [hero.pos.x, hero.pos.y])
+
 	# Every level with eclipse phases, every lead, walking and fighting, a few seeds: it finishes, and no one on
 	# the heroes' side drops through a gap where eclipse ground was, except after a hit since they last stood
 	# (a knockback throws anyone over any pit, on the ground or in the air). Ordinary pits keep Swift's rules and are not counted.
@@ -331,7 +420,8 @@ func _init() -> void:
 								grounded[f.id] = Fighter.St.HITSTUN
 						w.step(pilot.input_for(w))
 						for f: Fighter in w.fighters:
-							if f.team != "hero":
+							# A decoy is a lure, not a hero falling.
+							if f.team != "hero" or f.spec.is_decoy:
 								continue
 							var under := f.pos.y < -20.0
 							if under and not below.get(f.id, false) and grounded.get(f.id, -1) != Fighter.St.HITSTUN:

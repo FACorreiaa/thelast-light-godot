@@ -685,8 +685,8 @@ func _navigate(f: Fighter, inp: InputFrame, leader: Fighter) -> void:
 			inp.move_x = 0.0
 			return
 
-	# Port-only: eclipse ground that is gone or will go before the partner is across.
-	if eclipse_blocks(f, dir):
+	# Port-only: eclipse ground that is gone or will go before the partner is across, or that is waiting to form.
+	if eclipse_blocks(f, dir) or eclipse_held(f, dir):
 		inp.move_x = 0.0
 		return
 
@@ -1595,7 +1595,10 @@ func eclipse_blocks(f: Fighter, dir: float) -> bool:
 		var ahead := b.min_x - (f.pos.x + half) if dir > 0.0 else (f.pos.x - half) - b.max_x
 		var behind := f.pos.x > b.max_x if dir > 0.0 else f.pos.x < b.min_x
 		var rise := b.max_y - f.pos.y
-		if behind or ahead > 60.0 or rise < -40.0 or rise > ECLIPSE_STEP:
+		if behind or ahead > 60.0 or rise < -ECLIPSE_DROP or rise > ECLIPSE_STEP:
+			continue
+		# Lower ground matters only where the walker would step off its own: not under present ground at its feet.
+		if rise < -8.0 and has_ground(b.min_x + 1.0 if dir > 0.0 else b.max_x - 1.0, f.pos.y):
 			continue
 		if p.one_way and rise > 40.0:
 			continue
@@ -1607,13 +1610,16 @@ func eclipse_blocks(f: Fighter, dir: float) -> bool:
 	var p: Level.Platform = platforms[nearest]
 	var b := p.box_at(frame)
 	if not eclipse_solid(p):
-		# Gone: wait, unless there is floor to walk on where it was.
+		# Gone: wait, unless there is floor to walk on (or, below the feet, to land on) where it was.
+		if b.max_y < f.pos.y - 8.0:
+			return not _floor_below((b.min_x + b.max_x) / 2.0, f.pos.y)
 		return not has_ground((b.min_x + b.max_x) / 2.0, f.pos.y)
 	# Already standing over it: getting off in time is eclipse_escape's job.
 	if (f.pos.x >= b.min_x) if dir > 0.0 else (f.pos.x <= b.max_x):
 		return false
 	var cross := (b.max_x - b.min_x + f.spec.width + Sw.max_d(nearest_ahead, 0.0)) / Sw.max_d(f.spec.run_speed, 1.0)
-	var climb := ECLIPSE_JUMP_FRAMES if b.max_y - f.pos.y > 40.0 else 0.0
+	# Up a step or down a drop, the time in the air.
+	var climb := ECLIPSE_JUMP_FRAMES if absf(b.max_y - f.pos.y) > 40.0 else 0.0
 	return float(eclipse_swap_in()) < cross * Tuning.FRAMES_PER_SECOND + climb + ECLIPSE_MARGIN
 
 
@@ -1633,6 +1639,14 @@ func _eclipse_edge_unsafe(f: Fighter, x: float) -> bool:
 		# A gone step higher up leaves a gap at the feet too, unless there is floor under the edge.
 		if gone and b.max_y > f.pos.y + 8.0 and not p.one_way and not _floor_below(x, f.pos.y):
 			return true
+		# Lower eclipse ground past the edge of our own: a drop onto it is safe only if it will still be there.
+		if b.max_y < f.pos.y - 8.0 and f.pos.y - b.max_y <= ECLIPSE_DROP and not has_ground(x, f.pos.y):
+			if gone:
+				if not _floor_below(x, f.pos.y):
+					return true
+			elif float(eclipse_swap_in()) < ECLIPSE_MARGIN + ECLIPSE_JUMP_FRAMES:
+				return true
+			continue
 		if absf(b.max_y - f.pos.y) >= 8.0:
 			continue
 		if gone:
@@ -1645,6 +1659,8 @@ func _eclipse_edge_unsafe(f: Fighter, x: float) -> bool:
 
 ## Frames of slack eclipse_blocks wants before a swap: enough to cross and, if a swing starts on the way, for
 ## eclipse_escape (which allows 12 frames less) to still get clear.
+## Port-only: the deepest drop onto eclipse ground the safety checks look at.
+const ECLIPSE_DROP := 200.0
 const ECLIPSE_MARGIN := 48.0
 ## The highest step up eclipse_blocks treats as something to jump onto; anything taller is a wall.
 const ECLIPSE_STEP := 110.0
@@ -1721,6 +1737,26 @@ func eclipse_air_unsafe(f: Fighter, move_x: float) -> bool:
 	return _floor_below(f.pos.x, f.pos.y) and not _floor_below(next, f.pos.y)
 
 
+## Port-only: true when walking `dir` would take `f` into the space of solid eclipse ground that should be there now
+## but is held off by someone standing in it. Waiting at its edge lets it form; two walkers taking turns to step
+## in would keep it away for ever.
+func eclipse_held(f: Fighter, dir: float) -> bool:
+	if level == null or level.eclipse_period <= 0 or dir == 0.0:
+		return false
+	var hb := f.hurtbox()
+	for i in platforms.size():
+		var p: Level.Platform = platforms[i]
+		if p.eclipse == 0 or p.one_way or platform_boxes[i].min_y > -50000.0 or not eclipse_solid(p):
+			continue
+		var b := p.box_at(frame)
+		if not (b.max_y > hb.min_y + 1.0 and b.min_y < hb.max_y):
+			continue
+		var gap := b.min_x - hb.max_x if dir > 0.0 else hb.min_x - b.max_x
+		if gap >= 0.0 and gap < 12.0:
+			return true
+	return false
+
+
 ## Port-only: true when something present (and not about to go) lies under `x`, at or below `y`.
 func _floor_below(x: float, y: float) -> bool:
 	var going := eclipse_swap_in() < 40
@@ -1794,9 +1830,11 @@ func _eclipse_platforms(events: Array) -> void:
 			# One-way ground cannot trap anyone (it holds only what falls onto it), so it forms regardless.
 			platform_deltas[i] = Vec2.zero()
 		else:
+			# It waits for a hero standing in its space (it would trap them). Anyone else is shoved out by the walls
+			# like any other overlap; an enemy loitering in a gap must not hold the way shut.
 			var blocked := false
 			for f in fighters:
-				if f.is_alive() and f.hurtbox().intersects(nb):
+				if f.is_alive() and f.team == "hero" and f.hurtbox().intersects(nb):
 					blocked = true
 					break
 			if blocked:

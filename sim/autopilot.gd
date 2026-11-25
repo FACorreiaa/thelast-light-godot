@@ -44,7 +44,8 @@ func input_for(world: World) -> InputFrame:
 	var escape := world.eclipse_escape(me) if me != null else 0.0
 	if escape != 0.0:
 		return InputFrame.make(escape, false, out.jump_held)
-	if me != null and me.on_ground and absf(out.move_x) > 0.1 and world.eclipse_blocks(me, 1.0 if out.move_x > 0.0 else -1.0):
+	if me != null and me.on_ground and absf(out.move_x) > 0.1 and (world.eclipse_blocks(me, 1.0 if out.move_x > 0.0 else -1.0)
+			or world.eclipse_held(me, 1.0 if out.move_x > 0.0 else -1.0)):
 		out.move_x = 0.0
 		out.dodge = false
 		out.jump = false
@@ -335,7 +336,13 @@ func _puzzle_input(me: Fighter, world: World, level: Level) -> InputFrame:
 		if g.box.min_x > me.pos.x - 10.0 and float(world.gate_open.get(g.id, 1.0)) < 1.0:
 			ahead.append(g)
 
-	if me.kind == "orion":
+	# Port-only: with the lead down, Orion walks on alone; switching to no one would wait for ever.
+	var lead_alive := false
+	for f: Fighter in world.fighters:
+		if f.team == "hero" and f.kind != "orion" and not f.spec.is_decoy and f.is_alive():
+			lead_alive = true
+			break
+	if me.kind == "orion" and lead_alive:
 		var lead_x := me.pos.x
 		for f: Fighter in world.fighters:
 			if f.team == "hero" and f.kind != "orion" and not f.spec.is_decoy and f.is_alive():
