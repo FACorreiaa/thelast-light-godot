@@ -182,7 +182,8 @@ the Foundry's AI, and a symptom of the decline (the flood, a district with no on
 - **The Still Quarter** has walls that stand only in the light or only in shadow, so they work as gates.
 - **The Mason** (as built) pulls the next swap early and then raises floor strikes lower than the ledges, so the
   ledges standing after the swap are the shelter; in its second phase it calls help (Scrap Drones standing in for
-  the proposed Stand-ins).
+  the proposed Stand-ins). Not built from the earlier proposal: laying and removing eclipse ground during the
+  fight; the arena's ledges keep the level's rhythm.
 - **The Heart** (as built) never moves, only turns. (1) A steady beat with no swaps pulled early: a strike all
   round it up close, floor eruptions further off, lower than the ledges. (2) Every third attack pulls the next swap
   early; when alone it calls one Scrap Drone. (3) No more help; every second attack pulls the swap early. Not
@@ -190,18 +191,18 @@ the Foundry's AI, and a symptom of the decline (the flood, a district with no on
 - **Enemies.** Placeholders from the Foundry until these are agreed: the **Stand-in** (a machine in the shape of
   someone who lived in the district, keeping their routine) and the **Scaffold Crawler** (a builder that climbs
   the frame and drops loose parts).
-- **Handled for the built levels** (sim, autopilot and Orion; tested over seeds 1-9 for every lead): swings and
-  dodges stop at the edge of a gap; jumps and steps up account for the rhythm; no one steers from above floor to
+- **Handled for the built levels** (sim, autopilot and Orion; tested over seeds 1-9 for every lead): a hero's
+  swing lunge or dodge, the player's included, stops at the edge of eclipse ground that is gone or about to go; jumps and steps up account for the rhythm; no one steers from above floor to
   above none in the air; whoever stands where ground is forming steps out; a walker waits at ground someone else
   is holding off; only heroes hold off forming ground; no stepping or dodging down onto lower ground that will be
   gone first.
 - **Current limits of the mechanic:**
-  - A player's own swing lunge or jump can still carry them over ground that has gone, as over any pit. That is
-    the player's call, like any jump.
+  - A player's own jump, or walking off an edge, can still take them over ground that has gone, as over any pit.
+    That is the player's call, like any jump.
   - Eclipse ground of opposite phases must not touch; crossing from one to the other would need a jump.
   - An enemy standing on eclipse ground when it goes falls and is lost; levels place enemies on solid ground.
-  - The autopilot's ledge play in the boss arenas is not proven: it wins both fights, but not by using the ledges
-    as shelter.
+  - Ledge play in the boss arenas is unproven: the autopilot wins both fights, but nothing checks that it uses
+    the ledges as shelter.
 
 ### The open question: what beating the Heart does
 

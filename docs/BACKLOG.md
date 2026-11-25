@@ -48,8 +48,10 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
        sits on a waiting landing; seeds 1-9 pass, but a level edit can expose it.
      - The Heart's balance is thin for Nimue: over seeds 1-30 every lead wins, but Nimue's closest win ends at 5 HP
        (Caelen 44, Seraphine 46). The Heart spends about 8% of a fight staggered (the Mason 5-7%).
-     - The autopilot wins both boss fights without using the arena ledges as shelter, so ledge play is untested.
-     - A player's own lunge or jump can carry them over gone ground, like any pit.
+     - Ledge play is unproven: the autopilot wins both boss fights, but nothing checks that it uses the arena
+       ledges as shelter.
+     - A player's own jump, or walking off an edge, can take them over gone ground, like any pit. Lunges and
+       dodges stop at the edge for every hero, the player included.
 2. **The other four heroes as playable kits:** Elyra (Engineer, Foundry: control and debuff), Valen (Paladin,
    Dawnfaith: tank and protect), Lira (Scholar, Dawnfaith: buff and strike) and Jax (Broker, Lantern Cities: steal
    and burst). The owner brief says all eight become playable. The cast sheet says Jax needs a new name, because a
