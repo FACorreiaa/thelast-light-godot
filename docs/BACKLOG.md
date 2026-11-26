@@ -43,8 +43,8 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
    - Decided 2026-11-25 (DEC-020): voice A, every DRAFT-013 line, the ending line, the level names and the boss
      figures, cards and tips as they stand. The lines go into `data/story/chapter4.json`; then the chapter opens.
    - The three personal epilogues are in (DEC-021): they play after the chapter-end results screen.
-   - Next: showing voice A on screen (machines on the frame speaking; the Heart's arena has none yet, so
-     adding them is a level change plus a Godot golden re-record).
+   - Voice A on screen: placeholder builder machines on the Heart level's backdrop pillars light their eyes while
+     the AI speaks (drawing only, no sim change). Their figures await the creator's pixel verdict.
    - Known, left as is:
      - A boss's leftover summons stay alive during the victory delay and can still kill the lead before the level
        completes. That is the Swift rule; changing it is a design call and needs a Swift golden check plus a

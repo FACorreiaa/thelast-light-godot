@@ -287,6 +287,20 @@ func _run() -> void:
 	check(list.size() == chapters and total == app.scene.level_names().size(), "the chapter list covers the run")
 	var last: Dictionary = list[-1]
 	app.play_chapter(total - 1)
+	# Voice A on screen: on the Heart's level the frame machines' eyes stay dark until the AI speaks, then light.
+	if app.scene.world.level.id == "heart":
+		var eyes: Array[SkShape] = app.scene.voice_eyes
+		check(eyes.size() >= 3 and eyes.all(func(e: SkShape) -> bool: return e.modulate.a < 0.2), "the frame machines start dark")
+		app.story.forget(["heart.end"])
+		app.story.begin("heart.end")
+		await _frames(40)
+		check(String(app.story.runner.line.speaker) == "VOICE" and eyes.all(func(e: SkShape) -> bool: return e.modulate.a > 0.5),
+			"the frame machines light while the AI speaks")
+		while app.story.is_active():
+			app.story.advance()
+			await _frames(1)
+		await _frames(60)
+		check(eyes.all(func(e: SkShape) -> bool: return e.modulate.a < 0.3), "and go dark again after")
 	app.result = app.scene._level_result()
 	check(app.result.is_final and String(app.result.ending) == String(last.ending), "the last level ends the game")
 	app.screen = GameApp.Screen.RESULTS

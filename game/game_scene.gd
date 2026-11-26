@@ -84,6 +84,9 @@ var pickup_nodes: Dictionary = {}
 ## Columns of light, reused frame to frame.
 var strike_nodes: Array[SkShape] = []
 var shake := 0.0
+## The Heart's level: the eyes of the machines on the Engine's frame, lit while the AI speaks through them (DEC-020).
+var voice_eyes: Array[SkShape] = []
+var voice_glow := 0.0
 var run := 0
 var kills := 0
 var level_frames := 0
@@ -500,6 +503,33 @@ func _build_backdrop() -> void:
 		mid_layer.add_child(_shape(SkPath.rect(x, -10, 54, 520), Palette.MID, CLEAR))
 		mid_layer.add_child(_shape(SkPath.rect(x + 25, 40, 3, 150), Sk.with_alpha(Palette.CYAN, 0.35), CLEAR, 1, 2))
 		x += 310.0
+	voice_eyes = []
+	voice_glow = 0.0
+	if world.level != null and world.level.id == "heart":
+		_build_frame_machines(width)
+
+
+## Placeholder figures (pixels await the creator's verdict): builder machines clinging to the pillars of the
+## Engine's frame, dark until the AI speaks through every one of them at once (voice A, DEC-020). Drawing only;
+## the simulation never sees them.
+func _build_frame_machines(width: float) -> void:
+	var heights := [150.0, 330.0, 230.0, 390.0, 180.0, 300.0]
+	var x := -100.0
+	var i := 0
+	while x < width + 300.0:
+		var at := Vector2(x + 27.0, heights[i % heights.size()])
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var body := Vector2(at.x + side * 30.0, at.y)
+		# Legs gripping the pillar, a low body, one eye.
+		for leg in [Vector2(0, 16), Vector2(0, -16), Vector2(side * 8, 26), Vector2(side * 8, -26)]:
+			mid_layer.add_child(_shape(SkPath.line(body, at + leg), CLEAR, Sk.with_alpha(Palette.FAR, 1.0), 3))
+		mid_layer.add_child(_shape(SkPath.ellipse(body.x - 17, body.y - 10, 34, 20), Palette.FAR, Sk.with_alpha(Palette.RED, 0.25), 1))
+		var eye := _shape(SkPath.circle(3.5), Palette.RED, CLEAR, 1, 6, 1, body + Vector2(side * 9, 2))
+		eye.modulate.a = 0.12
+		mid_layer.add_child(eye)
+		voice_eyes.append(eye)
+		x += 310.0
+		i += 1
 
 
 func _build_room_floor() -> void:
@@ -644,6 +674,7 @@ func _draw_frame() -> void:
 		hud.set_heroes([hero.kind.to_upper(), hero.hp / hero.spec.max_hp],
 			[partner.kind.to_upper(), partner.hp / partner.spec.max_hp] if partner != null else [])
 	_draw_level()
+	_draw_voice()
 	# The Oracle's dusk darkens the room; in the ending it lifts halfway.
 	var dusk_target := 0.0
 	var b := world.boss()
@@ -686,6 +717,17 @@ func _draw_frame() -> void:
 	else:
 		hud.set_status("TRAINING" if world.wave_number == 0 else "WAVE %d   KILLS %d" % [world.wave_number, kills])
 	hud.set_debug(_debug_text() if show_debug else "")
+
+
+## The frame machines' eyes rise together while a VOICE line is on screen, with a slow shared pulse.
+func _draw_voice() -> void:
+	if voice_eyes.is_empty():
+		return
+	var speaking := story != null and story.runner != null and String(story.runner.line.get("speaker", "")) == "VOICE"
+	voice_glow += ((1.0 if speaking else 0.0) - voice_glow) * 0.12
+	var pulse := 0.8 + 0.2 * sin(Time.get_ticks_msec() / 140.0)
+	for eye in voice_eyes:
+		eye.modulate.a = 0.12 + 0.88 * voice_glow * pulse
 
 
 static func _open(f: Fighter) -> bool:
