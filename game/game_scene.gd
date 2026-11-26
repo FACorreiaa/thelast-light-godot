@@ -569,13 +569,16 @@ func _process(delta: float) -> void:
 		_toggle_mode()
 	if reading.debug:
 		show_debug = not show_debug
+	# A finished level belongs to the app once it listens for level_completed (results, closing scene, epilogue):
+	# a press then must not rebuild the level behind it. A lost level still restarts on a press.
+	var app_owns := world.is_complete and _app_takes_completion()
 	if reading.restart:
 		_restart(true)
-	elif world.is_over and (reading.attack or reading.jump or demo):
+	elif world.is_over and not app_owns and (reading.attack or reading.jump or demo):
 		_restart(false)
 
 	var presses := controls.take_presses()
-	if world.is_over and not presses.is_empty() and not reading.restart:
+	if world.is_over and not app_owns and not presses.is_empty() and not reading.restart:
 		_restart(false)
 		presses = {}
 	if reading.restart:
@@ -728,6 +731,12 @@ func _draw_voice() -> void:
 	var pulse := 0.8 + 0.2 * sin(Time.get_ticks_msec() / 140.0)
 	for eye in voice_eyes:
 		eye.modulate.a = 0.12 + 0.88 * voice_glow * pulse
+
+
+## Whether a finished level is handed to the app (results screen and what follows) rather than restarted here on
+## a press, as the bare scene and the demo do.
+func _app_takes_completion() -> bool:
+	return not (demo and not demo_shows_results) and not level_completed.get_connections().is_empty()
 
 
 static func _open(f: Fighter) -> bool:
@@ -1271,7 +1280,7 @@ func _react(events: Array) -> void:
 				haptics.rigid()
 				var total := world.level.pickups.size() if world.level != null else 0
 				var next := "tap to continue" if level_index + 1 < _levels.size() else "tap to start over"
-				if (demo and not demo_shows_results) or level_completed.get_connections().is_empty():
+				if not _app_takes_completion():
 					hud.show_message("CLEAR" if demo else "CLEAR   ◆ %d/%d\n%s" % [world.collected.size(), total, next])
 				else:
 					level_completed.emit(_level_result())

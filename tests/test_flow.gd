@@ -309,12 +309,27 @@ func _run() -> void:
 		# The epilogue plays first, over the still arena, then the way out the player chose.
 		check(app.story.is_active() and app.story.runner.scene_id == String(last.epilogue) and app.screen == GameApp.Screen.PLAYING,
 			"leaving the last results screen plays the chapter's epilogue")
+		# The level is finished behind the epilogue; a press right after its last line must not rebuild it.
+		app.scene.world.is_complete = true
+		app.scene.world.is_over = true
 		var said: Array = []
 		while app.story.is_active() and said.size() < 10:
 			said.append(String(app.story.runner.line.speaker))
 			app.story.advance()
 			await _frames(1)
 		check(said == ["SERAPHINE", "ORION"], "the epilogue is the lead's line, then Orion's: %s" % [said])
+		var level_before := app.scene.current_level()
+		var key := InputEventKey.new()
+		key.physical_keycode = KEY_J
+		key.pressed = true
+		Input.parse_input_event(key)
+		Input.flush_buffered_events()
+		await _frames(2)
+		key.pressed = false
+		Input.parse_input_event(key)
+		Input.flush_buffered_events()
+		check(app.scene.current_level() == level_before, "a press after the epilogue does not restart the level (%d, was %d)"
+			% [app.scene.current_level(), level_before])
 		await create_timer(0.3).timeout
 	check(app.screen == GameApp.Screen.TITLE and app.scene.current_level() == int(last.start), "after the end, Continue is the last chapter again")
 
