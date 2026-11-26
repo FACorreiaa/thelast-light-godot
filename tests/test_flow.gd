@@ -284,10 +284,21 @@ func _run() -> void:
 	var id_list := func(l: Array) -> Array: return l.map(func(e: Dictionary) -> String: return e.id)
 	check(id_list.call(GameScene.reachable(made_up, false)) == ["a", "c"], "a hidden chapter is left out")
 	check(id_list.call(GameScene.reachable(made_up, true)) == ["a", "b", "c"], "--all-chapters keeps a hidden chapter")
+	var routed := [{"id": "1", "route": {"nimue": ["a", "b"]}}, {"id": "2", "hidden": true, "route": {"nimue": ["c", "d"]}},
+		{"id": "3", "route": {"nimue": ["e"]}}]
+	var run := GameScene.route_in(GameScene.reachable(routed, false), "nimue")
+	var full := GameScene.route_in(GameScene.reachable(routed, true), "nimue")
+	check(run == ["a", "b", "e"] and full == ["a", "b", "c", "d", "e"], "a hidden chapter's levels leave the run: %s" % [run])
+	check(GameScene.resume_index(run, full, "b") == 1 and GameScene.resume_index(run, full, "d") == 2
+		and GameScene.resume_index(run, full, "zz") == 0, "a save inside a hidden chapter resumes at the next reachable level")
+	var tail: Array[String] = ["a", "b"]
+	check(GameScene.resume_index(tail, full.slice(0, 4), "c") == 1, "and at the last reachable level when nothing follows")
 	check(list.size() == chapters and total == app.scene.level_names().size(), "the chapter list covers the run")
 	var last: Dictionary = list[-1]
 	app.play_chapter(total - 1)
 	# Voice A on screen: on the Heart's level the frame machines' eyes stay dark until the AI speaks, then light.
+	# The run's last level is the Heart (Chapter 4, open); if it ever is not, say so rather than skip these checks.
+	check(app.scene.world.level.id == "heart", "the run ends on the Heart (%s)" % app.scene.world.level.id)
 	if app.scene.world.level.id == "heart":
 		var eyes: Array[SkShape] = app.scene.voice_eyes
 		check(eyes.size() >= 3 and eyes.all(func(e: SkShape) -> bool: return e.modulate.a < 0.2), "the frame machines start dark")
@@ -305,6 +316,7 @@ func _run() -> void:
 	check(app.result.is_final and String(app.result.ending) == String(last.ending), "the last level ends the game")
 	app.screen = GameApp.Screen.RESULTS
 	app.finish_chapter()
+	check(String(last.epilogue) != "", "the last chapter has an epilogue")
 	if String(last.epilogue) != "":
 		# The epilogue plays first, over the still arena, then the way out the player chose.
 		check(app.story.is_active() and app.story.runner.scene_id == String(last.epilogue) and app.screen == GameApp.Screen.PLAYING,

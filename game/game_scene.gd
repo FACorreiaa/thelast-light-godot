@@ -119,13 +119,9 @@ func _ready() -> void:
 	var saved_lead := String(saved.get_value("progress", "lead", "caelen"))
 	lead = _arg(args, "--lead", "caelen" if demo else saved_lead)
 	_levels = route(lead)
-	var saved_id := String(saved.get_value("progress", "level", ""))
-	var saved_level := _levels.find(saved_id)
-	# A save made inside a chapter that is now hidden resumes at the last level players can reach.
-	if saved_level < 0 and route(lead, true).has(saved_id):
-		saved_level = _levels.size() - 1
+	var saved_level := resume_index(_levels, route(lead, true), String(saved.get_value("progress", "level", "")))
 	var asked := _arg(args, "--level", "")
-	level_index = clampi(int(asked) if asked != "" else (0 if demo else maxi(saved_level, 0)), 0, _levels.size() - 1)
+	level_index = clampi(int(asked) if asked != "" else (0 if demo else saved_level), 0, _levels.size() - 1)
 	world = _make_world(1, -1, {})
 	if mode == Mode.LEVEL:
 		story.forget(_scene_ids())
@@ -190,11 +186,32 @@ static func reachable(list: Array, all: bool) -> Array:
 
 ## The whole run as the lead plays it: every reachable chapter's levels, in order.
 static func route(p_lead: String, all := OS.get_cmdline_user_args().has("--all-chapters")) -> Array[String]:
+	return route_in(chapters(all), p_lead)
+
+
+## The levels of `list`'s chapters for the lead, in order.
+static func route_in(list: Array, p_lead: String) -> Array[String]:
 	var out: Array[String] = []
-	for c: Dictionary in chapters(all):
+	for c: Dictionary in list:
 		for id: String in c.route[p_lead]:
 			out.append(id)
 	return out
+
+
+## Where a save resumes in the reachable run `run`, given the full run `full` (hidden chapters included). A save
+## inside a hidden chapter resumes at the first reachable level after it (everything before it was played), or
+## at the last reachable level when nothing follows. An unknown save starts the run.
+static func resume_index(run: Array[String], full: Array[String], saved_id: String) -> int:
+	var at := run.find(saved_id)
+	if at >= 0:
+		return at
+	var in_full := full.find(saved_id)
+	if in_full < 0:
+		return 0
+	for id: String in full.slice(in_full + 1):
+		if run.has(id):
+			return run.find(id)
+	return maxi(run.size() - 1, 0)
 
 
 func _make_world(seed: int, from_checkpoint: int, collected: Dictionary) -> World:
