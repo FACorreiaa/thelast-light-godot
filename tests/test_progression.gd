@@ -42,6 +42,7 @@ func _init() -> void:
 	_finishers()
 	_riposte()
 	_break_guard()
+	_counter()
 	print("progression: %d checks, %d failed" % [checks, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -238,3 +239,68 @@ func _frontal_hit(w: World, at: int) -> String:
 		if e.case == "hit" or e.case == "blocked":
 			return e.case
 	return ""
+
+
+## Orion, controlled, guards with Adapt and a forged soldier's slash lands on the guard. `behind` puts a dummy just
+## behind him. Returns [world, Orion's swing events (slot or index) over the next 70 frames, ids his swings hit].
+func _absorbed(step: int, behind := false) -> Array:
+	var foes := [["forgedSoldier", 470]]
+	if behind:
+		foes.append(["dummy", 340])
+	var w := World.from_level(arena(foes, true), "caelen", t, 1, -1, {}, {"caelen": step, "orion": step})
+	var o: Fighter = null
+	for f: Fighter in w.fighters:
+		if f.kind == "orion":
+			o = f
+	w.control(o.id)
+	o.pos.x = 400.0
+	o.facing = 1.0
+	w.step(InputFrame.make(0.0, false, false, false, false, true))
+	var s: Fighter = null
+	for f: Fighter in w.fighters:
+		if f.kind == "forgedSoldier":
+			s = f
+	s.awake = true
+	s.facing = -1.0
+	s.pos.x = w.controlled().pos.x + 60.0
+	s.enter_attack(0)
+	s.state_frame = s.current_attack().windup - 1
+	var swings: Array = []
+	var hits: Array = []
+	var absorbed := false
+	for i in 70:
+		for e: Dictionary in w.step(InputFrame.make(0.0, false, false, absorbed)):
+			if e.case == "absorbed" and e.by == o.id:
+				absorbed = true
+			if e.case == "swing" and e.id == o.id:
+				swings.append(e.get("slot", e.index))
+			if e.case == "hit" and e.attacker == o.id:
+				hits.append(e.target)
+	return [w, swings, hits, absorbed]
+
+
+func _counter() -> void:
+	var r1 := _absorbed(1)
+	check(r1[3], "Orion's guard absorbs the slash")
+	var sw: Array = r1[1]
+	check(not sw.is_empty() and str(sw[0]) == "counter", "at step 1 the counter is its own swing: %s" % [sw])
+	check(sw.size() < 2 or str(sw[1]) != "follow_through", "and it never chains into Follow-Through: %s" % [sw])
+	var r0 := _absorbed(0)
+	var sw0: Array = r0[1]
+	check(not sw0.is_empty() and sw0[0] is int, "at step 0 the counter is the kit's last swing, as today: %s" % [sw0])
+	var r2 := _absorbed(2, true)
+	var w2: World = r2[0]
+	var hit_behind := false
+	for id: int in r2[2]:
+		var at := w2.index_of(id)
+		if at >= 0 and w2.fighters[at].kind == "dummy":
+			hit_behind = true
+	check(hit_behind, "at step 2 the counter hits the dummy behind him")
+	var r1b := _absorbed(1, true)
+	var w1b: World = r1b[0]
+	var behind1 := false
+	for id: int in r1b[2]:
+		var at := w1b.index_of(id)
+		if at >= 0 and w1b.fighters[at].kind == "dummy":
+			behind1 = true
+	check(not behind1, "at step 1 it does not")

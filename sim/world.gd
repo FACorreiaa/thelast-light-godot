@@ -1253,12 +1253,21 @@ func _land(attack: Specs.AttackSpec, a: int, t: int, contact: Vec2, events: Arra
 		me.hit_ids = {}
 		me.attack_buffer = 0
 		me.enter_attack(me.spec.attacks.size() - 1)
+		# Port-only: once Orion's track has started (Progression), the counter is a slot of its own, so it never
+		# chains into Follow-Through; with Answer for Both it cuts both ways.
+		if me.step > 0 and not me.spec.attacks.is_empty():
+			me.slot = "counter"
+			me.slot_attack = Progression.load_default().slot(me.kind, "answer_for_both") \
+				if Progression.has(me, "answer_for_both") else me.spec.attacks[me.spec.attacks.size() - 1]
 		me.swing_scale = float(sp["counterScale"])
-		me.invulnerable = maxi(me.invulnerable, me.spec.attacks[me.spec.attacks.size() - 1].total() if not me.spec.attacks.is_empty() else 0)
+		me.invulnerable = maxi(me.invulnerable, me.current_attack().total() if not me.spec.attacks.is_empty() else 0)
 		fighters[t] = me
 		hit_stop = maxi(hit_stop, tuning.parry_hit_stop)
 		events.append({"case": "absorbed", "by": target.id, "attacker": attacker.id, "at": contact})
-		events.append({"case": "swing", "id": target.id, "index": target.spec.attacks.size() - 1})
+		if me.slot != "":
+			events.append({"case": "swing", "id": target.id, "index": target.spec.attacks.size() - 1, "slot": me.slot})
+		else:
+			events.append({"case": "swing", "id": target.id, "index": target.spec.attacks.size() - 1})
 		return
 
 	if target.is_parrying() and attacker.team == "enemy":
