@@ -5,7 +5,8 @@ extends SceneTree
 ##
 ##   godot --headless --path . -s res://tools/record_golden.gd -- [--levels=a,b] [--seeds=1,2]
 ##
-## Default: every level with eclipse phases, seed 1. Rewrites runs.json from the traces on disk.
+## Default: every level with eclipse phases, seed 1 (walking and fighting; boss arenas: seeds 1 and 2, fighting).
+## Rewrites runs.json from the traces on disk.
 ## A re-record changes what "correct" means: commit it on its own, saying why.
 
 const DIR := "res://tests/golden_godot"
@@ -29,9 +30,19 @@ func _init() -> void:
 				levels.append(id)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIR))
 	for id in levels:
-		for seed in seeds:
-			for fights in [false, true]:
-				_record(id, seed, fights)
+		if Level.load_id(id).boss != null:
+			# A boss arena has nothing to walk past, so its walk and fight runs come out the same: record each seed
+			# and the next one, fighting.
+			var both := {}
+			for seed in seeds:
+				both[seed] = true
+				both[seed + 1] = true
+			for seed: int in both:
+				_record(id, seed, true)
+		else:
+			for seed in seeds:
+				for fights in [false, true]:
+					_record(id, seed, fights)
 	var runs: Array = []
 	for f in DirAccess.get_files_at(DIR):
 		if f.ends_with(".trace"):
