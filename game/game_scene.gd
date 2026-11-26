@@ -812,7 +812,7 @@ func _draw_eclipse_ground(i: int, p: Level.Platform, level: Level) -> void:
 	var node: Node2D = platform_nodes[i]
 	var box := p.box_at(world.frame)
 	node.position = Vector2(box.min_x, box.min_y)
-	var there := world.platform_boxes[i].min_y > -50000.0
+	var there := world.eclipse_there(i)
 	if not there:
 		node.modulate.a = 0.3
 	elif world.eclipse_swap_in() <= level.eclipse_warning:

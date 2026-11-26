@@ -35,16 +35,18 @@ func input_for(world: World) -> InputFrame:
 	# Port-only: on a level with eclipse phases, never walk or dodge onto ground that is gone or will go before
 	# the hero is across, whatever the branch above wanted (fighting, a boss, walking).
 	var me := world.controlled()
-	if me != null and world.eclipse_air_unsafe(me, out.move_x):
+	if me == null:
+		return out
+	if world.eclipse_air_unsafe(me, out.move_x):
 		out.move_x = 0.0
 		return out
-	var clear := world.eclipse_clear(me) if me != null else 0.0
+	var clear := world.eclipse_clear(me)
 	if clear != 0.0:
 		return InputFrame.make(clear, false, out.jump_held)
-	var escape := world.eclipse_escape(me) if me != null else 0.0
+	var escape := world.eclipse_escape(me)
 	if escape != 0.0:
 		return InputFrame.make(escape, false, out.jump_held)
-	if me != null and me.on_ground and absf(out.move_x) > 0.1 and (world.eclipse_blocks(me, 1.0 if out.move_x > 0.0 else -1.0)
+	if me.on_ground and absf(out.move_x) > 0.1 and (world.eclipse_blocks(me, 1.0 if out.move_x > 0.0 else -1.0)
 			or world.eclipse_held(me, 1.0 if out.move_x > 0.0 else -1.0)):
 		out.move_x = 0.0
 		out.dodge = false

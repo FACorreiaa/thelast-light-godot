@@ -55,7 +55,7 @@ static func _shifts(lv: Level, t: Tuning) -> bool:
 
 
 static func _there(w: World, i: int) -> bool:
-	return w.platform_boxes[i].min_y > -50000.0
+	return w.eclipse_there(i)
 
 
 func _init() -> void:
@@ -87,8 +87,6 @@ func _init() -> void:
 	check(hero.pos.y < -20.0, "when the shadow comes the light bridge goes and the hero falls (y %.0f)" % hero.pos.y)
 
 	# Ground does not form around someone standing in its space.
-	w = World.from_level(room(), "caelen", t, 1)
-	hero = w.controlled()
 	var low := Level.from_data({
 		"name": "Eclipse low", "width": 1600.0, "start": {"x": 120.0, "y": 0.0},
 		"platforms": [_plat(-200, 1600, 0), _plat(300, 400, 30, -1)],
