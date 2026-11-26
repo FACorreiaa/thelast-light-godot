@@ -449,7 +449,14 @@ func _update(f: Fighter, inp: InputFrame, events: Array) -> bool:
 			if f.state_frame >= d.duration:
 				f.dodge_cooldown = d.cooldown
 				f.vel.x = 0.0
-				f.enter(Fighter.St.IDLE if f.on_ground else Fighter.St.AIR)
+				if f.interpose_for >= 0:
+					# Port-only: Interpose (Progression) ends in Adapt's guard at the partner's side.
+					var sp := f.spec.special
+					f.special_cooldown = int(sp["cooldown"])
+					f.enter(Fighter.St.GUARD_STANCE, int(sp["window"]))
+					events.append({"case": "guarded", "id": f.id})
+				else:
+					f.enter(Fighter.St.IDLE if f.on_ground else Fighter.St.AIR)
 		Fighter.St.ATTACK:
 			var i := f.attack_index
 			var a := f.current_attack()
@@ -585,7 +592,31 @@ func _start_dodge(f: Fighter, inp: InputFrame, events: Array) -> void:
 		f.facing = 1.0 if inp.move_x > 0.0 else -1.0
 	f.dodge_buffer = 0
 	f.enter(Fighter.St.DODGE)
+	if f.step > 0 and f.special_cooldown == 0 and Progression.has(f, "interpose"):
+		f.interpose_for = _interpose_target(f)
 	events.append({"case": "dodged", "id": f.id})
+
+
+## Port-only: the living hero `f` is dodging toward, within Interpose's reach (Progression); -1 for none.
+func _interpose_target(f: Fighter) -> int:
+	var reach := float(Progression.load_default().ability(f.kind, "interpose").reach)
+	for g in fighters:
+		if g.id != f.id and g.team == f.team and g.is_alive() and not g.spec.is_decoy:
+			var dx := g.pos.x - f.pos.x
+			if dx * f.facing > 0.0 and absf(dx) <= reach:
+				return g.id
+	return -1
+
+
+## Port-only: index of a hero guarding for `target_id` (Interpose) close enough to take its hits; -1 for none.
+func _interposer(target_id: int, target_x: float) -> int:
+	for i in fighters.size():
+		var g := fighters[i]
+		if g.interpose_for == target_id and g.state == Fighter.St.GUARD_STANCE and g.is_alive():
+			var redirect := float(Progression.load_default().ability(g.kind, "interpose").redirect)
+			if absf(g.pos.x - target_x) <= redirect:
+				return i
+	return -1
 
 
 func _integrate(f: Fighter, inp: InputFrame, events: Array) -> void:
@@ -1227,7 +1258,13 @@ func _resolve_hits(events: Array) -> void:
 			var contact := Vec2.new(
 				(Sw.max_d(box.min_x, hb.min_x) + Sw.min_d(box.max_x, hb.max_x)) / 2.0,
 				(Sw.max_d(box.min_y, hb.min_y) + Sw.min_d(box.max_y, hb.max_y)) / 2.0)
-			_land(attack, a, t, contact, events)
+			# Port-only: a hero guarding for this one (Interpose) takes the hit instead, once.
+			var guard := _interposer(tf.id, tf.pos.x) if tf.team == "hero" and tf.step > 0 else -1
+			if guard >= 0 and guard != a:
+				fighters[a].hit_ids[fighters[guard].id] = true
+				_land(attack, a, guard, contact, events)
+			else:
+				_land(attack, a, t, contact, events)
 			# A parry staggers the attacker and ends its swing.
 			if fighters[a].hitbox() == null:
 				break

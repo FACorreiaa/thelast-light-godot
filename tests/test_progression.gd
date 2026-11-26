@@ -43,6 +43,7 @@ func _init() -> void:
 	_riposte()
 	_break_guard()
 	_counter()
+	_interpose()
 	print("progression: %d checks, %d failed" % [checks, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -304,3 +305,99 @@ func _counter() -> void:
 		if at >= 0 and w1b.fighters[at].kind == "dummy":
 			behind1 = true
 	check(not behind1, "at step 1 it does not")
+
+
+## Caelen at 400 and Orion `gap` px left of him, Orion controlled; Orion dodges right toward Caelen (Adapt ready
+## unless `spent`). Returns [world, orion, caelen, invulnerable at some dodge frame].
+func _dodge_to_lead(step: int, gap: float, spent := false) -> Array:
+	var w := World.from_level(arena([], true), "caelen", t, 1, -1, {}, {"caelen": step, "orion": step})
+	var c := w.controlled()
+	var o: Fighter = null
+	for f: Fighter in w.fighters:
+		if f.kind == "orion":
+			o = f
+	w.control(o.id)
+	c.pos.x = 400.0
+	o.pos.x = 400.0 - gap
+	if spent:
+		o.special_cooldown = 300
+	var invulnerable := false
+	w.step(InputFrame.make(1.0, false, false, false, true))
+	for i in 20:
+		var me := w.fighters[w.index_of(o.id)]
+		if me.is_dodge_invulnerable():
+			invulnerable = true
+		if me.state != Fighter.St.DODGE:
+			break
+		w.step(InputFrame.neutral())
+	return [w, w.fighters[w.index_of(o.id)], w.fighters[w.index_of(c.id)], invulnerable]
+
+
+## With Orion guarding for Caelen, a forged soldier's slash lands on Caelen. Orion is moved `orion_dx` from Caelen.
+## Returns [caelen hp before, after, absorbed events by Orion, counter swings by Orion].
+func _slash_at_lead(orion_dx: float) -> Array:
+	var r := _dodge_to_lead(3, 120.0)
+	var w: World = r[0]
+	var o: Fighter = r[1]
+	var c: Fighter = r[2]
+	w.fighters[w.index_of(o.id)].pos.x = c.pos.x + orion_dx
+	w.control(c.id)
+	var sid := w.spawn("forgedSoldier", c.pos.x + 60.0, 0.0, -1.0)
+	var s := w.fighters[w.index_of(sid)]
+	s.awake = true
+	s.enter_attack(0)
+	s.state_frame = s.current_attack().windup - 1
+	var before := c.hp
+	var guarding := w.fighters[w.index_of(o.id)].state == Fighter.St.GUARD_STANCE
+	var absorbed := 0
+	var counters := 0
+	for i in 12:
+		for e: Dictionary in w.step(InputFrame.neutral()):
+			if e.case == "absorbed" and e.by == o.id:
+				absorbed += 1
+			if e.case == "swing" and e.id == o.id and e.get("slot", "") == "counter":
+				counters += 1
+	return [before, w.fighters[w.index_of(c.id)].hp, absorbed, counters, guarding]
+
+
+func _interpose() -> void:
+	var r := _dodge_to_lead(3, 120.0)
+	var o: Fighter = r[1]
+	check(r[3], "Interpose is a real dodge: invulnerable on its way")
+	check(o.state == Fighter.St.GUARD_STANCE and o.special_cooldown > 0, "and it ends in Adapt's guard, spending Adapt (%s, cooldown %d)" % [Fighter.STATE_NAMES[o.state], o.special_cooldown])
+	var plain := _dodge_to_lead(3, 120.0, true)
+	check((plain[1] as Fighter).state != Fighter.St.GUARD_STANCE, "without Adapt ready the dodge is plain")
+	var r2 := _dodge_to_lead(2, 120.0)
+	check((r2[1] as Fighter).state != Fighter.St.GUARD_STANCE, "at step 2 the dodge is plain")
+	var near := _slash_at_lead(-50.0)
+	check(near[1] == near[0], "a slash meant for Caelen lands on Orion's guard (hp %.0f -> %.0f)" % [near[0], near[1]])
+	check(near[4] and near[2] == 1 and near[3] == 1, "absorbed once, countered once, on the Interpose guard (guarding %s, %d, %d)" % [near[4], near[2], near[3]])
+	var far := _slash_at_lead(-140.0)
+	check(far[1] < far[0], "an interposer 140 px away does not take it (hp %.0f -> %.0f)" % [far[0], far[1]])
+
+	# The partner brain interposes when a slash is coming at the lead; below step 3 it draws the same random numbers.
+	var w := World.from_level(arena([], true), "caelen", t, 1, -1, {}, {"caelen": 3, "orion": 3})
+	var c := w.controlled()
+	var orion: Fighter = null
+	for f: Fighter in w.fighters:
+		if f.kind == "orion":
+			orion = f
+	c.pos.x = 400.0
+	orion.pos.x = 300.0
+	var sid := w.spawn("forgedSoldier", 460.0, 0.0, -1.0)
+	var foe := w.fighters[w.index_of(sid)]
+	foe.awake = true
+	foe.enter_attack(0)
+	foe.state_frame = foe.current_attack().windup - 8
+	var foes: Array[Fighter] = [foe]
+	var allies: Array[Fighter] = [c, orion]
+	var got := Brains.partner(orion.copy(), foes, allies, t, SeededRandom.new(7))
+	check(got.dodge and got.move_x > 0.0, "the partner brain dodges toward a threatened lead at step 3")
+	var outs: Array = []
+	for st in [0, 2]:
+		var me := orion.copy()
+		me.step = st
+		var rng := SeededRandom.new(7)
+		var inp := Brains.partner(me, foes, allies, t, rng)
+		outs.append([rng.state, inp.move_x, inp.dodge, inp.special])
+	check(outs[0] == outs[1], "below step 3 the partner brain is unchanged, random draws included: %s" % [outs])

@@ -966,6 +966,19 @@ static func partner(me: Fighter, foes: Array[Fighter], allies: Array[Fighter], t
 			break
 	var special_case: String = me.spec.special.get("case", "")
 
+	# Port-only: Interpose (Progression). A swing about to land on the lead: dodge to their side and guard. Decided
+	# before any random draw, so below step 3 the brain is unchanged.
+	if me.step >= 3 and special_case == "adapt" and leader != null and Progression.has(me, "interpose") \
+			and me.special_cooldown == 0 and me.dodge_cooldown == 0 and me.is_actionable() and me.on_ground:
+		var ldx := leader.pos.x - me.pos.x
+		if absf(ldx) > 20.0 and absf(ldx) <= float(Progression.load_default().ability(me.kind, "interpose").reach):
+			for foe: Fighter in foes:
+				var swing := foe.current_attack()
+				if swing != null and swing.is_strike() and foe.attack_phase() == Fighter.Phase.WINDUP \
+						and swing.windup - foe.state_frame <= 10 \
+						and absf(foe.pos.x - leader.pos.x) < leader.spec.width / 2.0 + foe.spec.width / 2.0 + swing.reach + 30.0:
+					return InputFrame.make(1.0 if ldx > 0.0 else -1.0, false, false, false, true)
+
 	# Threats first.
 	var threatened := false
 	for foe: Fighter in foes:

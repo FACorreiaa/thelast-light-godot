@@ -72,6 +72,8 @@ var slot_attack: Specs.AttackSpec = null
 var riposte_frames: int = 0
 ## Port-only: while marked, this fighter's shield does not stop the heroes (Caelen's Break Guard).
 var mark_breaks_guard: bool = false
+## Port-only: the hero this one dodged to guard (Orion's Interpose), through the dodge and the guard after; -1 for none.
+var interpose_for: int = -1
 
 
 static func make(p_id: int, p_kind: String, p_team: String, p_spec: Specs.FighterSpec, p_pos: Vec2,
@@ -140,6 +142,7 @@ func copy() -> Fighter:
 	f.slot_attack = slot_attack
 	f.riposte_frames = riposte_frames
 	f.mark_breaks_guard = mark_breaks_guard
+	f.interpose_for = interpose_for
 	return f
 
 
@@ -221,6 +224,8 @@ func enter(new_state: St, duration: int = 0) -> void:
 	state_duration = duration
 	slot = ""
 	slot_attack = null
+	if new_state != St.GUARD_STANCE:
+		interpose_for = -1
 
 
 func enter_attack(index: int) -> void:
@@ -264,6 +269,8 @@ func _port_canon() -> Dictionary:
 		out["riposteFrames"] = riposte_frames
 	if mark_breaks_guard:
 		out["markBreaksGuard"] = true
+	if interpose_for >= 0:
+		out["interposeFor"] = interpose_for
 	return out
 
 
