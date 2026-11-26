@@ -98,6 +98,7 @@
     },
     {
       "ending": "The Engine is still. The sun is no brighter.",
+      "epilogue": "engine.epilogue",
       "id": "chapter4",
       "number": 4,
       "route": {

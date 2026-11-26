@@ -291,6 +291,17 @@ func _run() -> void:
 	check(app.result.is_final and String(app.result.ending) == String(last.ending), "the last level ends the game")
 	app.screen = GameApp.Screen.RESULTS
 	app.finish_chapter()
+	if String(last.epilogue) != "":
+		# The epilogue plays first, over the still arena, then the way out the player chose.
+		check(app.story.is_active() and app.story.runner.scene_id == String(last.epilogue) and app.screen == GameApp.Screen.PLAYING,
+			"leaving the last results screen plays the chapter's epilogue")
+		var said: Array = []
+		while app.story.is_active() and said.size() < 10:
+			said.append(String(app.story.runner.line.speaker))
+			app.story.advance()
+			await _frames(1)
+		check(said == ["SERAPHINE", "ORION"], "the epilogue is the lead's line, then Orion's: %s" % [said])
+		await create_timer(0.3).timeout
 	check(app.screen == GameApp.Screen.TITLE and app.scene.current_level() == int(last.start), "after the end, Continue is the last chapter again")
 
 	# A relaunch finds the same place and the same decisions.

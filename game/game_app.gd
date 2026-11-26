@@ -25,6 +25,8 @@ var sheet := Sheet.NONE:
 		screen_changed.emit()
 ## The results screen's numbers while screen is RESULTS (GameScene._level_result).
 var result: Dictionary = {}
+## Whether this results screen's chapter epilogue has played (it plays once, on the way out).
+var _epilogue_played := false
 
 ## Menus and dialogue, laid out in points (about 874 x 402 on a phone) and scaled to the screen.
 var menu_layer := CanvasLayer.new()
@@ -136,6 +138,7 @@ func _on_level_completed(p_result: Dictionary) -> void:
 	if scene.demo_shows_results:
 		printerr("RESULTS ", p_result)
 	result = p_result
+	_epilogue_played = false
 	screen = Screen.RESULTS
 
 
@@ -212,13 +215,15 @@ func restart_level() -> void:
 
 ## From the results screen: on to the next level.
 func next_level() -> void:
+	if _epilogue_first(next_level):
+		return
 	scene.advance()
 	screen = Screen.PLAYING
 
 
 ## From the chapter's last results screen: back to the start of the chapter.
 func replay_chapter() -> void:
-	if screen != Screen.RESULTS:
+	if screen != Screen.RESULTS or _epilogue_first(replay_chapter):
 		return
 	scene.play_level(int(result.chapter_start))
 	screen = Screen.PLAYING
@@ -229,9 +234,34 @@ func finish_chapter() -> void:
 	if screen != Screen.RESULTS:
 		quit_to_title()
 		return
+	if _epilogue_first(finish_chapter):
+		return
 	if result.is_final:
 		scene.play_level(int(result.chapter_start))
 	quit_to_title()
+
+
+## A chapter's epilogue (index.json "epilogue") plays after its results screen, whichever way the player leaves it:
+## over the still arena, then on to where they chose. Returns true when it started; `then` runs after it.
+func _epilogue_first(then: Callable) -> bool:
+	var id := String(result.get("epilogue", ""))
+	if screen != Screen.RESULTS or id == "" or _epilogue_played:
+		return false
+	_epilogue_played = true
+	# Every time the chapter is finished, not only the first.
+	story.forget([id])
+	if not story.begin(id):
+		return false
+	screen = Screen.PLAYING
+	_after_epilogue(then)
+	return true
+
+
+func _after_epilogue(then: Callable) -> void:
+	while story.is_active():
+		await get_tree().create_timer(0.1).timeout
+	screen = Screen.RESULTS
+	then.call()
 
 
 func quit_to_title() -> void:

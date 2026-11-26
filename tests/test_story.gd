@@ -37,7 +37,7 @@ func _init() -> void:
 	quit(1 if bad > 0 else 0)
 
 
-## The port's own scenes (Chapter 4, DEC-020), which have no Swift golden: every scene a level triggers exists, and
+## The port's own scenes (Chapter 4, DEC-020 and DEC-021), which have no Swift golden: every scene a level triggers exists, and
 ## each lead and Orion choice sees exactly its approved lines, in order, and nothing meant for another lead.
 func _port_scenes(lib: Story.Library, index: Dictionary) -> int:
 	var bad := 0
@@ -62,6 +62,18 @@ func _port_scenes(lib: Story.Library, index: Dictionary) -> int:
 		"trusted": "ORION|I cannot tell you it is wrong. I can tell you it never asked.",
 		"watched": "ORION|It is certain. I told you to watch the certain ones.",
 	}
+	var epilogue := {
+		"caelen": ["CAELEN|The Foundry measured the light for years. Now they'll hear what was being built while they counted.",
+			"ORION|I will walk beside you, as far as they let me.", "ORION|I will walk where you can see me. That has not changed."],
+		"seraphine": ["SERAPHINE|Home, with a Foundry machine beside me and the old records in my bag. Let them sing or not.",
+			"ORION|If they do not open the doors, I will wait outside with you.", "ORION|Keep watching me. They will be watching both of us."],
+		"nimue": ["NIMUE|Pass it down every route: the way is open. Another road nobody charges for.",
+			"ORION|Then someone should walk it first. I can.", "ORION|Send me down it first, if you still want to watch."],
+	}
+	for c: Dictionary in index.chapters:
+		if c.has("epilogue") and not lib.scenes.has(c.epilogue):
+			print("MISSING epilogue %s of %s" % [c.epilogue, c.id])
+			bad += 1
 	var voice := [
 		"VOICE|You have stopped the work. You have not stopped the reason for it.",
 		"VOICE|Every living thing burns a little of the light that is left. Mine do not.",
@@ -70,7 +82,9 @@ func _port_scenes(lib: Story.Library, index: Dictionary) -> int:
 	for lead: String in first:
 		for choice: String in orion:
 			var flags := {"lead": lead, "orion": choice}
-			var want := {"approach.arrive": [first[lead]], "heart.end": voice + [answer[lead], orion[choice]]}
+			var e: Array = epilogue[lead]
+			var want := {"approach.arrive": [first[lead]], "heart.end": voice + [answer[lead], orion[choice]],
+				"engine.epilogue": [e[0], e[1] if choice == "trusted" else e[2]]}
 			for scene: String in want:
 				var got := _lines(lib, scene, flags)
 				if got != want[scene]:

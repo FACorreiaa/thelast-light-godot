@@ -954,7 +954,7 @@ func level_names() -> Array[String]:
 
 
 ## Each chapter with the run index of its first level and its level names:
-## [{id, number, title, ending, start, names}], for the chapter list.
+## [{id, number, title, ending, epilogue, start, names}], for the chapter list.
 func chapter_list() -> Array:
 	var out: Array = []
 	var start := 0
@@ -962,7 +962,8 @@ func chapter_list() -> Array:
 		var names: Array[String] = []
 		for id: String in c.route[lead]:
 			names.append(Level.load_id(id).name)
-		out.append({"id": c.id, "number": int(c.number), "title": c.title, "ending": c.ending, "start": start, "names": names})
+		out.append({"id": c.id, "number": int(c.number), "title": c.title, "ending": c.ending, "epilogue": c.get("epilogue", ""),
+			"start": start, "names": names})
 		start += names.size()
 	return out
 
@@ -981,7 +982,7 @@ func _level_result() -> Dictionary:
 	var c := chapter_at(level_index)
 	var ends_chapter := level_index + 1 == int(c.start) + (c.names as Array).size()
 	return {"name": world.level.name, "index": level_index, "chapter_number": c.number, "chapter_title": c.title,
-		"ending": c.ending if ends_chapter else "", "chapter_start": c.start, "is_final": level_index + 1 == _levels.size(),
+		"ending": c.ending if ends_chapter else "", "epilogue": c.epilogue if ends_chapter else "", "chapter_start": c.start, "is_final": level_index + 1 == _levels.size(),
 		"seconds": float(level_frames) / Tuning.FRAMES_PER_SECOND, "defeated": kills, "downs": downs,
 		"found": world.collected.size(), "hidden": world.level.pickups.size()}
 

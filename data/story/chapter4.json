@@ -79,6 +79,70 @@
           "text": "It is certain. I told you to watch the certain ones."
         }
       }
+    },
+    "engine.epilogue": {
+      "start": "caelen",
+      "lines": {
+        "caelen": {
+          "speaker": "CAELEN",
+          "text": "The Foundry measured the light for years. Now they'll hear what was being built while they counted.",
+          "requires": {
+            "lead": "caelen"
+          },
+          "otherwise": "seraphine",
+          "next": "caelen_trusted"
+        },
+        "caelen_trusted": {
+          "speaker": "ORION",
+          "text": "I will walk beside you, as far as they let me.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "caelen_watched"
+        },
+        "caelen_watched": {
+          "speaker": "ORION",
+          "text": "I will walk where you can see me. That has not changed."
+        },
+        "seraphine": {
+          "speaker": "SERAPHINE",
+          "text": "Home, with a Foundry machine beside me and the old records in my bag. Let them sing or not.",
+          "requires": {
+            "lead": "seraphine"
+          },
+          "otherwise": "nimue",
+          "next": "seraphine_trusted"
+        },
+        "seraphine_trusted": {
+          "speaker": "ORION",
+          "text": "If they do not open the doors, I will wait outside with you.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "seraphine_watched"
+        },
+        "seraphine_watched": {
+          "speaker": "ORION",
+          "text": "Keep watching me. They will be watching both of us."
+        },
+        "nimue": {
+          "speaker": "NIMUE",
+          "text": "Pass it down every route: the way is open. Another road nobody charges for.",
+          "next": "nimue_trusted"
+        },
+        "nimue_trusted": {
+          "speaker": "ORION",
+          "text": "Then someone should walk it first. I can.",
+          "requires": {
+            "orion": "trusted"
+          },
+          "otherwise": "nimue_watched"
+        },
+        "nimue_watched": {
+          "speaker": "ORION",
+          "text": "Send me down it first, if you still want to watch."
+        }
+      }
     }
   }
 }
