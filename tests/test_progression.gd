@@ -41,6 +41,7 @@ func _init() -> void:
 	_data()
 	_finishers()
 	_riposte()
+	_break_guard()
 	print("progression: %d checks, %d failed" % [checks, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -167,3 +168,73 @@ func _riposte() -> void:
 	var late := _parried(1)
 	if late != null:
 		check(_next_swing(late, 120, 60) is int, "60 frames after the parry, the window is gone")
+
+
+## Caelen marks the enemy of `kind` in front of him with Command; returns [world, that enemy's index].
+func _marked(kind: String, step: int) -> Array:
+	var w := World.from_level(arena([[kind, 520]]), "caelen", t, 1, -1, {}, {"caelen": step})
+	var at := -1
+	for i in 4:
+		for e: Dictionary in w.step(InputFrame.make(0.0, false, false, false, false, i == 0)):
+			if e.case == "commanded":
+				at = w.index_of(e.target)
+	return [w, at]
+
+
+func _break_guard() -> void:
+	var m := _marked("forgedSoldier", 2)
+	var w: World = m[0]
+	check(m[1] >= 0, "Command marks the soldier")
+	if m[1] >= 0:
+		var s := w.fighters[m[1]]
+		s.enter(Fighter.St.IDLE)
+		check(not s.is_guarding(), "at step 2 a marked soldier cannot guard")
+		# A frontal hit lands: the world's own hit rule, with the soldier standing guard in front of Caelen.
+		check(_frontal_hit(w, m[1]) == "hit", "and a frontal hit lands")
+		# When the mark runs out, the shield is back.
+		w.fighters[w.index_of(s.id)].marked_frames = 1
+		# (A hit's hit-stop holds every clock for a few frames.)
+		for i in 30:
+			if w.fighters[w.index_of(s.id)].marked_frames == 0:
+				break
+			w.step(InputFrame.neutral())
+		var after := w.fighters[w.index_of(s.id)]
+		after.enter(Fighter.St.IDLE)
+		check(after.marked_frames == 0 and after.is_guarding(), "when the mark runs out the soldier guards again")
+		check(_frontal_hit(w, w.index_of(s.id)) == "blocked", "and a frontal hit is blocked again")
+	var m1 := _marked("forgedSoldier", 1)
+	if m1[1] >= 0:
+		var s1: Fighter = (m1[0] as World).fighters[m1[1]]
+		s1.enter(Fighter.St.IDLE)
+		check(s1.is_guarding() and _frontal_hit(m1[0], m1[1]) == "blocked", "at step 1 a marked soldier still blocks")
+	var mb := _marked("lineWarden", 2)
+	check(mb[1] >= 0, "Command marks the Line Warden")
+	if mb[1] >= 0:
+		var b: Fighter = (mb[0] as World).fighters[mb[1]]
+		b.enter(Fighter.St.IDLE)
+		check(b.spec.boss and b.is_guarding(), "a boss keeps its shield when marked at step 2")
+	# The autopilot uses Command on a shielded enemy at step 2.
+	var wa := World.from_level(arena([["forgedSoldier", 650]]), "caelen", t, 1, -1, {}, {"caelen": 2})
+	var pilot := Autopilot.new(true)
+	var commanded := false
+	for i in 90:
+		for e: Dictionary in wa.step(pilot.input_for(wa)):
+			if e.case == "commanded":
+				commanded = true
+	check(commanded, "the autopilot marks a shielded enemy at step 2")
+
+
+## Lands Caelen's first swing on fighter `at`, standing idle and facing him from just in front; "hit" or "blocked".
+func _frontal_hit(w: World, at: int) -> String:
+	var me := w.controlled()
+	var s := w.fighters[at]
+	s.enter(Fighter.St.IDLE)
+	s.facing = -1.0
+	me.pos.x = s.pos.x - 70.0
+	me.facing = 1.0
+	var events: Array = []
+	w._land(me.spec.attacks[0], w.index_of(me.id), at, s.pos.copy(), events)
+	for e: Dictionary in events:
+		if e.case == "hit" or e.case == "blocked":
+			return e.case
+	return ""

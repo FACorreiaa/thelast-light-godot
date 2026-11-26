@@ -495,6 +495,16 @@ func _kit_special(me: Fighter, world: World) -> InputFrame:
 						and absf(f.pos.x - me.pos.x) < 160.0:
 					crowd += 1
 			return InputFrame.make(0.0, false, false, false, false, true) if crowd >= 2 else null
+		"command":
+			# Port-only: with Break Guard (Progression), mark a shielded enemy in front so its shield stops counting.
+			if me.step <= 0 or not Progression.has(me, "break_guard"):
+				return null
+			for f: Fighter in world.fighters:
+				if f.team == "enemy" and f.is_alive() and f.spec.frontal_block and not f.spec.boss and f.marked_frames == 0 \
+						and (f.pos.x - me.pos.x) * me.facing >= 0.0 and absf(f.pos.x - me.pos.x) <= float(me.spec.special["range"]) \
+						and absf(f.pos.y - me.pos.y) <= 220.0:
+					return InputFrame.make(0.0, false, false, false, false, true)
+			return null
 		_:
 			return null
 

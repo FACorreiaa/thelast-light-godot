@@ -70,6 +70,8 @@ var slot: String = ""
 var slot_attack: Specs.AttackSpec = null
 ## Port-only: frames left in which an attack press is a Riposte (Caelen, after a parry).
 var riposte_frames: int = 0
+## Port-only: while marked, this fighter's shield does not stop the heroes (Caelen's Break Guard).
+var mark_breaks_guard: bool = false
 
 
 static func make(p_id: int, p_kind: String, p_team: String, p_spec: Specs.FighterSpec, p_pos: Vec2,
@@ -137,6 +139,7 @@ func copy() -> Fighter:
 	f.slot = slot
 	f.slot_attack = slot_attack
 	f.riposte_frames = riposte_frames
+	f.mark_breaks_guard = mark_breaks_guard
 	return f
 
 
@@ -193,6 +196,8 @@ func is_parrying() -> bool:
 ## True while a frontal hit would be stopped by its shield.
 func is_guarding() -> bool:
 	if not spec.frontal_block:
+		return false
+	if mark_breaks_guard and marked_frames > 0:
 		return false
 	if state == St.IDLE or state == St.RUN:
 		return true
@@ -257,6 +262,8 @@ func _port_canon() -> Dictionary:
 		out["step"] = step
 	if riposte_frames != 0:
 		out["riposteFrames"] = riposte_frames
+	if mark_breaks_guard:
+		out["markBreaksGuard"] = true
 	return out
 
 

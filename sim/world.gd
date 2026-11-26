@@ -1132,7 +1132,10 @@ func _resolve_commands(events: Array) -> void:
 		for t in fighters.size():
 			if fighters[t].team != me.team:
 				fighters[t].marked_frames = 0
+				fighters[t].mark_breaks_guard = false
 		fighters[pick].marked_frames = int(sp["frames"])
+		# Port-only: Break Guard (Progression). A boss keeps its shield: there, the shield is the fight.
+		fighters[pick].mark_breaks_guard = me.step > 0 and Progression.has(me, "break_guard") and not fighters[pick].spec.boss
 		fighters[pick].mark_scale = float(sp["damageScale"])
 		fighters[i].special_cooldown = int(sp["cooldown"])
 		events.append({"case": "commanded", "by": me.id, "target": fighters[pick].id})
