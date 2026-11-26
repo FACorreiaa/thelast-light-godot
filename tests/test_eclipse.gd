@@ -212,6 +212,20 @@ func _init() -> void:
 				bare.append("%.0f-%.0f" % [p.box.min_x, p.box.max_x])
 		check(bare.is_empty(), "%s shifts the rhythm, so all its eclipse ground has floor under it: bare %s" % [id, bare])
 	print("fairness covered: ", covered)
+
+	# Eclipse pieces never touch end to end, whatever their phases. The walking rules treat each piece as its own
+	# span: two pieces of one phase side by side made a walker rock at the seam and fall, and opposite phases
+	# side by side could only be crossed by a jump.
+	var touching: Array = []
+	for id: String in (JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json")).levels as Array):
+		var lv := Level.load_id(id)
+		for a: Level.Platform in lv.platforms:
+			for b: Level.Platform in lv.platforms:
+				if a == b or a.eclipse == 0 or b.eclipse == 0:
+					continue
+				if absf(a.box.max_x - b.box.min_x) < 1.0 and a.box.min_y < b.box.max_y and b.box.min_y < a.box.max_y:
+					touching.append("%s %.0f" % [id, a.box.max_x])
+	check(touching.is_empty(), "no two pieces of eclipse ground touch end to end: %s" % [touching])
 	check(covered.has("masons_span"), "the fairness check covers the Mason's Span (%s)" % [covered])
 
 	# Every boss on an eclipse level shows its whole kit in a fight: it shifts the rhythm, raises floor strikes,
@@ -476,7 +490,9 @@ func _init() -> void:
 	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/index.json"))
 	for id: String in index.levels:
 		var level := Level.load_id(id)
-		if level.eclipse_period <= 0:
+		# Boss arenas have floor under all their eclipse ground (the fairness check), so nothing can drop through;
+		# the kit check above already plays each of their fights to the end.
+		if level.eclipse_period <= 0 or level.boss != null:
 			continue
 		for lead in ["caelen", "seraphine", "nimue"]:
 			for fights in [false, true]:
