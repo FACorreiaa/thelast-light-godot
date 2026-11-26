@@ -36,7 +36,7 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
    - Built (2026-11-25): the eclipse-phase mechanic in the sim (`tests/test_eclipse.gd`), its placeholder drawing,
      and all six levels (names, boss figures, cards and tips accepted as they stand, DEC-020): the Drowned Approach, the Scaffold Ways, the Still Quarter, the Mason's
      Span (mid-boss), the Corona Stair and the Heart (boss). Chapter 4 is in `index.json` for every lead and can be
-     finished, with a placeholder ending line. Godot goldens cover each level, walking and fighting.
+     finished. Godot goldens cover each level walking and fighting (boss arenas: two fighting seeds).
    - Decided 2026-11-25 (DEC-019): the Heart is beaten and the AI speaks (option 2); the ten claims are approved;
      Chapter 4 was hidden until its lines were in (DEC-020) and is open again since 2026-11-25. The mechanism
      stays: `"hidden": true` on a chapter in `index.json` hides it, `--all-chapters` shows it.
@@ -56,14 +56,16 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
      - Ledge play is unproven: the autopilot wins both boss fights, but nothing checks that it uses the arena
        ledges as shelter.
      - A player's own jump, or walking off an edge, can take them over gone ground, like any pit. Lunges and
-       dodges stop at the edge for every hero, the player included.
+       dodges on the ground stop at the edge for every hero, the player included; a swing in the air keeps the
+       jump's carry (fixed 2026-11-26 after the Fable review).
 2. **The other four heroes as playable kits:** Elyra (Engineer, Foundry: control and debuff), Valen (Paladin,
    Dawnfaith: tank and protect), Lira (Scholar, Dawnfaith: buff and strike) and Jax (Broker, Lantern Cities: steal
    and burst). The owner brief says all eight become playable. The cast sheet says Jax needs a new name, because a
    League of Legends champion already has it.
 3. **Progression** (spec 4.7): a short ability track per hero, unlocked by story progress, with no stat grinding.
    Not built in Swift either.
-4. **Personal epilogues** (spec 5): one ending scene per lead. Each chapter currently ends on a single line.
+4. **Personal epilogues** (spec 5): done for the game's ending (Chapter 4, DEC-021). Chapters 1-3 end on a single
+   line, which is how they were designed.
 5. **Bible verdicts:**
    - DRAFT-010 holds 9 PROPOSED world claims (Lantern Cities).
    - Character backstories are decided one character at a time (DEC-010).
