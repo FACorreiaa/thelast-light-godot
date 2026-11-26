@@ -56,6 +56,8 @@ var wave_delay: int = 0
 var switch_cooldown: int = 0
 var rng: SeededRandom
 var next_id: int = 1
+## Port-only: each hero kind's step on its ability track (Progression). Empty is step 0 for all.
+var steps: Dictionary = {}
 
 
 ## The training room: one flat floor across the arena.
@@ -87,17 +89,22 @@ static func feel_slice(seed: int, p_tuning: Tuning) -> World:
 
 
 ## Stage 2: the same room with Orion at Caelen's side. The player can switch between them.
-static func partner_slice(seed: int, p_tuning: Tuning) -> World:
+static func partner_slice(seed: int, p_tuning: Tuning, p_steps: Dictionary = {}) -> World:
 	var w := feel_slice(seed, p_tuning)
+	w.steps = p_steps
+	for f in w.fighters:
+		if f.team == "hero":
+			f.step = int(p_steps.get(f.kind, 0))
 	w.spawn("orion", 290.0, 0.0, 1.0)
 	return w
 
 
 ## A world built from level data. `from_checkpoint` and `p_collected` carry progress across a retry.
 static func from_level(p_level: Level, hero: String, p_tuning: Tuning, seed: int,
-		from_checkpoint: int = -1, p_collected: Dictionary = {}) -> World:
+		from_checkpoint: int = -1, p_collected: Dictionary = {}, p_steps: Dictionary = {}) -> World:
 	var w := World.new()
 	w.tuning = p_tuning
+	w.steps = p_steps
 	w.level = p_level
 	w.arena_lo = 0.0
 	w.arena_hi = p_level.width
@@ -195,6 +202,8 @@ func spawn(kind: String, x: float, y: float = 0.0, p_facing: Variant = null, p_s
 	var f := Fighter.make(id, kind, Fighter.team_of(kind), spec, Vec2.new(x, y), facing)
 	if f.spec.lifetime > 0:
 		f.expires = f.spec.lifetime
+	if f.team == "hero":
+		f.step = int(steps.get(kind, 0))
 	fighters.append(f)
 	return id
 

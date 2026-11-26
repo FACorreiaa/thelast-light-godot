@@ -28,6 +28,7 @@ run '^story: [0-9]+ runs, 0 mismatched' -s res://tests/test_story.gd
 run '^flow: [0-9]+ checks, 0 failed' -s res://tests/test_flow.gd
 run '^input: [0-9]+ checks, 0 failed' -s res://tests/test_input.gd
 run '^eclipse: [0-9]+ checks, 0 failed' -s res://tests/test_eclipse.gd
+run '^progression: [0-9]+ checks, 0 failed' -s res://tests/test_progression.gd
 # --pilot: the autopilot drives and its inputs must match the recorded ones too, which also covers the sim.
 run '^replay: ([0-9]+)/\1 runs match' -s res://tests/replay.gd -- --pilot "$@"
 run '^replay golden_godot: ([0-9]+)/\1 runs match' -s res://tests/replay.gd -- --dir=golden_godot --pilot "$@"

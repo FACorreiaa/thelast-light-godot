@@ -1,0 +1,163 @@
+{
+  "caelen": [
+    {
+      "id": "riposte",
+      "step": 1,
+      "name": "Riposte",
+      "card": "Attack right after a parry for a heavy counter-cut.",
+      "button": "attack",
+      "window": 40,
+      "pose": 1,
+      "slot": {
+        "windup": 4,
+        "active": 5,
+        "recovery": 18,
+        "damage": 26.0,
+        "reach": 74.0,
+        "height": 80.0,
+        "yOffset": 6.0,
+        "knockback": 320.0,
+        "lunge": 120.0,
+        "hitstun": 24,
+        "hitStop": 6,
+        "holdsStill": false,
+        "slowFrames": 0,
+        "bothSides": false,
+        "effect": {
+          "case": "strike"
+        }
+      },
+      "hint": {
+        "event": "parried",
+        "field": "by",
+        "text": "Attack now: Riposte"
+      }
+    },
+    {
+      "id": "break_guard",
+      "step": 2,
+      "name": "Command: Break Guard",
+      "card": "Enemies you mark cannot block.",
+      "button": "special",
+      "hint": {
+        "event": "commanded",
+        "field": "by",
+        "text": "Marked enemies cannot block"
+      }
+    },
+    {
+      "id": "full_arc",
+      "step": 3,
+      "name": "Full Arc",
+      "card": "A fourth swing ends your chain, cutting both ways.",
+      "button": "attack",
+      "pose": 2,
+      "slot": {
+        "windup": 7,
+        "active": 6,
+        "recovery": 24,
+        "damage": 24.0,
+        "reach": 80.0,
+        "height": 80.0,
+        "yOffset": 6.0,
+        "knockback": 360.0,
+        "lunge": 60.0,
+        "hitstun": 26,
+        "hitStop": 7,
+        "holdsStill": false,
+        "slowFrames": 0,
+        "bothSides": true,
+        "effect": {
+          "case": "strike"
+        }
+      },
+      "hint": {
+        "event": "swing",
+        "field": "id",
+        "index": 2,
+        "text": "Attack again: Full Arc"
+      }
+    }
+  ],
+  "orion": [
+    {
+      "id": "follow_through",
+      "step": 1,
+      "name": "Follow-Through",
+      "card": "A third strike ends your chain.",
+      "button": "attack",
+      "pose": 1,
+      "slot": {
+        "windup": 4,
+        "active": 4,
+        "recovery": 18,
+        "damage": 15.0,
+        "reach": 60.0,
+        "height": 70.0,
+        "yOffset": 10.0,
+        "knockback": 300.0,
+        "lunge": 140.0,
+        "hitstun": 22,
+        "hitStop": 5,
+        "holdsStill": false,
+        "slowFrames": 0,
+        "bothSides": false,
+        "effect": {
+          "case": "strike"
+        }
+      },
+      "hint": {
+        "event": "swing",
+        "field": "id",
+        "index": 1,
+        "text": "Attack again: Follow-Through"
+      }
+    },
+    {
+      "id": "answer_for_both",
+      "step": 2,
+      "name": "Adapt: Answer for Both",
+      "card": "Your counter cuts both ways.",
+      "button": "special",
+      "pose": 1,
+      "slot": {
+        "windup": 3,
+        "active": 4,
+        "recovery": 14,
+        "damage": 11.0,
+        "reach": 56.0,
+        "height": 70.0,
+        "yOffset": 10.0,
+        "knockback": 220.0,
+        "lunge": 150.0,
+        "hitstun": 18,
+        "hitStop": 4,
+        "holdsStill": false,
+        "slowFrames": 0,
+        "bothSides": true,
+        "effect": {
+          "case": "strike"
+        }
+      },
+      "hint": {
+        "event": "absorbed",
+        "field": "by",
+        "text": "Your counter cuts both ways"
+      }
+    },
+    {
+      "id": "interpose",
+      "step": 3,
+      "name": "Interpose",
+      "card": "Dodge toward your partner to guard at their side.",
+      "button": "dodge",
+      "reach": 160.0,
+      "redirect": 100.0,
+      "hint": {
+        "event": "guarded",
+        "field": "id",
+        "text": "Dodge toward your partner to guard them"
+      }
+    }
+  ]
+}

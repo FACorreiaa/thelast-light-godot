@@ -62,6 +62,8 @@ var dodge_buffer: int = 0
 ## Set of ids already hit by the current swing (keys only).
 var hit_ids: Dictionary = {}
 var since_hit: int = 0
+## Port-only: how far along its ability track this hero is (Progression); 0 for everyone else.
+var step: int = 0
 
 
 static func make(p_id: int, p_kind: String, p_team: String, p_spec: Specs.FighterSpec, p_pos: Vec2,
@@ -125,6 +127,7 @@ func copy() -> Fighter:
 	f.dodge_buffer = dodge_buffer
 	f.hit_ids = hit_ids.duplicate()
 	f.since_hit = since_hit
+	f.step = step
 	return f
 
 
@@ -229,7 +232,15 @@ func to_canon() -> Dictionary:
 		"patrolFrames": patrol_frames, "strandedFrames": stranded_frames, "lastSafe": last_safe,
 		"attackBuffer": attack_buffer, "jumpBuffer": jump_buffer, "dodgeBuffer": dodge_buffer,
 		"hitIDs": Canon.int_set(hit_ids), "sinceHit": since_hit,
-	}
+	}.merged(_port_canon())
+
+
+## Port-only state, written only when it differs from its default, so a step-0 run hashes as it always has.
+func _port_canon() -> Dictionary:
+	var out := {}
+	if step != 0:
+		out["step"] = step
+	return out
 
 
 static func team_of(k: String) -> String:
