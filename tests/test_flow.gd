@@ -384,6 +384,22 @@ func _progression() -> void:
 	check(app.scene.earned_step == 1, "beating the Protocol earns step 1 (%d)" % app.scene.earned_step)
 	var names: Array = (results[-1].get("unlocks", []) as Array).map(func(u: Dictionary) -> String: return u.name) if not results.is_empty() else []
 	check(names == ["Riposte", "Follow-Through"], "the results list the lead's unlock, then Orion's: %s" % [names])
+	await create_timer(1.6).timeout
+	var texts: Array = []
+	for l: Label in app.menu_root.find_children("*", "Label", true, false):
+		texts.append(l.text)
+	check(texts.has("NEW ABILITY") and texts.has("Riposte") and texts.has("Follow-Through"), "the results screen shows the NEW ABILITY cards")
+	# The first parry at step 1 shows Riposte's hint once.
+	app.scene.play_level(protocol)
+	app.screen = GameApp.Screen.PLAYING
+	var me: Fighter = app.scene.world.controlled()
+	var parried := [{"case": "parried", "by": me.id, "attacker": -1, "at": me.pos.copy()}]
+	app.scene.hud.hint.text = ""
+	app.scene._react(parried)
+	check(app.scene.hud.hint.text == "Attack now: Riposte" and app.scene.seen.has("caelen.riposte"), "the first parry shows Riposte's hint (%s)" % app.scene.hud.hint.text)
+	app.scene.hud.hint.text = ""
+	app.scene._react(parried)
+	check(app.scene.hud.hint.text == "", "and only once")
 	app.scene.play_level(protocol)
 	app.scene._complete_level()
 	check((results[-1].get("unlocks", []) as Array).is_empty(), "replaying the Protocol unlocks nothing new")

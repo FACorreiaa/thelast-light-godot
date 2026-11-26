@@ -464,6 +464,19 @@ func _results_screen() -> void:
 		pad.add_theme_constant_override("margin_top", 2)
 		pad.add_child(ending)
 		left.add_child(pad)
+	# Abilities this chapter's boss unlocked (Progression): one card each, the lead's first.
+	for u: Dictionary in r.get("unlocks", []):
+		var card := _vbox(2)
+		var cpad := MarginContainer.new()
+		cpad.add_theme_constant_override("margin_top", 6)
+		card.add_child(UI.label("NEW ABILITY", 11, GOLD, "heavy", 3))
+		card.add_child(UI.label(String(u.name), 20, Color.WHITE, "black"))
+		var line := UI.label(String(u.card), 13, Color(1, 1, 1, 0.75))
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		card.add_child(line)
+		card.add_child(UI.label(String(u.button).to_upper(), 11, CYAN, "heavy", 2))
+		cpad.add_child(card)
+		left.add_child(cpad)
 	var stats := _hbox(22)
 	var total := int(round(float(r.seconds)))
 	stats.add_child(_stat("TIME", "%d:%02d" % [total / 60, total % 60]))

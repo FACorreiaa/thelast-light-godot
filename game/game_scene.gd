@@ -1181,6 +1181,28 @@ func _toggle_mode() -> void:
 		hud.announce("TRAINING ROOM")
 
 
+## The first time an unlocked ability's moment comes for the hero in hand (Progression: its hint's event, by that
+## hero), a one-line hint; once per ability per run.
+func _ability_hint(e: Dictionary) -> void:
+	if demo or world == null:
+		return
+	var me := world.controlled()
+	if me == null or me.step <= 0:
+		return
+	for a: Dictionary in Progression.load_default().abilities(me.kind):
+		var h: Dictionary = a.get("hint", {})
+		if h.is_empty() or String(h.event) != String(e.case) or not Progression.has(me, String(a.id)):
+			continue
+		if int(e.get(String(h.field), -1)) != me.id or (h.has("index") and int(e.get("index", -1)) != int(h.index)):
+			continue
+		var key := "%s.%s" % [me.kind, a.id]
+		if seen.has(key):
+			continue
+		seen.append(key)
+		hud.show_hint(String(h.text))
+		_save_progress()
+
+
 func _show_hint() -> void:
 	if demo:
 		hud.show_hint("DEMO")
@@ -1218,6 +1240,7 @@ static func boss_title(kind: String) -> Array:
 
 func _react(events: Array) -> void:
 	for e: Dictionary in events:
+		_ability_hint(e)
 		var c: String = e["case"]
 		match c:
 			"hit":

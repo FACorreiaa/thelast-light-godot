@@ -964,6 +964,9 @@ func _animate_weapon(f: Fighter) -> void:
 					_draw_streak(a.reach, a.y_offset + a.height / 2.0, 3.0 if kind == "nimue" else 6.0)
 				else:
 					_draw_arc(from, to, _weapon_length())
+					# Port-only: an ability swing that cuts both ways (Full Arc, Answer for Both) shows behind too.
+					if f.slot != "" and a.both_sides:
+						_draw_arc(from, to, _weapon_length(), true)
 		_:
 			var t := (fr - float(a.windup + a.active)) / float(maxi(a.recovery, 1))
 			weapon_pivot.rotation = to + (rest - to) * t * t
@@ -978,11 +981,14 @@ func _draw_streak(length: float, y: float, width: float) -> void:
 	Sk.fade_out_and_free(streak, 0.18)
 
 
-func _draw_arc(from: float, to: float, radius: float) -> void:
+func _draw_arc(from: float, to: float, radius: float, mirrored := false) -> void:
 	var p := SkPath.new().add_arc(Vector2.ZERO, radius, from + PI / 2.0, to + PI / 2.0, to < from)
 	var arc := SkShape.make(p, CLEAR, rim, 7, 5)
 	arc.round_cap = true
 	arc.position = weapon_pivot.position
+	if mirrored:
+		arc.position.x = -arc.position.x
+		arc.scale.x = -1.0
 	Sk.z(arc, 5)
 	arc.alpha = 0.85
 	figure.add_child(arc)
