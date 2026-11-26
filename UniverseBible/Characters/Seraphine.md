@@ -19,6 +19,8 @@ Planned lead for the Dawnfaith opening (plan, stage 4). **LOCKED:** keeps her na
   and the Cinder King's ledgers carry the Dawnfaith's seal (WC-016, WC-018, DEC-013).
 - At the Eclipse Engine: "The sky is darker over it. Even the corona looks tired." To the AI's voice: "The Oracle
   wanted everyone still. So do you. Neither of you asked." (WC-028, DEC-020; says nothing of who the Oracle is to her)
+- Her epilogue (ALTERNATE, DEC-021): "Home, with a Foundry machine beside me and the old records in my bag. Let
+  them sing or not."
 
 ## Personality (PROPOSED)
 

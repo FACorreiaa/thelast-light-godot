@@ -299,12 +299,14 @@ Speaker label in the dialogue box: **"VOICE"**, so the AI is not given a name.
     the AI speaking changes nothing it says. Rejected alternative: "The Engine is still. Its maker is not." It
     would say the AI survives, which stays UNKNOWN.)
 
-The personal epilogues are DRAFT-014, below.
+The personal epilogues are below (DEC-021).
 
-## Draft: the personal epilogues (DRAFT-014, PROPOSED)
+## The personal epilogues (DRAFT-014, approved as DEC-021; ALTERNATE)
 
-Claim 10's directions are approved (DEC-019, ALTERNATE: player continuity). Everything in this section is a
-proposal; nothing here is in the game. Each scene plays after the chapter-end line, for its lead only. Guards: no
+Claim 10's directions are approved (DEC-019, ALTERNATE: player continuity). Creator, 2026-11-25: "Approved": all
+nine lines as listed, the flagged ones in their listed form (DEC-021). In the game: scene `engine.epilogue` in
+`data/story/chapter4.json`, set as Chapter 4's `"epilogue"` in `index.json`; it plays when the player leaves the
+chapter's results screen, whichever button they press, every time the chapter is finished. Each scene plays after the chapter-end line, for its lead only. Guards: no
 line says what any of them becomes later, whether the decline can be reversed, or what the Foundry or the
 Dawnfaith will do; Orion claims only what he knows (WC-014); the Foundry's people stay distinct from its AI.
 

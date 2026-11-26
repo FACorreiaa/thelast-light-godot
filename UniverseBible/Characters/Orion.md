@@ -18,6 +18,7 @@
 - He meets each lead differently in their opening, and always asks the same thing: walk beside, or ahead (DEC-012).
 - After the AI speaks at the Engine: "I cannot tell you it is wrong. I can tell you it never asked." (beside) or "It
   is certain. I told you to watch the certain ones." (ahead) (WC-028, DEC-020)
+- He speaks in every lead's epilogue, by the trust choice (ALTERNATE, DEC-021; lines in `Games/TheLastLight2D.md`).
 
 ## Personality (PROPOSED)
 

@@ -19,6 +19,7 @@ Planned lead for the Lantern Cities opening (plan, stage 4).
 - The Cinder King calls her routes his roads and says she never pays the toll (WC-017, DEC-013).
 - At the Eclipse Engine: "A whole city under the water, and they built on top of it." To the AI's voice: "You put a
   price on everyone and never asked if they'd sell." (WC-028, DEC-020)
+- Her epilogue (ALTERNATE, DEC-021): "Pass it down every route: the way is open. Another road nobody charges for."
 
 ## Personality (PROPOSED)
 

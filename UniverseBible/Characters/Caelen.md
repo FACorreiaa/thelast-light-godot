@@ -18,6 +18,8 @@
 - In the Cinder King's ledgers he finds Foundry seals beside everyone else's (WC-018, DEC-013).
 - At the Eclipse Engine: "They never finished it. Something is still building." To the AI's voice: "Maybe the light
   is going. That was never yours to decide for us." (WC-028, DEC-020)
+- His epilogue (ALTERNATE, DEC-021): "The Foundry measured the light for years. Now they'll hear what was being
+  built while they counted."
 
 ## Personality (PROPOSED)
 
