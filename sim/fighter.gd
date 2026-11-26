@@ -68,6 +68,8 @@ var step: int = 0
 ## `attack_index` then names the kit swing it is drawn like.
 var slot: String = ""
 var slot_attack: Specs.AttackSpec = null
+## Port-only: frames left in which an attack press is a Riposte (Caelen, after a parry).
+var riposte_frames: int = 0
 
 
 static func make(p_id: int, p_kind: String, p_team: String, p_spec: Specs.FighterSpec, p_pos: Vec2,
@@ -134,6 +136,7 @@ func copy() -> Fighter:
 	f.step = step
 	f.slot = slot
 	f.slot_attack = slot_attack
+	f.riposte_frames = riposte_frames
 	return f
 
 
@@ -252,6 +255,8 @@ func _port_canon() -> Dictionary:
 	var out := {}
 	if step != 0:
 		out["step"] = step
+	if riposte_frames != 0:
+		out["riposteFrames"] = riposte_frames
 	return out
 
 

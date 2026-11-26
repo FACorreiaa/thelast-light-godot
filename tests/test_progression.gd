@@ -40,6 +40,7 @@ func _init() -> void:
 	t = Tuning.load_default()
 	_data()
 	_finishers()
+	_riposte()
 	print("progression: %d checks, %d failed" % [checks, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -123,3 +124,46 @@ func _finishers() -> void:
 			check(g.slice(0, 3) == [0, 1, "follow_through"], "Orion at step 1 chains 0, 1, Follow-Through: %s" % [g])
 		else:
 			check(g.all(func(x: Variant) -> bool: return x is int), "Orion at step 0 has no Follow-Through: %s" % [g])
+
+
+## Caelen and a forged soldier whose slash lands next frame; Caelen presses attack on that frame, so it is parried.
+## Returns the world just after the parry, or null if there was none.
+func _parried(step: int) -> World:
+	var w := World.from_level(arena([["forgedSoldier", 470]]), "caelen", t, 1, -1, {}, {"caelen": step})
+	w.step(InputFrame.neutral())
+	var s: Fighter = null
+	for f: Fighter in w.fighters:
+		if f.kind == "forgedSoldier":
+			s = f
+	s.awake = true
+	s.facing = -1.0
+	s.pos.x = w.controlled().pos.x + 60.0
+	s.enter_attack(0)
+	s.state_frame = s.current_attack().windup - 1
+	for i in 3:
+		for e: Dictionary in w.step(InputFrame.make(0.0, false, false, true)):
+			if e.case == "parried" and e.by == w.controlled_id:
+				return w
+	return null
+
+
+## The hero's next swing within `frames` frames, pressing attack only from frame `from` on.
+func _next_swing(w: World, frames: int, from := 0) -> Variant:
+	for i in frames:
+		for e: Dictionary in w.step(InputFrame.make(0.0, false, false, i >= from)):
+			if e.case == "swing" and e.id == w.controlled_id:
+				return e.get("slot", e.index)
+	return null
+
+
+func _riposte() -> void:
+	var w := _parried(1)
+	check(w != null, "the forced slash is parried")
+	if w != null:
+		check(str(_next_swing(w, 60)) == "riposte", "at step 1, attacking after a parry is a Riposte")
+	var w0 := _parried(0)
+	if w0 != null:
+		check(_next_swing(w0, 60) is int, "at step 0 it is the next swing of the chain")
+	var late := _parried(1)
+	if late != null:
+		check(_next_swing(late, 120, 60) is int, "60 frames after the parry, the window is gone")

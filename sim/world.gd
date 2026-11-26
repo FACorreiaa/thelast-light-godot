@@ -461,9 +461,13 @@ func _update(f: Fighter, inp: InputFrame, events: Array) -> bool:
 			if f.state_frame == a.windup and not a.is_strike():
 				f.pending_effect = i
 			if not f.spec.boss and f.state_frame >= a.chain_from() and f.attack_buffer > 0 and f.on_ground \
-					and f.slot == "" and (i + 1 < f.spec.attacks.size() or _finisher_id(f) != ""):
-				# Port-only: past the kit's last swing, an unlocked finisher (Progression). Ability swings never chain.
-				if i + 1 < f.spec.attacks.size():
+					and f.slot == "" and (f.riposte_frames > 0 or i + 1 < f.spec.attacks.size() or _finisher_id(f) != ""):
+				# Port-only: just after a parry, a Riposte; past the kit's last swing, an unlocked finisher
+				# (Progression). Ability swings never chain.
+				if f.riposte_frames > 0:
+					f.riposte_frames = 0
+					_start_slot(f, "riposte", inp, events)
+				elif i + 1 < f.spec.attacks.size():
 					_start_attack(f, i + 1, inp, events)
 				else:
 					_start_slot(f, _finisher_id(f), inp, events)
@@ -504,6 +508,9 @@ func _update(f: Fighter, inp: InputFrame, events: Array) -> bool:
 						f.wants_special = true
 			elif _can_dodge(f):
 				_start_dodge(f, inp, events)
+			elif f.attack_buffer > 0 and f.riposte_frames > 0:
+				f.riposte_frames = 0
+				_start_slot(f, "riposte", inp, events)
 			elif f.attack_buffer > 0 and not f.spec.attacks.is_empty():
 				var idx := mini(f.next_attack, f.spec.attacks.size() - 1) if f.spec.boss or f.spec.chooses_attacks else 0
 				_start_attack(f, idx, inp, events)
@@ -527,6 +534,8 @@ func _update(f: Fighter, inp: InputFrame, events: Array) -> bool:
 		f.dodge_buffer -= 1
 	if f.special_buffer > 0:
 		f.special_buffer -= 1
+	if f.riposte_frames > 0:
+		f.riposte_frames -= 1
 	return explodes
 
 
@@ -1254,6 +1263,9 @@ func _land(attack: Specs.AttackSpec, a: int, t: int, contact: Vec2, events: Arra
 		fighters[a].vel.x = -attacker.facing * 120.0
 		hit_stop = maxi(hit_stop, tuning.parry_hit_stop)
 		events.append({"case": "parried", "by": target.id, "attacker": attacker.id, "at": contact})
+		# Port-only: Caelen's Riposte (Progression) opens a window for a heavy counter-cut.
+		if target.step > 0 and Progression.has(target, "riposte"):
+			fighters[t].riposte_frames = int(Progression.load_default().ability(target.kind, "riposte").window)
 		return
 
 	var from_front := (attacker.pos.x - target.pos.x) * target.facing >= 0.0
