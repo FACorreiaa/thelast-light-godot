@@ -452,7 +452,7 @@ func _update(f: Fighter, inp: InputFrame, events: Array) -> bool:
 				f.enter(Fighter.St.IDLE if f.on_ground else Fighter.St.AIR)
 		Fighter.St.ATTACK:
 			var i := f.attack_index
-			var a := f.spec.attacks[i]
+			var a := f.current_attack()
 			if f.on_ground:
 				var moving := f.state_frame < a.windup + a.active and not (a.holds_still and f.state_frame < a.windup)
 				f.vel.x = f.facing * a.lunge if moving else 0.0
@@ -460,9 +460,13 @@ func _update(f: Fighter, inp: InputFrame, events: Array) -> bool:
 				f.vel.x = 0.0
 			if f.state_frame == a.windup and not a.is_strike():
 				f.pending_effect = i
-			if not f.spec.boss and f.state_frame >= a.chain_from() and f.attack_buffer > 0 \
-					and i + 1 < f.spec.attacks.size() and f.on_ground:
-				_start_attack(f, i + 1, inp, events)
+			if not f.spec.boss and f.state_frame >= a.chain_from() and f.attack_buffer > 0 and f.on_ground \
+					and f.slot == "" and (i + 1 < f.spec.attacks.size() or _finisher_id(f) != ""):
+				# Port-only: past the kit's last swing, an unlocked finisher (Progression). Ability swings never chain.
+				if i + 1 < f.spec.attacks.size():
+					_start_attack(f, i + 1, inp, events)
+				else:
+					_start_slot(f, _finisher_id(f), inp, events)
 			elif f.state_frame >= a.windup + a.active and _can_dodge(f):
 				_start_dodge(f, inp, events)
 			elif f.state_frame >= a.total():
@@ -538,6 +542,33 @@ func _start_attack(f: Fighter, index: int, inp: InputFrame, events: Array) -> vo
 	f.swing_scale = 1.0
 	f.enter_attack(index)
 	events.append({"case": "swing", "id": f.id, "index": index})
+
+
+## Port-only: starts ability `id`'s own swing (Progression), drawn like the kit swing its `pose` names.
+func _start_slot(f: Fighter, id: String, inp: InputFrame, events: Array) -> void:
+	var p := Progression.load_default()
+	var pose := int(p.ability(f.kind, id).get("pose", 0))
+	if absf(inp.move_x) > 0.01:
+		f.facing = 1.0 if inp.move_x > 0.0 else -1.0
+	f.attack_buffer = 0
+	f.hit_ids = {}
+	f.swing_scale = 1.0
+	f.enter_attack(pose)
+	f.slot = id
+	f.slot_attack = p.slot(f.kind, id)
+	events.append({"case": "swing", "id": f.id, "index": pose, "slot": id})
+
+
+## Port-only: the unlocked swing that ends `f`'s chain, or "".
+static func _finisher_id(f: Fighter) -> String:
+	if f.step <= 0:
+		return ""
+	match f.kind:
+		"caelen":
+			return "full_arc" if Progression.has(f, "full_arc") else ""
+		"orion":
+			return "follow_through" if Progression.has(f, "follow_through") else ""
+	return ""
 
 
 func _start_dodge(f: Fighter, inp: InputFrame, events: Array) -> void:

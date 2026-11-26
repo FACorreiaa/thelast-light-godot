@@ -64,6 +64,10 @@ var hit_ids: Dictionary = {}
 var since_hit: int = 0
 ## Port-only: how far along its ability track this hero is (Progression); 0 for everyone else.
 var step: int = 0
+## Port-only: the ability swing in progress (Progression), by id, or "" for a swing from the kit's own list.
+## `attack_index` then names the kit swing it is drawn like.
+var slot: String = ""
+var slot_attack: Specs.AttackSpec = null
 
 
 static func make(p_id: int, p_kind: String, p_team: String, p_spec: Specs.FighterSpec, p_pos: Vec2,
@@ -128,6 +132,8 @@ func copy() -> Fighter:
 	f.hit_ids = hit_ids.duplicate()
 	f.since_hit = since_hit
 	f.step = step
+	f.slot = slot
+	f.slot_attack = slot_attack
 	return f
 
 
@@ -145,7 +151,9 @@ func hurtbox() -> Box:
 
 ## The swing in progress, or null.
 func current_attack() -> Specs.AttackSpec:
-	return spec.attacks[attack_index] if state == St.ATTACK else null
+	if state != St.ATTACK:
+		return null
+	return slot_attack if slot_attack != null else spec.attacks[attack_index]
 
 
 func attack_phase() -> Phase:
@@ -203,6 +211,8 @@ func enter(new_state: St, duration: int = 0) -> void:
 	state = new_state
 	state_frame = 0
 	state_duration = duration
+	slot = ""
+	slot_attack = null
 
 
 func enter_attack(index: int) -> void:
@@ -212,6 +222,8 @@ func enter_attack(index: int) -> void:
 
 func state_canon() -> Variant:
 	if state == St.ATTACK:
+		if slot != "":
+			return {"case": "attack", "_0": attack_index, "slot": slot}
 		return {"case": "attack", "_0": attack_index}
 	return STATE_NAMES[state]
 
