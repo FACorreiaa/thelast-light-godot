@@ -974,8 +974,11 @@ static func partner(me: Fighter, foes: Array[Fighter], allies: Array[Fighter], t
 		if absf(ldx) > 20.0 and absf(ldx) <= float(Progression.load_default().ability(me.kind, "interpose").reach):
 			for foe: Fighter in foes:
 				var swing := foe.current_attack()
+				# Only when the swing lands after the dodge, so Orion is already guarding when it does.
+				var lands_in := swing.windup - foe.state_frame if swing != null else 0
+				var dodge_frames := me.spec.dodge.duration if me.spec.dodge != null else 0
 				if swing != null and swing.is_strike() and foe.attack_phase() == Fighter.Phase.WINDUP \
-						and swing.windup - foe.state_frame <= 10 \
+						and lands_in > dodge_frames and lands_in <= dodge_frames + 12 \
 						and absf(foe.pos.x - leader.pos.x) < leader.spec.width / 2.0 + foe.spec.width / 2.0 + swing.reach + 30.0:
 					return InputFrame.make(1.0 if ldx > 0.0 else -1.0, false, false, false, true)
 
@@ -1077,6 +1080,9 @@ static func partner(me: Fighter, foes: Array[Fighter], allies: Array[Fighter], t
 			return _mv(dir * FACING_NUDGE)
 		if absf(dx) > _strike_distance(me, target):
 			return _mv(dir)
+		# Port-only: with a finisher unlocked (Progression), a swing already started is carried through the chain.
+		if me.step > 0 and me.state == Fighter.St.ATTACK and me.slot == "" and World._finisher_id(me) != "":
+			return _mv(dir * FACING_NUDGE, true)
 		if me.ai_cooldown == 0:
 			me.ai_cooldown = rng.int_closed(tuning.partner_attack_gap.lower, tuning.partner_attack_gap.upper)
 			return _mv(dir * FACING_NUDGE, true)

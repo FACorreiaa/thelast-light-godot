@@ -44,6 +44,7 @@ func _init() -> void:
 	_break_guard()
 	_counter()
 	_interpose()
+	_partner_finishers()
 	print("progression: %d checks, %d failed" % [checks, failed])
 	quit(1 if failed > 0 else 0)
 
@@ -388,11 +389,16 @@ func _interpose() -> void:
 	var foe := w.fighters[w.index_of(sid)]
 	foe.awake = true
 	foe.enter_attack(0)
-	foe.state_frame = foe.current_attack().windup - 8
+	# The slash lands 20 frames from now: after Orion's 16-frame dodge, so he is guarding when it does.
+	foe.state_frame = foe.current_attack().windup - 20
 	var foes: Array[Fighter] = [foe]
 	var allies: Array[Fighter] = [c, orion]
 	var got := Brains.partner(orion.copy(), foes, allies, t, SeededRandom.new(7))
 	check(got.dodge and got.move_x > 0.0, "the partner brain dodges toward a threatened lead at step 3")
+	# 8 frames out it would arrive after the hit: no Interpose.
+	foe.state_frame = foe.current_attack().windup - 8
+	var late := Brains.partner(orion.copy(), foes, allies, t, SeededRandom.new(7))
+	check(not (late.dodge and late.move_x > 0.0), "too late to arrive in time, it does not interpose")
 	var outs: Array = []
 	for st in [0, 2]:
 		var me := orion.copy()
@@ -401,3 +407,26 @@ func _interpose() -> void:
 		var inp := Brains.partner(me, foes, allies, t, rng)
 		outs.append([rng.state, inp.move_x, inp.dodge, inp.special])
 	check(outs[0] == outs[1], "below step 3 the partner brain is unchanged, random draws included: %s" % [outs])
+
+
+## The AI partner finishes its chain once a finisher is unlocked; at step 0 it fights as today.
+func _partner_finishers() -> void:
+	# A dummy the brains treat as a foe: mortal and sturdy, in a tuning of this test's own.
+	var tt := Tuning.load_default()
+	tt.dummy.immortal = false
+	tt.dummy.max_hp = 100000.0
+	for st in [1, 0]:
+		var w := World.from_level(arena([["dummy", 230]], true), "caelen", tt, 1, -1, {}, {"caelen": st, "orion": st})
+		var oid := -1
+		for f: Fighter in w.fighters:
+			if f.kind == "orion":
+				oid = f.id
+		var finishers := 0
+		for i in 600:
+			for e: Dictionary in w.step(InputFrame.neutral()):
+				if e.case == "swing" and e.id == oid and e.get("slot", "") == "follow_through":
+					finishers += 1
+		if st == 1:
+			check(finishers > 0, "AI Orion at step 1 reaches Follow-Through (%d)" % finishers)
+		else:
+			check(finishers == 0, "AI Orion at step 0 has none")
