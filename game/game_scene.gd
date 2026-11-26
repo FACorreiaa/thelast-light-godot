@@ -509,7 +509,7 @@ func _build_backdrop() -> void:
 		_build_frame_machines(width)
 
 
-## Placeholder figures (pixels await the creator's verdict): builder machines clinging to the pillars of the
+## Figures accepted by the creator ("looks good", 2026-11-26): builder machines clinging to the pillars of the
 ## Engine's frame, dark until the AI speaks through every one of them at once (voice A, DEC-020). Drawing only;
 ## the simulation never sees them.
 func _build_frame_machines(width: float) -> void:

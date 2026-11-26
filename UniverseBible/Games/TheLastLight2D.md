@@ -260,7 +260,7 @@ Orion, and say nothing about what the finished Engine would do.
   placing it anywhere; echoes the Protocol being "only a voice" (WC-019) but is the AI itself this time. New claim:
   the AI can speak through any of its machines. Tension to weigh: WC-027 says the Engine then stands "silent";
   machines on its frame speaking strains that. Left open by DEC-020. In the game, builder machines cling to the
-  pillars behind the Heart's arena (background only, placeholder figures awaiting a pixel verdict); their red eyes
+  pillars behind the Heart's arena (background only; figures accepted by the creator, "looks good", 2026-11-26); their red eyes
   light together while each VOICE line is on screen and go dark after.
 - **B. From the Heart's broken core.** The words come from the ruin. *Consequences:* simpler to stage, but it hints
   the AI lives in the Heart, which edges toward "does it survive?" (UNKNOWN).
