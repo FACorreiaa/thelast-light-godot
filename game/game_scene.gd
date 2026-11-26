@@ -28,6 +28,14 @@ var world: World
 var pilot := Autopilot.new()
 var lead := "caelen"
 var level_index := 0
+## The lead's step on the ability track, earned at the Chapter 1-3 bosses (Progression); saved per lead.
+var earned_step := 0
+## Abilities whose one-time hint has shown, as "<kind>.<id>"; saved per lead, reset by a New Game.
+var seen: Array[String] = []
+## --steps N: play every level at step N (for checking a step without earning it); -1 when not given.
+var steps_override := -1
+## The abilities the last level's completion unlocked, for the results screen.
+var _unlocks: Array = []
 var show_debug := false
 var screen_shake := true
 var story: StoryPresenter
@@ -119,7 +127,13 @@ func _ready() -> void:
 	var saved_lead := String(saved.get_value("progress", "lead", "caelen"))
 	lead = _arg(args, "--lead", "caelen" if demo else saved_lead)
 	_levels = route(lead)
-	var saved_level := resume_index(_levels, route(lead, true), String(saved.get_value("progress", "level", "")))
+	var saved_id := String(saved.get_value("progress", "level", ""))
+	var saved_level := resume_index(_levels, route(lead, true), saved_id)
+	# A save from before progression has no step: it gets the step of the chapter it is in.
+	var migrated := Progression.chapter_step(saved_id) if lead == saved_lead else 0
+	earned_step = int(saved.get_value("progress", "steps_" + lead, migrated))
+	seen.assign(saved.get_value("progress", "seen_" + lead, []))
+	steps_override = int(_arg(args, "--steps", "-1"))
 	var asked := _arg(args, "--level", "")
 	level_index = clampi(int(asked) if asked != "" else (0 if demo else saved_level), 0, _levels.size() - 1)
 	world = _make_world(1, -1, {})
@@ -218,8 +232,19 @@ func _make_world(seed: int, from_checkpoint: int, collected: Dictionary) -> Worl
 	var t := Tuning.load_default()
 	t.hero_damage_scale = settings.damage_taken()
 	if mode == Mode.ROOM:
-		return World.partner_slice(seed, t)
-	return World.from_level(Level.load_id(_levels[level_index]), lead, t, seed, from_checkpoint, collected)
+		var s := earned_step if steps_override < 0 else steps_override
+		return World.partner_slice(seed, t, {"caelen": s, "orion": s})
+	var id := _levels[level_index]
+	var step := Progression.chapter_step(id) if demo else effective_step(earned_step, id, steps_override)
+	return World.from_level(Level.load_id(id), lead, t, seed, from_checkpoint, collected, {lead: step, "orion": step})
+
+
+## The step a level is played at: `override` (--steps) when given, else what was earned, but never below the
+## level's chapter step, so jumping ahead never means the base kit.
+static func effective_step(earned: int, level_id: String, override: int) -> int:
+	if override >= 0:
+		return override
+	return maxi(earned, Progression.chapter_step(level_id))
 
 
 ## Points per pixel for the HUD: the Swift scene's size is in points, about 874 x 402 on a phone.
@@ -1005,9 +1030,48 @@ func _save_progress() -> void:
 	if demo:
 		return
 	var cfg := ConfigFile.new()
+	# Other leads' steps live in the same file.
+	cfg.load(SaveDir.path("progress.cfg"))
 	cfg.set_value("progress", "lead", lead)
 	cfg.set_value("progress", "level", _levels[level_index])
+	cfg.set_value("progress", "steps_" + lead, earned_step)
+	cfg.set_value("progress", "seen_" + lead, seen)
 	cfg.save(SaveDir.path("progress.cfg"))
+
+
+## A level is cleared: a Chapter 1-3 boss earns the next step (saved before the results show), then the app or
+## the bare scene takes over.
+func _complete_level() -> void:
+	_unlocks = _grant_steps()
+	if not demo:
+		_save_progress()
+	var total := world.level.pickups.size() if world.level != null else 0
+	var next := "tap to continue" if level_index + 1 < _levels.size() else "tap to start over"
+	if not _app_takes_completion():
+		hud.show_message("CLEAR" if demo else "CLEAR   ◆ %d/%d\n%s" % [world.collected.size(), total, next])
+	else:
+		level_completed.emit(_level_result())
+
+
+## Raises the earned step when this level ends Chapter N (N at most 3); returns what that unlocked, the lead's
+## abilities first, then Orion's, as {name, card, button}.
+func _grant_steps() -> Array:
+	if demo or mode != Mode.LEVEL:
+		return []
+	var c := chapter_at(level_index)
+	var ends_chapter := level_index + 1 == int(c.start) + (c.names as Array).size()
+	var n := int(c.number)
+	if not ends_chapter or n > 3 or earned_step >= n:
+		return []
+	var old := earned_step
+	earned_step = n
+	var out: Array = []
+	var p := Progression.load_default()
+	for kind: String in [lead, "orion"]:
+		for a: Dictionary in p.abilities(kind):
+			if int(a.step) > old and int(a.step) <= earned_step:
+				out.append({"name": a.name, "card": a.card, "button": a.button})
+	return out
 
 
 func current_level() -> int:
@@ -1052,7 +1116,7 @@ func _level_result() -> Dictionary:
 	return {"name": world.level.name, "index": level_index, "chapter_number": c.number, "chapter_title": c.title,
 		"ending": c.ending if ends_chapter else "", "epilogue": c.epilogue if ends_chapter else "", "chapter_start": c.start, "is_final": level_index + 1 == _levels.size(),
 		"seconds": float(level_frames) / Tuning.FRAMES_PER_SECOND, "defeated": kills, "downs": downs,
-		"found": world.collected.size(), "hidden": world.level.pickups.size()}
+		"found": world.collected.size(), "hidden": world.level.pickups.size(), "unlocks": _unlocks}
 
 
 func apply_settings(p_settings: Settings) -> void:
@@ -1067,7 +1131,11 @@ func apply_settings(p_settings: Settings) -> void:
 func begin_as(p_lead: String) -> void:
 	lead = p_lead
 	_levels = route(lead)
+	# A New Game starts the lead's ability track over, hints included.
+	earned_step = 0
+	seen = []
 	play_level(0)
+	_save_progress()
 
 
 func play_level(index: int) -> void:
@@ -1295,12 +1363,7 @@ func _react(events: Array) -> void:
 			"levelComplete":
 				sound.play("clear")
 				haptics.rigid()
-				var total := world.level.pickups.size() if world.level != null else 0
-				var next := "tap to continue" if level_index + 1 < _levels.size() else "tap to start over"
-				if not _app_takes_completion():
-					hud.show_message("CLEAR" if demo else "CLEAR   ◆ %d/%d\n%s" % [world.collected.size(), total, next])
-				else:
-					level_completed.emit(_level_result())
+				_complete_level()
 			"swing":
 				var id: int = e["id"]
 				if id == world.boss_id:

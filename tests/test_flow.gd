@@ -360,7 +360,57 @@ func _run() -> void:
 	check(again.scene.mode == GameScene.Mode.ROOM and again.screen == GameApp.Screen.PLAYING, "the training room plays")
 	again.queue_free()
 	await _frames(2)
+	await _progression()
 	for f in ["settings.cfg", "progress.cfg", "story.json"]:
 		DirAccess.remove_absolute(SaveDir.path(f))
 	print("flow: %d checks, %d failed" % [_checks, _bad])
 	quit(1 if _bad > 0 else 0)
+
+
+## Hero progression in the app: steps are earned at the Chapter 1-3 bosses, saved per lead, migrated from old saves,
+## reset by a New Game, and kept across a restart.
+func _progression() -> void:
+	check(GameScene.effective_step(0, "heart", -1) == 3 and GameScene.effective_step(3, "awakening", -1) == 3
+		and GameScene.effective_step(3, "heart", 0) == 0, "effective steps: chapter floor, earned kept, --steps wins")
+	var app := await _launch()
+	app.begin("caelen")
+	await _frames(2)
+	check(app.scene.earned_step == 0, "a new run starts at step 0")
+	var results: Array = []
+	app.scene.level_completed.connect(func(r: Dictionary) -> void: results.append(r))
+	var protocol := GameScene.route("caelen").find("protocol")
+	app.scene.play_level(protocol)
+	app.scene._complete_level()
+	check(app.scene.earned_step == 1, "beating the Protocol earns step 1 (%d)" % app.scene.earned_step)
+	var names: Array = (results[-1].get("unlocks", []) as Array).map(func(u: Dictionary) -> String: return u.name) if not results.is_empty() else []
+	check(names == ["Riposte", "Follow-Through"], "the results list the lead's unlock, then Orion's: %s" % [names])
+	app.scene.play_level(protocol)
+	app.scene._complete_level()
+	check((results[-1].get("unlocks", []) as Array).is_empty(), "replaying the Protocol unlocks nothing new")
+	var cfg := ConfigFile.new()
+	cfg.load(SaveDir.path("progress.cfg"))
+	check(int(cfg.get_value("progress", "steps_caelen", -1)) == 1, "the step is saved for the lead")
+	# Review Focus 2: a restart keeps the step (Chapter 4 plays at least at step 3).
+	app.scene.play_level(GameScene.route("caelen").find("heart"))
+	app.scene._restart(false)
+	check(app.scene.world.controlled().step == 3, "a restart keeps the step (%d)" % app.scene.world.controlled().step)
+	app.scene.steps_override = 0
+	app.scene._restart(false)
+	check(app.scene.world.controlled().step == 0, "--steps overrides it")
+	app.scene.steps_override = -1
+	# A New Game resets the lead's step.
+	app.begin("caelen")
+	await _frames(2)
+	cfg.load(SaveDir.path("progress.cfg"))
+	check(app.scene.earned_step == 0 and int(cfg.get_value("progress", "steps_caelen", -1)) == 0, "a New Game resets the step")
+	app.queue_free()
+	await _frames(2)
+	# Review Focus 3: an old save on a Chapter 4 level, with no steps key, plays at step 3.
+	var old := ConfigFile.new()
+	old.set_value("progress", "lead", "caelen")
+	old.set_value("progress", "level", "masons_span")
+	old.save(SaveDir.path("progress.cfg"))
+	var later := await _launch()
+	check(later.scene.earned_step == 3, "an old Chapter 4 save migrates to step 3 (%d)" % later.scene.earned_step)
+	later.queue_free()
+	await _frames(2)
