@@ -38,6 +38,7 @@ decision are listed separately.
 | DRAFT-009 | 2026-11-16 | The Lock Works, a Chapter 1 puzzle level between the Machine Hall and the Warden's Gate: its name and the lead and Orion lines. | Games/TheLastLight2D, Locations |
 | DRAFT-010 | 2026-11-18 | Chapter 2 additions: the Lamplighter (mid-boss) and the Lamp Row, the Toll Canal puzzle level, and their lead and Orion lines. | Games/TheLastLight2D, Locations, Bestiary/LanternCities |
 | DRAFT-011 | 2026-11-18 | Chapter 3 additions: the Sworn (mid-boss) at the Cloister Gate, the Bell Tower puzzle level, and their lines. | Games/TheLastLight2D, Locations, Bestiary/Dawnfaith |
+| DRAFT-015 | 2026-11-26 | Hero progression abilities (gameplay, PROPOSED names and card text), numbered as in `docs/superpowers/specs/2026-11-26-hero-progression-design.md`: 1 Riposte, 2 Command: Break Guard, 3 Full Arc (Caelen); 4 Binding Bolt, 5 Light Listens: Shelter, 6 Sunburst (Seraphine); 7 Shadowstep, 8 Lantern Trick: Flare, 9 Switchback (Nimue); 10 Follow-Through, 11 Adapt: Answer for Both, 12 Interpose (Orion). The design was approved 2026-11-26; the names, cards and feel are not yet decided. In the game: 1-3 and 10-12 (slice 1). Lore flags: 5 (the Light protects as well as heals, extending "Light Listens"), 12 (Orion shields his lead; no new claim). | Games/TheLastLight2D (once decided), data/progression.json |
 
 ## How to amend
 

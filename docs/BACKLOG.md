@@ -63,7 +63,9 @@ Nothing landed in Swift after the tag except a CI change for Xcode 27, so this i
    and burst). The owner brief says all eight become playable. The cast sheet says Jax needs a new name, because a
    League of Legends champion already has it.
 3. **Progression** (spec 4.7): a short ability track per hero, unlocked by story progress, with no stat grinding.
-   Not built in Swift either.
+   Design approved 2026-11-26 (`docs/superpowers/specs/2026-11-26-hero-progression-design.md`). **Slice 1 built**
+   (Caelen and Orion, abilities 1-3 and 10-12; balance in `docs/balance/2026-11-26-progression-slice1.md`).
+   Next: the creator's feel and pixel verdicts and DRAFT-015, then slice 2 (Seraphine and Nimue, abilities 4-9).
 4. **Personal epilogues** (spec 5): done for the game's ending (Chapter 4, DEC-021). Chapters 1-3 end on a single
    line, which is how they were designed.
 5. **Bible verdicts:**
