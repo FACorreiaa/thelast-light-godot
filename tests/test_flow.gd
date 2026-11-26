@@ -340,7 +340,9 @@ func _run() -> void:
 		key.pressed = false
 		Input.parse_input_event(key)
 		Input.flush_buffered_events()
-		check(app.scene.current_level() == level_before, "a press after the epilogue does not restart the level (%d, was %d)"
+		# The epilogue's own exit may already have run (it polls every 0.1 s) and moved Continue to the chapter's start;
+		# the bug this guards against rebuilt the run's first level.
+		check(app.scene.current_level() in [level_before, int(last.start)], "a press after the epilogue does not restart the level (%d, was %d)"
 			% [app.scene.current_level(), level_before])
 		await create_timer(0.3).timeout
 	check(app.screen == GameApp.Screen.TITLE and app.scene.current_level() == int(last.start), "after the end, Continue is the last chapter again")
