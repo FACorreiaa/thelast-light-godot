@@ -495,7 +495,8 @@ func _init() -> void:
 		for lead in ["caelen", "seraphine", "nimue"]:
 			for fights in [false, true]:
 				for seed in [1, 2, 3]:
-					w = World.from_level(level, lead, t, seed)
+					var cs := Progression.chapter_step(id)
+					w = World.from_level(level, lead, t, seed, -1, {}, {lead: cs, "orion": cs})
 					var pilot := Autopilot.new(fights)
 					var drops: Array = []
 					var below := {}

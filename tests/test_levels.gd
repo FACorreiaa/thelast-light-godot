@@ -23,7 +23,9 @@ func _traverse(level_id: String, seed: int, fights: bool, lead: String) -> Dicti
 	t.caelen.max_hp = 100000.0
 	t.seraphine.max_hp = 100000.0
 	t.nimue.max_hp = 100000.0
-	var world := World.from_level(Level.load_id(level_id), lead, t, seed)
+	# Each level is played at its chapter's step (Progression), as a player arriving there would be.
+	var cs := Progression.chapter_step(level_id)
+	var world := World.from_level(Level.load_id(level_id), lead, t, seed, -1, {}, {lead: cs, "orion": cs})
 	var pilot := Autopilot.new(fights)
 	var events: Array = []
 	for i in FRAMES:

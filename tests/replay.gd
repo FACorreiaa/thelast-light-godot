@@ -64,12 +64,14 @@ static func make_world(header: Dictionary) -> World:
 		t.seraphine.max_hp = 100000.0
 		t.nimue.max_hp = 100000.0
 	t.hero_damage_scale = float(header.get("damageScale", 1.0))
+	# Port-only: the heroes' steps on their ability tracks (Progression); a trace without them is step 0.
+	var steps: Dictionary = header.get("steps", {})
 	match String(header.get("room", "level")):
 		"feel":
 			return World.feel_slice(int(header.seed), t)
 		"partner":
-			return World.partner_slice(int(header.seed), t)
-	return World.from_level(Level.load_id(header.level), header.lead, t, int(header.seed))
+			return World.partner_slice(int(header.seed), t, steps)
+	return World.from_level(Level.load_id(header.level), header.lead, t, int(header.seed), -1, {}, steps)
 
 
 func _replay(id: String) -> bool:

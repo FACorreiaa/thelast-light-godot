@@ -3,7 +3,10 @@ extends SceneTree
 ## source of truth). Same format as the Swift traces, except the events field is "#<Canon.hash_hex>" instead of
 ## oracle JSON. The autopilot drives, walking and fighting, with sturdy heroes like the Swift runs.
 ##
-##   godot --headless --path . -s res://tools/record_golden.gd -- [--levels=a,b] [--seeds=1,2]
+##   godot --headless --path . -s res://tools/record_golden.gd -- [--levels=a,b] [--seeds=1,2] [--chapter-steps]
+##
+## --chapter-steps records the heroes at their level's chapter step (Progression), as "<run>-step<N>" runs with a
+## "steps" header; without it, every run is step 0.
 ##
 ## Default: every level with eclipse phases, seed 1 (walking and fighting; boss arenas: seeds 1 and 2, fighting).
 ## Rewrites runs.json from the traces on disk.
@@ -12,10 +15,13 @@ extends SceneTree
 const DIR := "res://tests/golden_godot"
 const MAX_FRAMES := 60 * 240
 
+var _chapter_steps := false
+
 
 func _init() -> void:
 	var levels: PackedStringArray = []
 	var seeds: Array[int] = [1]
+	_chapter_steps = OS.get_cmdline_user_args().has("--chapter-steps")
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--levels="):
 			levels = a.trim_prefix("--levels=").split(",", false)
@@ -60,6 +66,11 @@ func _record(level_id: String, seed: int, fights: bool) -> void:
 	var header := {"complete": false, "damageScale": 1.0, "fights": fights, "frames": 0, "id": run_id,
 		"lead": "caelen", "level": level_id, "over": false, "room": "level", "script": "", "seed": seed,
 		"sturdy": true}
+	var cs := Progression.chapter_step(level_id) if _chapter_steps else 0
+	if cs > 0:
+		run_id += "-step%d" % cs
+		header.id = run_id
+		header.steps = {"caelen": cs, "orion": cs}
 	var world: World = load("res://tests/replay.gd").make_world(header)
 	var pilot := Autopilot.new(fights)
 	var lines: PackedStringArray = [world.state_hash()]
