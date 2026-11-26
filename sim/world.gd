@@ -564,9 +564,10 @@ func _integrate(f: Fighter, inp: InputFrame, events: Array) -> void:
 			f.vel.x = 0.0
 			blocked = true
 
-	# Port-only: a hero's lunge or dodge stops at the edge of eclipse ground that is gone or about to go,
-	# instead of carrying them over the gap. Ordinary pits keep Swift's rule.
-	if f.team == "hero" and f.vel.x != 0.0 and (f.state == Fighter.St.ATTACK or f.state == Fighter.St.DODGE) \
+	# Port-only: a hero's lunge or dodge on the ground stops at the edge of eclipse ground that is gone or about to
+	# go, instead of carrying them over the gap. In the air a swing keeps the jump's carry. Ordinary pits keep
+	# Swift's rule.
+	if f.team == "hero" and f.on_ground and f.vel.x != 0.0 and (f.state == Fighter.St.ATTACK or f.state == Fighter.St.DODGE) \
 			and level != null and level.eclipse_period > 0:
 		var edge := f.pos.x + (1.0 if f.vel.x > 0.0 else -1.0) * (half + 6.0)
 		if _eclipse_edge_unsafe(f, edge):

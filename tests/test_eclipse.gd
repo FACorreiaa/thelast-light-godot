@@ -445,6 +445,31 @@ func _init() -> void:
 	check(hero.pos.y == 300.0 and hero.pos.x < 500.0 + hero.spec.width,
 		"and a dodge stops at the ledge's edge (x %.0f, y %.0f)" % [hero.pos.x, hero.pos.y])
 
+	# The edge stop is for lunges and dodges on the ground. An attack swung in the air keeps the jump's carry, even
+	# over eclipse ground close to its swap: stopping it mid-air dropped the hero back onto a bridge about to go.
+	var air := Level.from_data({
+		"name": "Eclipse air attack", "width": 2000.0, "start": {"x": 300.0, "y": 0.0},
+		"platforms": [_plat(-200, 500, 0), _plat(500, 740, 0, 1), _plat(740, 2000, 0)],
+		"hazards": [], "levers": [], "plates": [], "gates": [], "checkpoints": [], "pickups": [], "enemies": [],
+		"partner": null, "boss": null, "twin": null, "scenes": [], "exitX": 1900.0, "killY": -260.0,
+		"eclipsePeriod": 300, "eclipseWarning": 40})
+	var stalled := -1
+	var swung := 0
+	for start in [0, 20, 40, 60, 80, 100]:
+		w = World.from_level(air, "caelen", t, 1)
+		w.controlled().pos.x = 380.0 + start
+		for i in 150 - 70:
+			w.step(InputFrame.neutral())
+		for i in 60:
+			var before := w.controlled().pos.x
+			w.step(InputFrame.make(1.0, i == 0, i < 12, i == 4))
+			hero = w.controlled()
+			if not hero.on_ground and hero.state == Fighter.St.ATTACK:
+				swung += 1
+				if hero.pos.x <= before and stalled < 0:
+					stalled = start
+	check(swung > 0 and stalled < 0, "an attack in the air keeps the jump's carry near a swap (stalled from %d, %d air-attack frames)" % [stalled, swung])
+
 	# Every level with eclipse phases, every lead, walking and fighting, a few seeds: it finishes, and no one on
 	# the heroes' side drops through a gap where eclipse ground was, except after a hit since they last stood
 	# (a knockback throws anyone over any pit, on the ground or in the air). Ordinary pits keep Swift's rules and are not counted.
